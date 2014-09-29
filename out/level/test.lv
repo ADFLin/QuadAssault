@@ -1,0 +1,6 @@
+player 100 100
+key 200 300 0
+mob 600 600 Mob.Laser
+mob 700 600 Mob.Plasma
+mob 800 600 Mob.Minigun
+
