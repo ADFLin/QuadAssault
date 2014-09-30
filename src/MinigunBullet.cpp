@@ -21,8 +21,9 @@ public:
 
 		MinigunBullet* bullet = object->cast< MinigunBullet >();
 
+		Vec2f size = Vec2f(16,32);
 		float rot= atan2( bullet->dir.y, bullet->dir.x ) + Math::toRad( 90 );
-		drawSprite( object->getPos() - Vec2f(8,16) , Vec2f(16,32) , rot , texG );
+		drawSprite( bullet->getPos() - size / 2 , size , rot , texG );
 
 	}
 	Texture* texG;
@@ -34,6 +35,7 @@ DEFINE_RENDERER( MinigunBullet , MinigunBulletRenderer )
 void MinigunBullet::init(Vec2f const& poz, Vec2f const& dir, int team )
 {
 	Bullet::init(poz,dir,team );
+
 	speed=1000;
 	domet=500;
 	mDamage=0.5;
@@ -43,7 +45,7 @@ void MinigunBullet::onSpawn()
 {
 	BaseClass::onSpawn();
 
-	light->init(mPos,128);
+	light->init( getPos() , 128 );
 	light->setColorParam(Vec3(1.0, 1.0, 0.1),12);
 
 	getLevel()->playSound("minigun1.wav");		
@@ -59,7 +61,7 @@ void MinigunBullet::tick()
 void MinigunBullet::onDestroy()
 {
 	light->destroy();
-	Explosion* e= getLevel()->createExplosion(mPos,64);
+	Explosion* e= getLevel()->createExplosion( getPos() , 64 );
 	e->setParam(4,100,80);
 	e->setColor(Vec3(1.0, 0.75, 0.5));	
 }

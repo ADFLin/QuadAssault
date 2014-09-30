@@ -27,8 +27,10 @@ enum BlockFlag
 {
 	BF_CAST_SHADOW      = 1 << 0 ,
 	BF_MOVABLE          = 1 << 1 ,
-	BF_COLLISION = 1 << 2 ,
+	BF_FLYABLE          = 1 << 2 ,
 	BF_NONSIMPLE        = 1 << 3 ,
+	BF_PASS_VIEW       = 1 << 4 ,
+	
 };
 
 struct Tile

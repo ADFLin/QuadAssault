@@ -10,13 +10,10 @@
 #include "Mob.h"
 #include "Explosion.h"
 
-#include "Laser.h"
-#include "Plasma.h"
-#include "Minigun.h"
-
 #include "RenderUtility.h"
 #include "Texture.h"
 
+bool gPlayerGodPower = true;
 
 class PlayerRenderer : public IRenderer
 {
@@ -45,6 +42,7 @@ public:
 		switch( pass )
 		{
 		case RP_DIFFUSE:
+			//Shadow
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glPushMatrix();
@@ -56,6 +54,7 @@ public:
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 			glPopMatrix();
 			glDisable(GL_BLEND);
+			//
 		case RP_NORMAL:
 			glColor3f( 1.0, 1.0, 1.0 );	
 			RenderPodlogu( pass , player );
@@ -63,23 +62,39 @@ public:
 			RenderTorzo( pass , player );	
 			glColor3f(1.0, 1.0, 1.0 );
 			break;
-
 		}
+
 
 		for(int i=0; i<4; i++)
 		{
 			Weapon* weapon = player->weaponSlot[i];
 			if( weapon )
 			{
-				Vec2f centerPos = player->getCenterPos();
+				Vec2f centerPos = player->getPos();
 
 				glPushMatrix();
 				glTranslatef( centerPos.x,centerPos.y,0 );
 				glRotatef( Math::toDegree( player->rotationAim ) + 90 ,0,0,1 );
-				glTranslatef(weapon->getPos().x ,weapon->getPos().y ,0 );
+				glTranslatef(weapon->getRenderPos().x ,weapon->getRenderPos().y ,0 );
 				weapon->render( pass );
 				glPopMatrix();
 			}
+		}
+
+		if ( pass == RP_GLOW )
+		{
+			Vec2f size = player->getSize();
+			glPushMatrix();
+			glTranslatef( player->getRenderPos().x , player->getRenderPos().y , 0 );
+			glColor3f( 0 , 1 , 0 );
+			glBegin( GL_LINE_LOOP );
+			glVertex3f( 0 , 0 , 0 );
+			glVertex3f( size.x , 0 , 0 );
+			glVertex3f( size.x , size.y , 0 );
+			glVertex3f( 0 , size.y , 0 );
+			glEnd();
+			glColor3f(1.0, 1.0, 1.0 );
+			glPopMatrix();
 		}
 	}
 
@@ -92,7 +107,7 @@ public:
 			tex=podloga_normal;
 
 		glPushMatrix();	
-		drawSprite( player->getPos() , player->getSize() , player->getRotation() ,tex);	
+		drawSprite( player->getRenderPos() , player->getSize() , player->getRotation() ,tex);	
 		glPopMatrix();
 	}
 	void RenderTorzo(RenderPass pass , Player* player )
@@ -103,7 +118,7 @@ public:
 		if(pass==RP_NORMAL)
 			tex = texturaN;	
 		glPushMatrix();	
-		drawSprite( player->getPos() , player->getSize(), player->rotationAim + Math::toRad(90) , tex );			
+		drawSprite( player->getRenderPos() , player->getSize(), player->rotationAim + Math::toRad(90) , tex );			
 		glPopMatrix();	
 	}
 
@@ -122,7 +137,7 @@ public:
 
 		tex->bind();
 
-		Vec2f centerPos = player->getCenterPos();
+		Vec2f centerPos = player->getPos();
 		float shift = player->shiftTrack;
 		Vec2f size = player->getSize();
 
@@ -176,12 +191,10 @@ Player::~Player()
 
 void Player::Init(Vec2f poz)
 {
-	this->mPos=poz;
+	setPos( poz );
+	setSize( Vec2f(64,64));
 
 	akceleracija = 0;
-
-	mSize.x=64;
-	mSize.y=64;
 
 	for(int i=0; i<4; i++)
 		weaponSlot[i]=NULL;
@@ -220,12 +233,13 @@ void Player::Update(float deltaT, Vec2f mis)
 		moment.x=cos(rad)*akceleracija;
 		moment.y=sin(rad)*akceleracija;	
 
-		mPos.y+=moment.y*brzina*deltaT;
+		Vec2f offset = ( brzina * deltaT ) * moment;
+		mPos.y += offset.y;
 		if(checkCollision())
-			mPos.y-=moment.y*brzina*deltaT;
-		mPos.x+=moment.x*brzina*deltaT;
+			mPos.y -= offset.y;
+		mPos.x += offset.x;
 		if(checkCollision())
-			mPos.x-=moment.x*brzina*deltaT;
+			mPos.x -= offset.x;
 
 		if(moment.x!=0 || moment.y!=0)
 		{
@@ -242,7 +256,7 @@ void Player::Update(float deltaT, Vec2f mis)
 
 		SudarProjektila();
 
-		Vec2f dir = mis - getCenterPos();
+		Vec2f dir = mis - getPos();
 		rotationAim = atan2( dir.y , dir.x );
 
 		if(mIsDead==false)
@@ -269,13 +283,13 @@ void Player::Update(float deltaT, Vec2f mis)
 			hp=0.0;
 			mIsDead=true;
 
-			Explosion* e= getLevel()->createExplosion( getCenterPos(),512 );
+			Explosion* e= getLevel()->createExplosion( getPos(),512 );
 			e->setParam(256,3000,200);
 
-			getLevel()->playSound("explozija1.wav");		
+			getLevel()->playSound("explosion1.wav");		
 
 			Message* gameOverMsg = new Message();
-			gameOverMsg->init("Base", "Svim jedinicama, izgubili smo kod Q.", 4, "blip.wav" );
+			gameOverMsg->init("Base", "All units lost, mission Failed." , 4, "blip.wav" );
 			getLevel()->addMessage( gameOverMsg );	
 
 			light->setColorParam(Vec3(0,0,0), 0);
@@ -294,7 +308,7 @@ void Player::updateHeadlight()
 	Vec2f offset;
 	offset.x=cos( rotationAim );
 	offset.y=sin( rotationAim );
-	light->changePos(getCenterPos()+ 34 * offset);
+	light->setPos(getPos()+ 34 * offset);
 }
 
 void Player::DodajMoment(float x)
@@ -303,42 +317,44 @@ void Player::DodajMoment(float x)
 }
 
 
-void Player::Shoot(Vec2f posTaget, float deltaT)
+void Player::shoot( Vec2f const& posTaget )
 {
-	if( !mIsDead )
-	{
-		Vec2f dir = posTaget - getCenterPos();
-		Math::normalize( dir );
+	if( mIsDead )
+		return;
 
-		for(int i=0; i<4; i++)
-		{		
-			if( weaponSlot[i] == NULL )
-				continue;
+	Vec2f dir = posTaget - getPos();
+	Math::normalize( dir );
 
-			if(energy>=weaponSlot[i]->getEnergyCast())
-			{
-				Vec2f offset = weaponSlot[i]->getPos();
+	for(int i=0; i<4; i++)
+	{		
+		if( weaponSlot[i] == NULL )
+			continue;
 
-				float angle = rotationAim + atan2(offset.y,offset.x) + Math::toRad( 90 );
+		if(energy>=weaponSlot[i]->getEnergyCast())
+		{
+			Vec2f offset = weaponSlot[i]->getPos();
 
-				Vec2f slotDir;
-				slotDir.x = cos( angle );
-				slotDir.y = sin( angle );
-				weaponSlot[i]->fire(getCenterPos()+ sqrt( offset.length2() ) * slotDir ,dir,TEAM_PLAYER);
-				haveShoot=true;
-			}
+			float angle = rotationAim + atan2(offset.y,offset.x) + Math::toRad( 90 );
+
+			Vec2f slotDir;
+			slotDir.x = cos( angle );
+			slotDir.y = sin( angle );
+			weaponSlot[i]->fire( getPos() + sqrt( offset.length2() ) * slotDir , dir , TEAM_PLAYER );
+			haveShoot=true;
 		}
 	}
+
 }
 bool Player::checkCollision()
 {
 	Rect bBox;
-	bBox.min=mPos+Vec2f(4,4);
-	bBox.max=mPos+mSize-Vec2f(4,4);
+	calcBoundBox( bBox );
+	bBox.min += Vec2f(4,4);
+	bBox.max -= Vec2f(4,4);
 
 	TileMap& terrian = getLevel()->getTerrain();
 
-	if ( getLevel()->testTerrainCollision( bBox ) )
+	if ( getLevel()->testTerrainCollision( bBox , BF_MOVABLE ) )
 		return true;
 
 	for( MobList::iterator iter = getLevel()->getMobs().begin() , itEnd = getLevel()->getMobs().end();
@@ -346,10 +362,9 @@ bool Player::checkCollision()
 	{
 		Mob* mob = *iter;
 
-		Rect k2;
-		k2.min = mob->getPos();
-		k2.max = mob->getPos()+mob->getSize();
-		if( bBox.intersect(k2) )
+		Rect bBoxOther;
+		mob->calcBoundBox( bBoxOther );
+		if( bBox.intersect(bBoxOther) )
 			return true;		
 	}
 
@@ -357,19 +372,20 @@ bool Player::checkCollision()
 }
 void Player::SudarProjektila()
 {
-	Rect k1;
-	k1.min=mPos+Vec2f(4,4);
-	k1.max=mPos+mSize-Vec2f(4,4);
+	Rect bBox;
+	calcBoundBox( bBox );
+	bBox.min += Vec2f(4,4);
+	bBox.max -= Vec2f(4,4);
+
 	for( BulletList::iterator iter = getLevel()->getBullets().begin() , itEnd = getLevel()->getBullets().end();
 		iter != itEnd ; ++iter )
 	{
 		Bullet* bt = *iter;
 		if( bt->team == TEAM_EMPTY )
 		{
-			Rect k2;
-			k2.min = bt->getPos();
-			k2.max = bt->getPos()+ bt->getSize();
-			if(k1.intersect(k2))
+			Rect bBoxOther;
+			bt->calcBoundBox( bBoxOther );
+			if( bBox.intersect(bBoxOther) )
 			{
 				takeDamage( bt );				
 			}
@@ -377,13 +393,18 @@ void Player::SudarProjektila()
 	}
 }
 
+
 void Player::takeDamage(Bullet* p)
 {
-	if(mIsDead==false)
+	if( mIsDead )
+		return;
+
+	if ( !gPlayerGodPower )
 	{
 		hp -= p->getDamage();
-		p->destroy();
 	}
+	p->destroy();
+
 }
 
 void Player::addWeapon( Weapon* weapon )
@@ -401,7 +422,7 @@ void Player::addWeapon( Weapon* weapon )
 			continue;
 
 		weapon->init( this );
-		weapon->changePos( posSlot[i] );
+		weapon->setPos( posSlot[i] );
 
 		weaponSlot[i] = weapon;
 		weapon = NULL;

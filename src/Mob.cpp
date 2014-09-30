@@ -10,7 +10,7 @@
 
 void Mob::init( Vec2f const& poz )
 {
-	this->mPos=poz;
+	setPos( poz );
 
 	mTarget = NULL;
 	mSize.x=64;
@@ -35,12 +35,12 @@ void Mob::onSpawn()
 
 void Mob::onDestroy()
 {
-	Explosion* e = getLevel()->createExplosion( getCenterPos(), 128 );
+	Explosion* e = getLevel()->createExplosion( getPos(), 128 );
 	e->setParam(128,3000,200);
 	for(int i=0; i<4; i++)
 	{
 		MinePickup* c= new MinePickup;
-		c->Init( getCenterPos() );
+		c->Init( getPos() );
 		getLevel()->addItem( c );
 	}
 	BaseClass::onDestroy();
@@ -51,11 +51,11 @@ void Mob::tick()
 	BaseClass::tick();
 
 	Player* player = getLevel()->getPlayer();
-	if ( !getLevel()->rayTerrainTest( getCenterPos() , player->getCenterPos() ) )
+	if ( !getLevel()->rayTerrainTest( getPos() , player->getPos() , BF_PASS_VIEW ) )
 	{
 		mTarget = player;
 		mTimeCantView = 0;
-		mPosLastView = mTarget->getCenterPos();
+		mPosLastView = mTarget->getPos();
 	}
 	else
 	{
@@ -70,7 +70,7 @@ void Mob::tick()
 	if ( mTarget )
 	{
 		Vec2f dir;
-		dir = mPosLastView - getCenterPos();
+		dir = mPosLastView - getPos();
 		Math::normalize( dir );
 
 		rotation = atan2(dir.y,dir.x) + Math::toRad( 90 );
@@ -81,7 +81,6 @@ void Mob::tick()
 		moment.y = sin( angle )*akceleracija;
 
 		Vec2f offset = ( brzina * TICK_TIME ) * moment;
-
 		mPos.y += offset.y;
 		if(checkCollision())
 			mPos.y -= offset.y;
@@ -90,7 +89,12 @@ void Mob::tick()
 			mPos.x -= offset.x;
 	}
 
-	SudarProjektila();	
+	SudarProjektila();
+
+	if(punjenje<100)
+	{
+		punjenje+=brzinaPunjenja* TICK_TIME;
+	}
 
 	if( hp<=0 )
 	{
@@ -98,12 +102,13 @@ void Mob::tick()
 	}
 
 	akceleracija=0;
+
 }
 
 
 void Mob::spawnEffect()
 {
-	Explosion* e = getLevel()->createExplosion( getCenterPos(),512 );
+	Explosion* e = getLevel()->createExplosion( getPos(),512 );
 	e->setParam(32,1000,100);
 	e->setColor(Vec3(0.25,0.5,1.0));
 }
@@ -117,32 +122,32 @@ void Mob::DodajMoment(float x)
 bool Mob::checkCollision()
 {
 	Rect bBox;
-	bBox.min=mPos+Vec2f(4,4);
-	bBox.max=mPos+mSize-Vec2f(4,4);
+	calcBoundBox( bBox );
+	bBox.min += Vec2f(4,4);
+	bBox.max -= Vec2f(4,4);
 
 	TileMap& terrain = getLevel()->getTerrain();
 
-	if ( getLevel()->testTerrainCollision( bBox ) )
+	if ( getLevel()->testTerrainCollision( bBox , BF_MOVABLE ) )
 		return true;
 
 	for( MobList::iterator iter = getLevel()->getMobs().begin() , itEnd = getLevel()->getMobs().end();
 		 iter != itEnd ; ++iter )
 	{
 		Mob* mob = *iter;
-		if( mob !=this )
-		{
-			Rect k2;
-			k2.min= mob->getPos();
-			k2.max= mob->getPos() + mob->getSize();
-			if(bBox.intersect(k2))
-				return true;
-		}
+		if( mob == this )
+			continue;
+
+		Rect bBoxOther;
+		mob->calcBoundBox( bBoxOther );
+		if( bBox.intersect(bBoxOther) )
+			return true;
 	}
-	Rect k2;
+
+	Rect bBoxOther;
 	Player* player = getLevel()->getPlayer();
-	k2.min = player->getPos();
-	k2.max = player->getPos()+ player->getSize();
-	if(bBox.intersect(k2))
+	player->calcBoundBox( bBoxOther );
+	if( bBox.intersect(bBoxOther) )
 		return true;
 
 	return false;
@@ -150,9 +155,10 @@ bool Mob::checkCollision()
 
 void Mob::SudarProjektila()
 {
-	Rect k1;
-	k1.min=mPos+Vec2f(4,4);
-	k1.max=mPos+mSize-Vec2f(4,4);
+	Rect bBox;
+	calcBoundBox( bBox );
+	bBox.min += Vec2f(4,4);
+	bBox.max -= Vec2f(4,4);
 
 	for( BulletList::iterator iter = getLevel()->getBullets().begin() , itEnd = getLevel()->getBullets().end();
 		 iter != itEnd ; ++iter )
@@ -160,10 +166,10 @@ void Mob::SudarProjektila()
 		Bullet* bt = *iter;
 		if( bt->team == TEAM_PLAYER )
 		{
-			Rect k2;
-			k2.min = bt->getPos();
-			k2.max = bt->getPos()+bt->getSize();
-			if(k1.intersect(k2))
+			Rect bBoxOther;
+			bt->calcBoundBox( bBoxOther );
+
+			if( bBox.intersect(bBoxOther) )
 			{
 				takeDamage( bt );				
 			}
@@ -177,7 +183,7 @@ void Mob::takeDamage(Bullet* bullet)
 	bullet->destroy();
 }
 
-void Mob::shoot( IBulletFactory const& creator , float deltaT )
+void Mob::shoot( IBulletFactory const& creator )
 {
 	if ( !mTarget )
 		return;
@@ -185,18 +191,14 @@ void Mob::shoot( IBulletFactory const& creator , float deltaT )
 	if( mTarget->isDead() )
 		return;
 
-	if(punjenje<100)
+	if(punjenje>=100)
 	{
-		punjenje+=brzinaPunjenja*deltaT;
-	}
-	else if(punjenje>=100)
-	{
-		Vec2f offset= mPosLastView - getCenterPos();
+		Vec2f offset= mPosLastView - getPos();
 		if( offset.length2() < domet * domet )
 		{
 			Math::normalize( offset );
 			Bullet* p = creator.create();
-			p->init( getCenterPos() ,offset , TEAM_EMPTY );	
+			p->init( getPos() ,offset , TEAM_EMPTY );	
 			getLevel()->addBullet(p);
 		}	
 		punjenje=0;
@@ -216,7 +218,7 @@ void MobRenderer::render( RenderPass pass , LevelObject* object )
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPushMatrix();		
 		glColor4f(0.0, 0.0, 0.0, 0.6);			
-		drawSprite( mob->getPos() + Vec2f(5,5), mob->getSize() , mob->getRotation() , tex );	
+		drawSprite( mob->getRenderPos() + Vec2f(5,5), mob->getSize() , mob->getRotation() , tex );	
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 		glPopMatrix();
 		glDisable(GL_BLEND);
@@ -224,6 +226,23 @@ void MobRenderer::render( RenderPass pass , LevelObject* object )
 	}
 
 	glPushMatrix();	
-	drawSprite( mob->getPos() + Vec2f(5,5), mob->getSize() , mob->getRotation() , tex );	
-	glPopMatrix();	
+	drawSprite( mob->getRenderPos() , mob->getSize() , mob->getRotation() , tex );	
+	glPopMatrix();
+
+
+	if ( pass == RP_GLOW )
+	{
+		Vec2f size = mob->getSize();
+		glPushMatrix();
+		glTranslatef( mob->getRenderPos().x , mob->getRenderPos().y , 0 );
+		glColor3f( 0 , 1 , 0 );
+		glBegin( GL_LINE_LOOP );
+		glVertex3f( 0 , 0 , 0 );
+		glVertex3f( size.x , 0 , 0 );
+		glVertex3f( size.x , size.y , 0 );
+		glVertex3f( 0 , size.y , 0 );
+		glEnd();
+		glColor3f(1.0, 1.0, 1.0 );
+		glPopMatrix();
+	}
 }

@@ -20,7 +20,8 @@ public:
 	{
 		if( pass !=RP_DIFFUSE )
 			return ;
-		drawSprite( object->getPos() , object->getSize() ,0,tex);
+
+		drawSprite( object->getRenderPos() , object->getSize() ,0,tex);
 	}
 	Texture* tex;
 };
@@ -43,7 +44,7 @@ void PlasmaBullet::onSpawn()
 {
 	Bullet::onSpawn();
 
-	light->init(mPos,256);
+	light->init( getPos() , 256 );
 	light->setColorParam(Vec3(0.25, 0.5, 1.0),18);	
 
 	getLevel()->playSound("plazma1.wav");	
@@ -56,7 +57,7 @@ void PlasmaBullet::tick()
 	if(dimTimer>=10.0)
 	{
 		Particle* c= getLevel()->addParticle(new Smoke());
-		c->Init( mPos + Vec2f(mSize.x/2,mSize.y/2) );
+		c->Init( getPos() );
 		dimTimer=0.0;
 	}
 }
@@ -64,9 +65,9 @@ void PlasmaBullet::tick()
 void PlasmaBullet::onDestroy()
 {		
 	light->destroy();
-	Explosion* e = getLevel()->createExplosion( mPos , 256 );	
+	Explosion* e = getLevel()->createExplosion( getRenderPos() , 256 );	
 	e->setParam(20,1000,50);
 	e->setColor(Vec3(1.0, 0.75, 0.5));
 
-	getLevel()->playSound("explozija1.wav");		
+	getLevel()->playSound("explosion1.wav");		
 }

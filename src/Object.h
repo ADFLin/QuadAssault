@@ -8,19 +8,20 @@ class Object
 {
 public:
 	Object();
-	virtual ~Object();
-	Vec2f const& getPos(){ return mPos; }//daje poziciju objekta
-	Vec2f const& getSize(){ return mSize; }
-	Vec2f getCenterPos();
-	virtual void changePos(Vec2f const& poz); //mijenja poziciju objekta
-	virtual void changeSize(Vec2f const& dim);
+	virtual ~Object(){}
+	
+	Vec2f const& getSize() const { return mSize; }
+	Vec2f const& getPos() const { return mPos; }
 
+	Vec2f getRenderPos() const { return mPos - mSize / 2; }
 
+	void  setPos(Vec2f const& pos){ mPos = pos; }
+	void  setSize(Vec2f const& size ){ mSize = size; }
+
+	void calcBoundBox( Rect& bBox );
 protected:
 	Vec2f mPos;
 	Vec2f mSize;	
-
-private:
 };
 
 class Level;
@@ -56,6 +57,7 @@ public:
 	virtual void onSpawn(){}
 	virtual void onDestroy(){}
 	virtual void tick(){}
+	virtual void postTick(){}
 	virtual void updateRender( float dt ){}
 	virtual IRenderer* getRenderer(){ return NULL; }
 	virtual void render( RenderPass pass ){}
@@ -74,15 +76,11 @@ public:
 #endif
 	}
 
-
-
-	
 protected:
 	friend class Level;
 
 	HookNode baseHook;
 	HookNode typeHook;
-	
 
 	Level*   mLevel;
 	bool     mNeedDestroy;
@@ -94,7 +92,7 @@ public:
 	IRenderer();
 	virtual void init() = 0;
 	virtual void render( RenderPass pass , LevelObject* object ) = 0;
-
+	virtual void renderDev( LevelObject* object ){}
 
 	static void cleanup();
 	static void initialize();

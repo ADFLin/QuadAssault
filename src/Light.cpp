@@ -15,7 +15,8 @@ Light::~Light()
 
 void Light::init(Vec2f poz, float radius )
 {
-	this->mPos = poz;
+	setPos( poz );
+
 	this->radius = radius;
 
 	drawShadow = false;
@@ -33,7 +34,7 @@ void Light::setColorParam( Vec3 const& color , float intensity)
 	this->intensity=intensity;
 }
 
-void Light::PostavkeKuta(Vec2f dir, float angle)
+void Light::PostavkeKuta( Vec2f const& dir, float angle)
 {
 	this->dir=dir;
 	this->angle=angle;

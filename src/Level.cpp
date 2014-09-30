@@ -31,10 +31,18 @@ static void remove( C& c , T obj )
 
 void Level::tick()
 {
-	for( ObjectList::iterator iter = mObjects.begin() ; iter != mObjects.end(); )
+	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end(); 
+		  iter != itEnd; ++iter )
 	{
 		LevelObject* obj = *iter;
+		obj->tick();
+	}
 
+	
+	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end(); 
+		  iter != itEnd; )
+	{
+		LevelObject* obj = *iter;
 		++iter;
 
 		if( obj->mNeedDestroy )
@@ -53,8 +61,7 @@ void Level::tick()
 		}
 		else
 		{
-			obj->tick();
-			
+			obj->postTick();
 		}
 	}
 }
@@ -76,11 +83,11 @@ Explosion* Level::createExplosion( Vec2f const& pos , float raidus )
 	return e;
 }
 
-Light* Level::createLight( Vec2f const& pos ,float radius , bool staticno )
+Light* Level::createLight( Vec2f const& pos ,float radius , bool bStatic )
 {
 	Light* light = new Light();
 	light->init( pos , radius );
-	light->isStatic = staticno;
+	light->isStatic = bStatic;
 	mLights.push_back( light );
 	addOjectInternal( light );
 	return light;
@@ -231,26 +238,29 @@ void Level::changeState( State state )
 	mState = state;
 }
 
-bool Level::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to )
+Tile* Level::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned skipFlag )
 {
 	if ( !mTerrain.isVaildRange( tPos.x , tPos.y ) )
-		return false;
+		return NULL;
 
 	Tile& tile = mTerrain.getData( tPos.x , tPos.y );
 	Block* block = Block::FromType( tile.type );
 
-	if ( !block->checkFlag( BF_COLLISION ) )
-		return false;
+	if ( block->checkFlag( skipFlag ) )
+		return NULL;
 
-	return true;
+	return &tile;
 }
 
-bool Level::rayTerrainTest( Vec2f const& from , Vec2f const& to )
+Tile* Level::rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned skipFlag )
 {
 	Vec2i tpFrom = Vec2i( Math::floor( from.x / BLOCK_SIZE ) , Math::floor( from.y / BLOCK_SIZE ) );
+
+
+	Tile* out;
 	
-	if ( rayBlockTest( tpFrom , from , to ) )
-		return true;
+	if ( out = rayBlockTest( tpFrom , from , to , skipFlag ) )
+		return out;
 
 	Vec2i tpCur  = tpFrom;
 	Vec2i tpTo   = Vec2i( Math::floor( to.x / BLOCK_SIZE ) , Math::floor( to.y / BLOCK_SIZE ) );
@@ -262,8 +272,8 @@ bool Level::rayTerrainTest( Vec2f const& from , Vec2f const& to )
 		while( tpCur.y != tpTo.y )
 		{
 			tpCur.y += delta;
-			if ( rayBlockTest( tpCur , from , to ) )
-				return true;	
+			if ( out = rayBlockTest( tpCur , from , to , skipFlag ) )
+				return out;	
 		}
 	}
 	else if ( tpDif.y == 0 )
@@ -272,8 +282,8 @@ bool Level::rayTerrainTest( Vec2f const& from , Vec2f const& to )
 		while( tpCur.x != tpTo.x )
 		{
 			tpCur.x += delta;
-			if ( rayBlockTest( tpCur , from , to ) )
-				return true;	
+			if ( out = rayBlockTest( tpCur , from , to , skipFlag ) )
+				return out;	
 		}
 	}
 	else
@@ -315,17 +325,17 @@ bool Level::rayTerrainTest( Vec2f const& from , Vec2f const& to )
 				tpCur.y += deltaY;
 			}
 
-			if ( rayBlockTest( tpCur , from , to ) )
-				return true;
+			if ( out = rayBlockTest( tpCur , from , to , skipFlag ) )
+				return out;
 
 			if ( tpCur.x == tpTo.x && tpCur.y == tpTo.y )
 				break;
 		}
 	}
-	return false;
+	return NULL;
 }
 
-bool Level::testTerrainCollision( Rect const& bBox )
+Tile* Level::testTerrainCollision( Rect const& bBox , unsigned skipFlag )
 {
 	TileMap& terrain = getTerrain();
 
@@ -338,17 +348,19 @@ bool Level::testTerrainCollision( Rect const& bBox )
 	{
 		for(int y = yMin; y <= yMax; ++y  )
 		{
-			if( terrain.getData( x , y ).type == TID_FLAT )
+			Tile& tile = mTerrain.getData( x , y );
+			Block* block = Block::FromType( tile.type );
+
+			if ( block->checkFlag( skipFlag ) )
 				continue;
 
-			Rect k2;
-			k2.min=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE);
-			k2.max=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE)+Vec2f(BLOCK_SIZE,BLOCK_SIZE);
+			Rect bBoxOther;
+			bBoxOther.min=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE);
+			bBoxOther.max=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE)+Vec2f(BLOCK_SIZE,BLOCK_SIZE);
 
-			if( bBox.intersect(k2) )
-				return true;
+			if( bBox.intersect(bBoxOther) )
+				return &tile;
 		}
 	}
-
-	return false;
+	return NULL;
 }

@@ -29,7 +29,7 @@ public:
 			else if( pickup->id==KEY_GREEN )
 				glColor3f(0.1, 1.0, 0.1);
 		}
-		drawSprite(pickup->getPos(),pickup->getSize(),pickup->rotation, mTex[ pass ] );
+		drawSprite(pickup->getRenderPos(),pickup->getSize(),pickup->rotation, mTex[ pass ] );
 		glColor3f(1.0, 1.0, 1.0);
 	}
 
@@ -53,7 +53,7 @@ void KeyPickup::Init(Vec2f poz, int id)
 void KeyPickup::onSpawn()
 {
 	BaseClass::onSpawn();
-	s = getLevel()->createLight( getCenterPos() , 128 , false);
+	s = getLevel()->createLight( getPos() , 128 , false);
 	if(id==KEY_RED)
 		s->setColorParam(Vec3(1.0,0.1,0.1),4);	
 	if(id==KEY_BLUE)

@@ -44,16 +44,16 @@ void MinigunMob::onSpawn()
 
 void MinigunMob::onDestroy()
 {
-	getLevel()->playSound( "explozija1.wav" , true );		
+	getLevel()->playSound( "explosion1.wav" , true );		
 	BaseClass::onDestroy();
 }
 
 void MinigunMob::tick()
 {
 	BaseClass::tick();
-	shoot( BulletFactoryT< MinigunBullet >(), TICK_TIME );	
+	shoot( BulletFactoryT< MinigunBullet >() );	
 	Vec2f dir;
-	dir= getLevel()->getPlayer()->getCenterPos()- getCenterPos();
+	dir= getLevel()->getPlayer()->getPos()- getPos();
 	if( dir.length2()< 300 * 300 )
 	{
 		brzina-=100* TICK_TIME;
@@ -68,15 +68,13 @@ void MinigunMob::tick()
 	}
 }
 
-void MinigunMob::shoot( IBulletFactory const& creator , float deltaT)
+void MinigunMob::shoot( IBulletFactory const& creator )
 {	
-
-	BaseClass::shoot(creator,deltaT);	
+	BaseClass::shoot( creator );	
 }
 
 void MinigunMob::takeDamage(Bullet* bullet )
 {
-
 	BaseClass::takeDamage(bullet);
 }
 

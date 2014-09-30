@@ -21,8 +21,9 @@ public:
 
 		LaserBullet* bullet = object->cast< LaserBullet >();
 
+		Vec2f size = Vec2f(16,32);
 		float rot= atan2( bullet->dir.y, bullet->dir.x ) + Math::toRad( 90 );
-		drawSprite( object->getPos() - Vec2f(8,16) , Vec2f(16,32) , rot , texG );		
+		drawSprite( bullet->getPos() - size / 2 , size , rot , texG );		
 	}
 	Texture* texG;
 };
@@ -31,7 +32,7 @@ DEFINE_RENDERER( LaserBullet , LaserBulletRenderer )
 
 void LaserBullet::init(Vec2f const& poz, Vec2f const& dir , int team )
 {
-	Bullet::init(poz,dir,team );
+	BaseClass::init(poz,dir,team );
 	speed=910;
 	domet=600;
 	mDamage=4;
@@ -39,8 +40,8 @@ void LaserBullet::init(Vec2f const& poz, Vec2f const& dir , int team )
 
 void LaserBullet::onSpawn()
 {
-	Bullet::onSpawn();
-	light->init(mPos,128);
+	BaseClass::onSpawn();
+	light->init( getPos() , 128 );
 	light->setColorParam(Vec3(0.5, 1.0, 0.2),12);
 
 	getLevel()->playSound("laser1.wav");		
@@ -49,14 +50,14 @@ void LaserBullet::onSpawn()
 
 void LaserBullet::tick()
 {
-	Bullet::tick();
+	BaseClass::tick();
 }
 
 
 void LaserBullet::onDestroy()
 {
 	light->destroy();
-	Explosion* e = getLevel()->createExplosion( mPos , 128 );
+	Explosion* e = getLevel()->createExplosion( getPos() , 128 );
 	e->setParam(8,100,80);
 	e->setColor(Vec3(1.0, 0.75, 0.5));	
 }

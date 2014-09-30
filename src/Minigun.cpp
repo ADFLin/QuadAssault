@@ -24,11 +24,11 @@ void Minigun::update(float deltaT)
 	BaseClass::update(deltaT);
 }
 
-void Minigun::doFire( FireHelper& heler )
+void Minigun::doFire( FireHelper& helper )
 {
 	for(int i=0; i<1; i++)
 	{
-		Vec2f offset = -4 * heler.dir;
-		heler.fire( new MinigunBullet , offset );		
+		Vec2f offset = -4 * helper.dir;
+		helper.fire( new MinigunBullet , offset );		
 	}
 }

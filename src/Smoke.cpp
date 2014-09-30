@@ -33,7 +33,7 @@ public:
 
 			float faktorBoje=smoke->zivot/smoke->maxZivot;
 
-			Vec2f center = smoke->getPos() + smoke->getSize() / 2;
+			Vec2f center = smoke->getPos();
 			glPushMatrix();
 			glTranslatef( center.x , center.y , 0);	
 			glScalef(faktorSkaliranja,faktorSkaliranja,0);

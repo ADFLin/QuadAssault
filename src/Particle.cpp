@@ -4,7 +4,7 @@
 
 void Particle::Init(Vec2f poz)
 {
-	this->mPos=poz;
+	setPos( poz );
 	zivot=100;
 	maxZivot=zivot;	
 }

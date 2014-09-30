@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Collision.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\DataPath.h"
 				>
 			</File>
@@ -200,18 +204,6 @@
 			</File>
 			<File
 				RelativePath=".\src\GlobalVariable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Grid.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ItemPickup.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\KeyPickup.h"
 				>
 			</File>
 			<File
@@ -270,10 +262,6 @@
 				RelativePath=".\src\TextureManager.h"
 				>
 			</File>
-			<File
-				RelativePath=".\src\Trigger.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Source"
@@ -289,14 +277,6 @@
 			</File>
 			<File
 				RelativePath=".\src\GlobalVariable.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Grid.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ItemPickup.cpp"
 				>
 			</File>
 			<File
@@ -357,10 +337,6 @@
 			</File>
 			<File
 				RelativePath=".\src\TextureManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Trigger.cpp"
 				>
 			</File>
 			<File
@@ -568,7 +544,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ItemPickup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ItemPickup.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\KeyPickup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\KeyPickup.h"
 				>
 			</File>
 			<File
@@ -685,6 +673,14 @@
 			</File>
 			<File
 				RelativePath=".\src\Smoke.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Trigger.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Trigger.h"
 				>
 			</File>
 			<File

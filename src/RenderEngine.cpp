@@ -113,8 +113,8 @@ void RenderEngine::renderScene( RenderParam& param )
 
 	TileRange& renderRange = param.terrainRange;
 
-	renderRange.xMin = int( param.camera->getPos().x/BLOCK_SIZE )-1;
-	renderRange.yMin = int( param.camera->getPos().y/BLOCK_SIZE )-1;
+	renderRange.xMin = int( param.camera->getRenderPos().x/BLOCK_SIZE )-1;
+	renderRange.yMin = int( param.camera->getRenderPos().y/BLOCK_SIZE )-1;
 	renderRange.xMax = renderRange.xMin + int( param.renderWidth / BLOCK_SIZE ) + 3;
 	renderRange.yMax = renderRange.yMin + int( param.renderHeight / BLOCK_SIZE ) + 3;
 
@@ -235,7 +235,7 @@ void RenderEngine::renderLighting( RenderParam& param , Light* light )
 {
 	mShaderLighting->bind();
 
-	Vec2f posLight = light->getPos() - param.camera->getPos();
+	Vec2f posLight = light->getRenderPos() - param.camera->getRenderPos();
 
 	mShaderLighting->setParam( "posLight" , posLight );
 
@@ -273,7 +273,7 @@ void RenderEngine::renderGeometryFBO( RenderParam& param )
 
 	glPushMatrix();
 	//Sprite(Vec2(0,0),Vec2(igra->DajRW()->getSize().x, igra->DajRW()->getSize().y),mt->DajTexturu(1)->id);
-	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
+	glTranslatef( - param.camera->getRenderPos().x, - param.camera->getRenderPos().y, 0);			
 
 	renderTerrain( param.level , param.terrainRange );
 	param.level->renderObjects(RP_DIFFUSE);	
@@ -295,7 +295,7 @@ void RenderEngine::renderNormalFBO( RenderParam& param )
 
 	glPushMatrix();	
 
-	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
+	glTranslatef( - param.camera->getRenderPos().x, - param.camera->getRenderPos().y, 0);			
 
 	//Sprite(Vec2(0,0),Vec2(igra->DajRW()->getSize().x, igra->DajRW()->getSize().y),mt->DajTexturu(1)->id);
 	renderTerrainNormal( param.level , param.terrainRange );		
@@ -332,7 +332,7 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 
 	glPushMatrix();
-	glTranslatef(-camera->getPos().x, -camera->getPos().y, 0);
+	glTranslatef(-camera->getRenderPos().x, -camera->getRenderPos().y, 0);
 	renderTerrainGlow( param.level , param.terrainRange );
 	param.level->renderObjects(RP_GLOW);
 	glPopMatrix();
@@ -350,10 +350,10 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 	{		
 		Light* light = *iter;
 
-		if( light->getPos().x + light->radius < camera->getPos().x ||
-			light->getPos().x - light->radius > camera->getPos().x + w ||
-			light->getPos().y + light->radius < camera->getPos().y || 
-			light->getPos().y - light->radius > camera->getPos().y + h )
+		if( light->getRenderPos().x + light->radius < camera->getRenderPos().x ||
+			light->getRenderPos().x - light->radius > camera->getRenderPos().x + w ||
+			light->getRenderPos().y + light->radius < camera->getRenderPos().y || 
+			light->getRenderPos().y - light->radius > camera->getRenderPos().y + h )
 			continue;
 
 		if ( light->drawShadow )
@@ -371,12 +371,12 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 			
 			glPushMatrix();
-			glTranslatef(-camera->getPos().x, -camera->getPos().y, 0);
+			glTranslatef(-camera->getRenderPos().x, -camera->getRenderPos().y, 0);
 
 			TileRange range = param.terrainRange;
 
-			int tx = int( light->getPos().x / BLOCK_SIZE );
-			int ty = int( light->getPos().y / BLOCK_SIZE );
+			int tx = int( light->getRenderPos().x / BLOCK_SIZE );
+			int ty = int( light->getRenderPos().y / BLOCK_SIZE );
 
 			if ( tx < range.xMin )
 				range.xMin = tx;
@@ -450,7 +450,7 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 			if ( !block->checkFlag( BF_CAST_SHADOW ) )
 				continue;
 
-			Vec2f tileOffset = tile.pos - light->getPos();
+			Vec2f tileOffset = tile.pos - light->getRenderPos();
 
 			for( int idxCur = 0 , idxPrev = 3; idxCur < 4; idxPrev = idxCur , ++idxCur )
 			{
@@ -471,8 +471,8 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 					Vec2f const& cur  = tile.pos + tileVertex[ idxCur ];
 					Vec2f const& prev = tile.pos + tileVertex[ idxPrev ];
 
-					Vec2f v1 = light->getPos() + 5000 * offsetPrev;
-					Vec2f v2 = light->getPos() + 5000 * offsetCur;
+					Vec2f v1 = light->getRenderPos() + 5000 * offsetPrev;
+					Vec2f v2 = light->getRenderPos() + 5000 * offsetCur;
 
 					glBegin( GL_QUADS );
 					glVertex2f( prev.x , prev.y );

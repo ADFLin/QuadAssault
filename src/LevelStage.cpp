@@ -116,7 +116,7 @@ bool LevelStage::init()
 	IRenderer::initialize();
 
 	mCamera = new Object();
-	mCamera->changePos(Vec2f(0,0));	
+	mCamera->setPos(Vec2f(0,0));
 	mWorldScaleFactor = 1.0f;
 
 
@@ -227,7 +227,7 @@ void LevelStage::tick()
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
 		mPlayer->DodajMoment(-moveAcc);
 	if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-		mPlayer->Shoot( wPosMouse , TICK_TIME );
+		mPlayer->shoot( wPosMouse );
 
 	mPlayer->Update( TICK_TIME , wPosMouse );
 
@@ -281,7 +281,7 @@ void LevelStage::updateRender( float dt )
 	Level::updateRender( dt );
 	mTweener.update( dt );
 
-	mCamera->changePos( mPlayer->getCenterPos() - ( 0.5f * mWorldScaleFactor ) * Vec2f( getGame()->getScreenSize() ) );
+	mCamera->setPos( mPlayer->getPos() - ( 0.5f * mWorldScaleFactor ) * Vec2f( getGame()->getScreenSize() ) );
 
 }
 
@@ -424,7 +424,7 @@ void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 	case UI_CREATE_TRIGGER:
 		if( mStepEdit == 0 )
 		{		
-			mEditTrigger = new Trigger;
+			mEditTrigger = new AreaTrigger;
 			mStepEdit    = 1;
 		}
 		break;

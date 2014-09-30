@@ -36,7 +36,6 @@ public:
 	Player();
 	~Player();
 
-	
 
 	ObjectType getType(){ return OT_PLAYER; }
 
@@ -51,11 +50,11 @@ public:
 	void RenderHP_Bar();
 	void RenderEnergija_Bar();
 
-	void Shoot(Vec2f misPoz, float deltaT);
-
+	void shoot( Vec2f const& posTaget );
 	bool checkCollision();
 	void clearWeapons();
 	void SudarProjektila();
+
 	void takeDamage(Bullet* p);
 
 	bool isDead();

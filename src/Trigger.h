@@ -20,33 +20,38 @@ enum FireMode
 	FM_ONCE_AND_DESTROY ,
 };
 
-class Trigger : public LevelObject
+class TriggerBase
+{
+public:
+	TriggerBase();
+
+	void fireActions( Level* level );
+	void addAction( Action* act );
+	void enable( bool beE ){ mEnable = beE; }
+	void setFireMode( FireMode mode ){  mMode = mode;  }
+	
+protected:
+	typedef std::vector< Action* > ActionList;
+	ActionList mActions;
+	bool       mEnable;
+	FireMode   mMode;
+};
+
+class AreaTrigger : public LevelObject
+	              , public TriggerBase
 {
 
 public:
-	~Trigger();
+	~AreaTrigger();
 	void init( Vec2f const& v1, Vec2f const& v2 );
-	
 
 	ObjectType getType(){ return OT_TRIGGER; }
 	void tick();
-
-	void fireActions();
-	void enable( bool beE ){ mEnable = beE; }
 	void renderDev();
-	void addAction( Action* act );
-
 
 private:
-	typedef std::vector< Action* > ActionList;
-	ActionList mActions;
-
 	typedef std::vector< LevelObject* >  ObjectList;
 	std::vector< LevelObject* > mTouchObjects;
-
-	bool     mEnable;
-	FireMode mMode;
-	
 };
 
 class SpawnMobAct : public Action

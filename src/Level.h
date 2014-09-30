@@ -76,7 +76,7 @@ public:
 	Player*           getPlayer(){  return mPlayer;  }
 
 	Explosion*        createExplosion( Vec2f const& pos , float raidus );
-	Light*            createLight( Vec2f const& pos , float radius , bool staticno);
+	Light*            createLight( Vec2f const& pos , float radius , bool bStatic );
 
 	Bullet*           addBullet( Bullet* bullet );
 	ItemPickup*       addItem( ItemPickup* item );
@@ -93,10 +93,9 @@ public:
 
 	void              renderObjects( RenderPass pass );
 
-	bool              rayTerrainTest( Vec2f const& from , Vec2f const& to );
-	bool              rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to );
-
-	bool              testTerrainCollision( Rect const& bBox );
+	Tile*            rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned skipFlag );
+	Tile*            rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned skipFlag );
+	Tile*            testTerrainCollision( Rect const& bBox , unsigned skipFlag );
 	
 public:
 	typedef MemberHook< LevelObject , &LevelObject::baseHook > ObjHook;
@@ -117,6 +116,8 @@ protected:
 
 	void       destroyObject( LevelObject* object );
 	void       addOjectInternal( LevelObject* obj );
+
+
 
 	Listener*    mListener;
 	ObjectList   mObjects;

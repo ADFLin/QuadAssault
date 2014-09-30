@@ -4,21 +4,21 @@
 
 void ItemPickup::Init( Vec2f poz )
 {
-	this->mPos=poz;
+	setPos( poz );
 	mSize.x=32;
 	mSize.y=32;	
 }
 
 void ItemPickup::tick()
 {
-	Rect k1;
-	k1.min=mPos;
-	k1.max=mPos+mSize;
-	Rect k2; 
+	Rect bBox;
+	calcBoundBox( bBox );
+
+	Rect bBoxOther; 
 	Player* player = getLevel()->getPlayer();
-	k2.min = player->getPos();
-	k2.max = player->getPos() + player->getSize();
-	if(k1.intersect(k2))
+	player->calcBoundBox( bBoxOther );
+
+	if( bBox.intersect(bBoxOther) )
 	{
 		onPick( player );
 	}

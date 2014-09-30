@@ -18,13 +18,13 @@ void LevelStage::UpdateDev(float deltaT)
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
 		speed=750;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-		mCamera->changePos(mCamera->getPos()+Vec2f(-speed*deltaT,0));
+		mCamera->setPos(mCamera->getPos()+Vec2f(-speed*deltaT,0));
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-		mCamera->changePos(mCamera->getPos()+Vec2f(speed*deltaT,0));
+		mCamera->setPos(mCamera->getPos()+Vec2f(speed*deltaT,0));
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-		mCamera->changePos(mCamera->getPos()+Vec2f(0, -speed*deltaT));
+		mCamera->setPos(mCamera->getPos()+Vec2f(0, -speed*deltaT));
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-		mCamera->changePos(mCamera->getPos()+Vec2f(0, speed*deltaT));
+		mCamera->setPos(mCamera->getPos()+Vec2f(0, speed*deltaT));
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad7))
 		sr+=0.5*deltaT;
@@ -67,7 +67,7 @@ void LevelStage::UpdateDev(float deltaT)
 	{
 		mEditLight->radius=srad;
 		mEditLight->setColorParam(Vec3(sr,sg,sb),si);
-		mEditLight->changePos( convertToWorldPos( getGame()->getMousePos() ) );
+		mEditLight->setPos( convertToWorldPos( getGame()->getMousePos() ) );
 	}
 
 	updateRender( deltaT );

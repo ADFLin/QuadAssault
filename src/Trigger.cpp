@@ -10,7 +10,27 @@
 #include "DataPath.h"
 #include <fstream>
 
-Trigger::~Trigger()
+TriggerBase::TriggerBase()
+{
+	mEnable = true;
+	mMode   = FM_ONCE_AND_DESTROY;
+}
+
+void TriggerBase::fireActions( Level* level )
+{
+	for ( ActionList::iterator iter = mActions.begin() , itEnd = mActions.end();
+		iter != itEnd; ++iter )
+	{
+		(*iter)->fire( level );
+	}
+}
+
+void TriggerBase::addAction( Action* act )
+{
+	mActions.push_back( act );
+}
+
+AreaTrigger::~AreaTrigger()
 {
 	for ( ActionList::iterator iter = mActions.begin() , itEnd = mActions.end();
 		iter != itEnd ; ++iter )
@@ -19,41 +39,38 @@ Trigger::~Trigger()
 	}
 }
 
-void Trigger::init( Vec2f const& v1, Vec2f const& v2 )
+void AreaTrigger::init( Vec2f const& v1, Vec2f const& v2 )
 {
-	mPos    = v1;
+	setPos( v1 );
 	mSize   = v2-v1;
 	mMode   = FM_ONCE_AND_DESTROY;
-	mEnable = true;
 }
 
-void Trigger::tick()
+void AreaTrigger::tick()
 {
-	Rect k1;
-	k1.min=mPos;
-	k1.max=mPos+mSize;
+	Rect bBox;
+	calcBoundBox( bBox );
 
 	if ( mEnable )
 	{
 		Player* player = getLevel()->getPlayer();
-		Rect k2;
-		k2.min= player->getPos();
-		k2.max= k2.min + player->getSize();
+		Rect bBoxOther;
+		player->calcBoundBox( bBoxOther );
 
-		if( k1.intersect(k2) )
+		if( bBox.intersect(bBoxOther) )
 		{
 			switch( mMode )
 			{
 			case FM_ALWAYS:
-				fireActions();
+				fireActions( getLevel() );
 				break;
 			case FM_ONCE_AND_DESTROY:
+				fireActions( getLevel() );
 				destroy();
-				fireActions();
 				mEnable = false;
 				break;
 			case FM_ONCE:
-				fireActions();
+				fireActions( getLevel() );
 				mEnable = false;
 				break;
 			case FM_ON_TOUCH:
@@ -69,7 +86,7 @@ void Trigger::tick()
 						}
 					}
 					if ( needFire )
-						fireActions();
+						fireActions( getLevel() );
 				}
 				break;
 			}
@@ -81,11 +98,10 @@ void Trigger::tick()
 	{
 		LevelObject* obj = *iter;
 
-		Rect k2;
-		k2.min= obj ->getPos();
-		k2.max= k2.min + obj->getSize();
+		Rect bBoxOther;
+		obj->calcBoundBox( bBoxOther );
 
-		if ( k1.intersect(k2) )
+		if ( bBox.intersect(bBoxOther) )
 		{
 			iter = mTouchObjects.erase( iter );
 		}
@@ -96,28 +112,18 @@ void Trigger::tick()
 	}
 
 }
-void Trigger::fireActions()
-{
-	for ( ActionList::iterator iter = mActions.begin() , itEnd = mActions.end();
-		iter != itEnd; ++iter )
-	{
-		(*iter)->fire( getLevel() );
-	}
-}
 
-void Trigger::addAction( Action* act )
-{
-	mActions.push_back( act );
-}
 
-void Trigger::renderDev()
+void AreaTrigger::renderDev()
 {
+	Vec2f pos  = getRenderPos();
+	Vec2f size = getSize();
 	glColor3f(1,1,1);
 	glBegin(GL_LINE_LOOP);
-	glVertex2f(mPos.x, mPos.y);
-	glVertex2f(mPos.x+mSize.x, mPos.y);
-	glVertex2f(mPos.x+mSize.x, mPos.y+mSize.y);
-	glVertex2f(mPos.x, mPos.y+mSize.y);
+	glVertex2f( pos.x        , pos.y        );
+	glVertex2f( pos.x+size.x , pos.y        );
+	glVertex2f( pos.x+size.x , pos.y+size.y );
+	glVertex2f( pos.x        , pos.y+size.y );
 	glEnd();
 }
 

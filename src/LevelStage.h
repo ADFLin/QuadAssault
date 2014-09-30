@@ -82,7 +82,7 @@ private:
 	bool  postavljaLight;
 
 	int      mStepEdit;
-	Trigger* mEditTrigger;
+	AreaTrigger* mEditTrigger;
 
 
 

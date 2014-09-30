@@ -14,7 +14,7 @@ Explosion::~Explosion()
 
 void Explosion::Init( Vec2f poz, float radius )
 {
-	this->mPos=poz;
+	setPos( poz );
 	this->radius=radius;
 
 	umire=false;

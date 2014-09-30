@@ -31,7 +31,7 @@ public:
 
 	void setColorParam( Vec3 const& color , float intensity );
 	void SetExplozija(bool explozija);
-	void PostavkeKuta(Vec2f dir, float angle);
+	void PostavkeKuta(Vec2f const& dir, float angle);
 	
 	void setupShader(Shader* s );
 

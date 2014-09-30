@@ -33,7 +33,7 @@ public:
 	virtual void render( RenderPass pass , LevelObject* object )
 	{
 		WeaponPickup* pickup = static_cast< WeaponPickup* >( object );
-		drawSprite( pickup->getPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->rotation , mTex[ pickup->id ][ pass ] );
+		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->rotation , mTex[ pickup->id ][ pass ] );
 	}
 	Texture* mTex[ 3 ][ NUM_RENDER_PASS ];
 };
@@ -55,7 +55,7 @@ void WeaponPickup::onSpawn()
 {
 	BaseClass::onSpawn();
 
-	s = getLevel()->createLight( getCenterPos() , 256 , false );
+	s = getLevel()->createLight( getPos() , 256 , false );
 	if(id==LASER1)
 		s->setColorParam(Vec3(0.2,1.0,0.2),6);
 	else if(id==PLAZMA1)

@@ -16,13 +16,16 @@ class Bullet : public LevelObject
 	typedef LevelObject BaseClass;
 protected:
 	Vec2f  dir;
-	float  speed;
+	
 
 	float  domet, domet_timer;
 
 	Light* light;
 
 	float mDamage;
+
+public:
+	float  speed;
 
 public:
 	Bullet();

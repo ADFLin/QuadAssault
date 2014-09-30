@@ -24,11 +24,11 @@ void Laser::update( float deltaT )
 	BaseClass::update(deltaT);
 }
 
-void Laser::doFire( FireHelper& heler )
+void Laser::doFire( FireHelper& helper )
 {
 	for(int i=0; i<1; i++)
 	{
-		Vec2f offset = -4 * heler.dir;
-		heler.fire( new LaserBullet() , offset );		
+		Vec2f offset = -4 * helper.dir;
+		helper.fire( new LaserBullet() , offset );		
 	}
 }

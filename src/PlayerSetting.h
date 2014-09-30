@@ -2,7 +2,8 @@
 #define PlayerSetting_h__
 
 int const MAX_LEVEL_NUM =64;
-class PlayerSetting
+
+struct PlayerSetting
 {
 	string name;
 	int    idxCurLevel;

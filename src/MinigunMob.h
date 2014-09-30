@@ -13,7 +13,7 @@ public:
 	IRenderer* getRenderer();
 	void onSpawn();
 	void onDestroy();
-	void shoot( IBulletFactory const& creator , float deltaT );
+	void shoot( IBulletFactory const& creator );
 };
 
 #endif // MinigunMob_h__

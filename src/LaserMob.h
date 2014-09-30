@@ -12,7 +12,7 @@ public:
 	void onDestroy();
 	void tick();
 	void takeDamage(Bullet* p);
-	void shoot( IBulletFactory const& creator, float deltaT);
+	void shoot( IBulletFactory const& creator );
 
 	virtual IRenderer* getRenderer();
 

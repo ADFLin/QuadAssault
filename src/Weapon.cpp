@@ -17,27 +17,24 @@ void FireHelper::fire( Bullet* bullet , Vec2f const& offset )
 void Weapon::init( Player* player )
 {	
 	mOwner = player;
-	mPos.x=0;
-	mPos.y=0;
-	mSize.x=16;
-	mSize.y=32;
 
-	mCDTime=100;
-	mFireTimer=mCDTime;
-	mCDSpeed=250;	
-	mEnergyCast=1;
+	setPos( Vec2f(0,0) );
+	setSize( Vec2f( 16 , 32 ) );
+
+	mCDTime    = 100;
+	mFireTimer = mCDTime;
+	mCDSpeed   = 250;	
+	mEnergyCast = 1;
 }
 
 void Weapon::update(float deltaT)
 {	
 	mFireTimer += mCDSpeed * deltaT;
-	if( mFireTimer > mCDTime )
-		mFireTimer = mCDTime;
 }
 
 void Weapon::fire( Vec2f const& pos, Vec2f const& dir, int team )
 {
-	if ( mFireTimer == mCDTime )
+	if ( mFireTimer >= mCDTime )
 	{
 		FireHelper helper;
 		helper.pos  = pos;
@@ -57,7 +54,18 @@ void Weapon::onFireBullet( Bullet* p )
 
 void Weapon::render( RenderPass pass )
 {
-	float o=mFireTimer/mCDTime*8;
+	float factor = std::min( 1.0f , mFireTimer / mCDTime );
+
+	float off;
+	float len = 20;
+	if ( factor < 0.5 )
+	{
+		off = len * factor;
+	}
+	else
+	{
+		off = len * ( 1 - factor );
+	}
 
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER,0.5f);
@@ -66,7 +74,7 @@ void Weapon::render( RenderPass pass )
 	mTextues[ pass ]->bind();
 
 	glPushMatrix();
-	glTranslatef(-mSize.x/2,-o-mSize.y/2,0);
+	glTranslatef( 0 , off , 0 );
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0, 0.0); glVertex2f(0,0);	

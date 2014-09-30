@@ -12,8 +12,8 @@ class Message
 private:	
 	sf::Text p_text;
 	sf::Text text;
-	Vec2f  mPos;
-	float  mDurstion; //trajanje poruke u sekundama
+	Vec2f   mPos;
+	float   mDurstion; //trajanje poruke u sekundama
 
 	float    timer; //pocinje od nule	
 	Texture* portret;

@@ -45,10 +45,10 @@ void PlasmaMob::tick()
 {
 	BaseClass::tick();
 	
-	shoot( BulletFactoryT< PlasmaBullet >() , TICK_TIME );	
+	shoot( BulletFactoryT< PlasmaBullet >() );	
 	
 	Vec2f dir;
-	dir= getLevel()->getPlayer()->getCenterPos() - getCenterPos();
+	dir= getLevel()->getPlayer()->getPos() - getPos();
 	if( dir.length2()<300 * 300 )
 	{
 		brzina-=100*TICK_TIME;
@@ -65,7 +65,7 @@ void PlasmaMob::tick()
 
 void PlasmaMob::onDestroy()
 {
-	getLevel()->playSound("explozija1.wav");
+	getLevel()->playSound("explosion1.wav");
 	BaseClass::onDestroy();
 }
 

@@ -5,6 +5,8 @@
 
 class LaserBullet : public Bullet
 {
+	typedef Bullet BaseClass;
+
 public:	
 	void init(Vec2f const& poz, Vec2f const& dir, int team );
 	void tick();

@@ -41,7 +41,7 @@ void LaserMob::onSpawn()
 
 void LaserMob::onDestroy()
 {
-	getLevel()->playSound("explozija1.wav");		
+	getLevel()->playSound("explosion1.wav");		
 	BaseClass::onDestroy();
 }
 
@@ -49,9 +49,9 @@ void LaserMob::tick()
 {
 	Mob::tick();
 
-	shoot( BulletFactoryT< LaserBullet >() , TICK_TIME );
+	shoot( BulletFactoryT< LaserBullet >() );
 
-	Vec2f dir = getLevel()->getPlayer()->getCenterPos()- getCenterPos();
+	Vec2f dir = getLevel()->getPlayer()->getPos()- getPos();
 	
 	if( dir.length2()<300 * 300 )
 	{
@@ -68,9 +68,9 @@ void LaserMob::tick()
 }
 
 
-void LaserMob::shoot( IBulletFactory const& creator, float deltaT)
+void LaserMob::shoot( IBulletFactory const& creator )
 {	
-	BaseClass::shoot( creator ,deltaT );	
+	BaseClass::shoot( creator  );	
 }
 
 void LaserMob::takeDamage(Bullet* bullet)

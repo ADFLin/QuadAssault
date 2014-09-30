@@ -20,12 +20,12 @@ struct BlockInfo
 
 static BlockInfo const gInfo[] = 
 {
-	{ TID_FLAT , BF_MOVABLE     , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
+	{ TID_FLAT , BF_MOVABLE | BF_FLYABLE | BF_PASS_VIEW , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
 	//{ TID_FLAT , BF_MOVABLE     , "synthetic_metal_diffuse.png" , "synthetic_metal_normal.png" , NULL } ,
-	{ TID_WALL , BF_CAST_SHADOW | BF_COLLISION , "Block.tga" , "zid1Normal.tga" , NULL } ,
-	{ TID_GAP  , 0              , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
-	{ TID_DOOR , BF_CAST_SHADOW | BF_COLLISION , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
-	{ TID_ROCK , BF_CAST_SHADOW | BF_COLLISION , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
+	{ TID_WALL , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
+	{ TID_GAP  , BF_PASS_VIEW | BF_FLYABLE , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
+	{ TID_DOOR , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
+	{ TID_ROCK , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
 };
 
 void Block::Init( unsigned char tip )
@@ -125,7 +125,7 @@ void Rock::onCollision( Tile& tile , Bullet* bullet )
 		Explosion* e = bullet->getLevel()->createExplosion( tile.pos + 0.5 * mSize , 128 );
 		e->setParam(128,3000,200);
 
-		bullet->getLevel()->playSound("explozija1.wav");		
+		bullet->getLevel()->playSound("explosion1.wav");		
 	}
 	bullet->destroy();
 }

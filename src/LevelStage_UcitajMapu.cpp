@@ -190,7 +190,7 @@ void LevelStage::LoadLevel()
 			}
 			else if(token=="mob_trigger")
 			{
-				Trigger* trigger = new Trigger;
+				AreaTrigger* trigger = new AreaTrigger;
 
 				Vec2f v1 , v2;
 				getline(lstring,token,' ');
@@ -216,7 +216,7 @@ void LevelStage::LoadLevel()
 			}
 			else if(token=="goal_trigger")
 			{
-				Trigger* trigger = new Trigger;
+				AreaTrigger* trigger = new AreaTrigger;
 
 				Vec2f v1 , v2;
 				getline(lstring,token,' ');
@@ -236,7 +236,7 @@ void LevelStage::LoadLevel()
 			}
 			else if(token=="msg_trigger")
 			{				
-				Trigger* trigger = new Trigger;
+				AreaTrigger* trigger = new AreaTrigger;
 
 				Vec2f v1 , v2;
 				getline(lstring,token,' ');

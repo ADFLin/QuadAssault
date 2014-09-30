@@ -15,7 +15,7 @@ class Light;
 class ItemPickup;
 class Bullet;
 class Block;
-class Trigger;
+class AreaTrigger;
 
 class Texture;
 

@@ -51,7 +51,7 @@ public:
 	virtual void tick();
 	virtual void spawnEffect();
 	
-	virtual void shoot( IBulletFactory const& creator , float deltaT);
+	virtual void shoot( IBulletFactory const& creator );
 
 	virtual void takeDamage(Bullet* p);
 

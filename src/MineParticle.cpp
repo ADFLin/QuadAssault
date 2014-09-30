@@ -28,7 +28,7 @@ public:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 			glColor3f( factor , factor , factor );
-			drawSprite( particle->getPos() , particle->getSize() , 0 ,t );
+			drawSprite( particle->getRenderPos() , particle->getSize() , 0 ,t );
 			glColor3f(1.0, 1.0, 1.0);
 			glDisable(GL_BLEND);
 		}

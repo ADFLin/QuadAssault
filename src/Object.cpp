@@ -2,27 +2,15 @@
 
 Object::Object()
 {
-
+	mPos  = Vec2f(0,0);
+	mSize = Vec2f(0,0);
 }
 
-Object::~Object()
-{	
-
-}
-
-void Object::changePos(Vec2f const& poz)
+void Object::calcBoundBox( Rect& bBox )
 {
-	mPos = poz;
-}
-
-Vec2f Object::getCenterPos()
-{
-	return mPos+Vec2f(mSize.x/2,mSize.y/2);
-}
-
-void Object::changeSize(Vec2f const& dim)
-{
-	this->mSize=dim;
+	Vec2f half = mSize / 2;
+	bBox.min = mPos - half;
+	bBox.max = mPos + half;
 }
 
 
