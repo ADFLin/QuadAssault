@@ -1,4 +1,4 @@
-#include "MineParticle.h"
+#include "DebrisParticle.h"
 
 #include "GameInterface.h"
 #include "Level.h"
@@ -16,7 +16,7 @@ public:
 
 	virtual void render( RenderPass pass , LevelObject* object )
 	{
-		MineParticle* particle = object->cast< MineParticle >();
+		DebrisParticle* particle = object->cast< DebrisParticle >();
 		Texture* t;
 		if(pass==RP_DIFFUSE)
 			t=tex;
@@ -38,24 +38,30 @@ public:
 	Texture* texN;
 };
 
-DEFINE_RENDERER( MineParticle , MineParticleRenderer )
+DEFINE_RENDERER( DebrisParticle , MineParticleRenderer )
 
 
-void MineParticle::Init(Vec2f poz)
+DebrisParticle::DebrisParticle( Vec2f const& pos )
+	:BaseClass( pos )
 {
-	BaseClass::Init(poz);
+
+}
+
+
+void DebrisParticle::init()
+{
+	BaseClass::init();
 	maxZivot=45;
 	zivot=maxZivot;	
 }
 
-void MineParticle::onSpawn()
+void DebrisParticle::onSpawn()
 {
 	BaseClass::onSpawn();
 
 }
 
-void MineParticle::tick()
+void DebrisParticle::tick()
 {
 	BaseClass::tick();
 }
-

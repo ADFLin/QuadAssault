@@ -4,6 +4,10 @@
 #include "MathCore.h"
 #include <cmath>
 
+#ifndef BIT
+#define BIT( n ) (( n ) << 1 )
+#endif
+
 typedef TVector2< int > Vec2i; 
 
 float const TICK_TIME = 60 / 1000.0f;

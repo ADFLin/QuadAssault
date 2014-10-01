@@ -5,7 +5,7 @@
 #include "Explosion.h"
 #include "Player.h"
 
-#include "MinePickup.h"
+#include "DebrisPickup.h"
 #include "TextureManager.h"
 
 void Mob::init( Vec2f const& poz )
@@ -39,7 +39,7 @@ void Mob::onDestroy()
 	e->setParam(128,3000,200);
 	for(int i=0; i<4; i++)
 	{
-		MinePickup* c= new MinePickup;
+		DebrisPickup* c= new DebrisPickup;
 		c->Init( getPos() );
 		getLevel()->addItem( c );
 	}

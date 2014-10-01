@@ -9,8 +9,6 @@
 
 static Block* gBlockMap[ 256 ] = { 0 };
 
-
-
 struct BlockInfo
 {
 	BlockType   type;
@@ -30,14 +28,14 @@ static BlockInfo const gInfo[] =
 	{ TID_ROCK , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
 };
 
-void Block::init( unsigned char tip )
+void Block::init( BlockType type )
 {
-	BlockInfo const& info = gInfo[ tip ];
+	BlockInfo const& info = gInfo[ type ];
 
-	assert( info.type == tip );
+	assert( info.type == type );
 
-	type = info.type;
-	flag = info.flag;
+	mType = info.type;
+	mFlag = info.flag;
 	
 	TextureManager* texMgr = getGame()->getTextureMgr();
 	
@@ -73,7 +71,7 @@ Block* Block::FromType( unsigned char type )
 	return gBlockMap[ type ];
 }
 
-void Block::initMap( Level* level )
+void Block::initialize( Level* level )
 {
 	gBlockMap[ TID_FLAT ] = new Block;
 	gBlockMap[ TID_WALL ] = new Block;
@@ -87,7 +85,7 @@ void Block::initMap( Level* level )
 	}
 }
 
-void Block::cleanupMap()
+void Block::cleanup()
 {
 	for(int i=0; i< NUM_BLOCK_TYPE; i++)
 	{

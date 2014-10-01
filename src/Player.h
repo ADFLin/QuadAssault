@@ -39,7 +39,7 @@ public:
 	void takeDamage(Bullet* p);
 
 	void loseEnergy(float e);
-	void DodajHP(float kolicina);
+	void addHP(float kolicina);
 
 	void RenderHP_Bar();
 	void RenderEnergija_Bar();

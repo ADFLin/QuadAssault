@@ -443,7 +443,7 @@ void Player::loseEnergy(float e)
 	if(mEnergy<0.0)
 		mEnergy=0.0;
 }
-void Player::DodajHP(float kolicina)
+void Player::addHP(float kolicina)
 {
 	mHP+=kolicina;
 	if(mHP>100.0)

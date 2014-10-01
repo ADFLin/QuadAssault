@@ -1,18 +1,19 @@
-#ifndef Smoke_h__
-#define Smoke_h__
+#ifndef DebrisParticle_h__
+#define DebrisParticle_h__
 
 #include "Particle.h"
 
-class Smoke : public Particle
+class DebrisParticle : public Particle
 {
 	typedef Particle BaseClass;
 public:
-	Smoke( Vec2f const& pos );
+	DebrisParticle( Vec2f const& pos );
 	virtual void init();
 	virtual void tick();
 	virtual void onSpawn();
+
 	virtual IRenderer* getRenderer();
 
 };
 
-#endif // Smoke_h__
+#endif // DebrisParticle_h__

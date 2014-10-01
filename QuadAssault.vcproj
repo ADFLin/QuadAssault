@@ -276,6 +276,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Collision.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Game.cpp"
 				>
 			</File>
@@ -341,10 +345,6 @@
 			</File>
 			<File
 				RelativePath=".\src\TextureManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\WeaponPickup.cpp"
 				>
 			</File>
 		</Filter>
@@ -552,6 +552,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\DebrisParticle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\DebrisParticle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\DebrisPickup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\DebrisPickup.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Explosion.cpp"
 				>
 			</File>
@@ -597,22 +613,6 @@
 			</File>
 			<File
 				RelativePath=".\src\Light.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MineParticle.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MineParticle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MinePickup.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MinePickup.h"
 				>
 			</File>
 			<File
@@ -693,6 +693,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Trigger.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\WeaponPickup.cpp"
 				>
 			</File>
 			<File

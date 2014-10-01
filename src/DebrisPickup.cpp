@@ -1,4 +1,6 @@
-#include "MinePickup.h"
+#include "DebrisPickup.h"
+
+#include "DebrisParticle.h"
 
 #include "GameInterface.h"
 #include "Level.h"
@@ -6,7 +8,7 @@
 #include "Explosion.h"
 #include "Player.h"
 
-class MinePickupRenderer : public IRenderer
+class DebrisPickupRenderer : public IRenderer
 {
 public:
 	virtual void init()
@@ -34,9 +36,9 @@ public:
 	Texture* texN;
 };
 
-DEFINE_RENDERER( MinePickup , MinePickupRenderer )
+DEFINE_RENDERER( DebrisPickup , DebrisPickupRenderer )
 
-void MinePickup::Init(Vec2f poz)
+void DebrisPickup::Init(Vec2f poz)
 {
 	BaseClass::Init(poz);
 
@@ -49,7 +51,7 @@ void MinePickup::Init(Vec2f poz)
 
 }
 
-void MinePickup::onSpawn()
+void DebrisPickup::onSpawn()
 {
 	BaseClass::onSpawn();
 
@@ -64,12 +66,13 @@ void MinePickup::onSpawn()
 	light->isExplosion = true;
 }
 
-void MinePickup::onDestroy()
+void DebrisPickup::onDestroy()
 {
+	light->destroy();
 	BaseClass::onDestroy();
 }
 
-void MinePickup::tick()
+void DebrisPickup::tick()
 {
 	BaseClass::tick();		
 	
@@ -78,14 +81,16 @@ void MinePickup::tick()
 		light->setPos(getPos());
 		if(cesticaTimer>=1.0)
 		{
-			MineParticle* c = new MineParticle();
-			c->Init(getRenderPos());	
+			DebrisParticle* c = new DebrisParticle( getPos() );
+			c->init();	
 			getLevel()->addParticle( c );
 				
 			cesticaTimer = 0.0;
 		}
 		else
+		{
 			cesticaTimer += TICK_TIME*10;
+		}
 
 		Vec2f offset = ( brzina*TICK_TIME ) * dir;
 		mPos.y += offset.y;
@@ -106,14 +111,12 @@ void MinePickup::tick()
 	{
 		brzina=0.0;
 	}
-
-	
 }
-bool MinePickup::checkCollision()
+
+bool DebrisPickup::checkCollision()
 {
 	Rect bBox;
 	calcBoundBox( bBox );
-	TileMap& terrain = getLevel()->getTerrain();
 
 	if ( getLevel()->testTerrainCollision( bBox , BF_MOVABLE ) )
 		return true;
@@ -121,16 +124,15 @@ bool MinePickup::checkCollision()
 	return false;
 }
 
-void MinePickup::onPick(Player* player)
+void DebrisPickup::onPick(Player* player)
 {
 	getLevel()->playSound("pickup.wav");		
 	
-	light->destroy();
 	Explosion* e= getLevel()->createExplosion( getPos(),128 );
 	e->setParam(12,100,50);
 	e->setColor(Vec3(1.0, 0.75, 0.5));	
 
-	player->DodajHP(2);
+	player->addHP(2);
 
 	destroy();
 }

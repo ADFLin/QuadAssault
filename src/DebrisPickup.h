@@ -1,11 +1,10 @@
-#ifndef MinePickup_h__
-#define MinePickup_h__
+#ifndef DebrisPickup_h__
+#define DebrisPickup_h__
 
 #include "ItemPickup.h"
-#include "MineParticle.h"
 #include "Light.h"
 
-class MinePickup : public ItemPickup
+class DebrisPickup : public ItemPickup
 {
 	typedef ItemPickup BaseClass;
 
@@ -30,8 +29,7 @@ protected:
 
 	Light* light;
 
-
-
 };
 
-#endif // MinePickup_h__
+
+#endif // DebrisPickup_h__

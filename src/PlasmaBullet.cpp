@@ -59,8 +59,8 @@ void PlasmaBullet::tick()
 	dimTimer += TICK_TIME * 750;
 	if(dimTimer>=10.0)
 	{
-		Smoke* p = new Smoke;
-		p->Init( getPos() );
+		Smoke* p = new Smoke( getPos() );
+		p->init();
 		getLevel()->addParticle( p );
 		dimTimer=0.0;
 	}

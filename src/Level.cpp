@@ -133,7 +133,7 @@ void Level::cleanup()
 	mPlayer = NULL;
 
 	//FIXME
-	Block::cleanupMap();
+	Block::cleanup();
 }
 
 int Level::random( int i1, int i2 )
@@ -199,11 +199,13 @@ void Level::renderObjects( RenderPass pass )
 	}
 }
 
-void Level::playSound( char const* name , bool canRepeat /*= false */ )
+Sound* Level::playSound( char const* name , bool canRepeat /*= false */ )
 {
 	Sound* sound = getGame()->getSoundMgr()->addSound( name , canRepeat );
 	if ( sound )
 		sound->play();
+
+	return sound;
 }
 
 void Level::updateRender( float dt )
@@ -239,6 +241,12 @@ Tile* Level::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& 
 
 	if ( block->checkFlag( skipFlag ) )
 		return NULL;
+
+	if ( block->checkFlag( BF_NONSIMPLE ) )
+	{
+		if ( !block->rayTest( tile , from , to ) )
+			return NULL;
+	}
 
 	return &tile;
 }
@@ -349,8 +357,16 @@ Tile* Level::testTerrainCollision( Rect const& bBox , unsigned skipFlag )
 			bBoxOther.min=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE);
 			bBoxOther.max=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE)+Vec2f(BLOCK_SIZE,BLOCK_SIZE);
 
-			if( bBox.intersect(bBoxOther) )
-				return &tile;
+			if( !bBox.intersect(bBoxOther) )
+				continue;
+
+			if ( block->checkFlag( BF_NONSIMPLE ) )
+			{
+				if ( !block->testIntersect( tile , bBox ) )
+					continue;
+			}
+
+			return &tile;
 		}
 	}
 	return NULL;

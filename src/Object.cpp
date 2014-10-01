@@ -6,8 +6,22 @@ Object::Object()
 
 }
 
+Object::Object( Vec2f const& pos ) 
+	:mPos( pos )
+{
+
+}
+
 LevelObject::LevelObject() 
 	:mSize( 0 , 0 )
+{
+	mNeedDestroy = false;
+	mLevel = NULL;
+}
+
+LevelObject::LevelObject( Vec2f const& pos ) 
+	:BaseClass( pos )
+	,mSize( 0 , 0 )
 {
 	mNeedDestroy = false;
 	mLevel = NULL;

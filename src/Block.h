@@ -6,7 +6,7 @@
 
 Vec2f const gSimpleBlockSize = Vec2f( BLOCK_SIZE , BLOCK_SIZE );
 
-enum BlockType
+enum BlockTypeEnum
 {
 	TID_FLAT , 
 	TID_WALL , 
@@ -34,11 +34,12 @@ enum BlockFlag
 	
 };
 
+typedef unsigned char BlockType;
 struct Tile
 {
-	unsigned char type;
-	int  meta;
-	Vec2f pos;
+	BlockType type;
+	int       meta;
+	Vec2f     pos;
 };
 
 class Level;
@@ -50,28 +51,30 @@ class Block
 public:
 
 	virtual ~Block(){}
-	bool  checkFlag( unsigned checkBits ){ return ( flag & checkBits) != 0; }
+	bool  checkFlag( unsigned checkBits ){ return ( mFlag & checkBits) != 0; }
 
-	virtual void  init( unsigned char tip );
+	virtual void  init( BlockType type );
 	virtual void  onCollision( Tile& tile , Bullet* bullet );
 
 	virtual void  render( Tile const& tile );
 	virtual void  renderNormal( Tile const& tile );
 	virtual void  renderGlow( Tile const& tile );
+	virtual void  renderNoTexture( Tile const& tile );
 
 	//call when block is not simple
-	virtual void  renderNoTexture( Tile const& tile );
 	virtual void  renderShadow( Tile const& tile , Light& light ){}
+	virtual bool  rayTest( Tile const& tile , Vec2f const& from , Vec2f const& to ){ return false; }
+	virtual bool  testIntersect( Tile const& tile , Rect const& bBox ){ return false; }
 
 
-	static void   initMap( Level* level );
-	static void   cleanupMap();
-	static Block* FromType( unsigned char type );
+	static void   initialize( Level* level );
+	static void   cleanup();
+	static Block* FromType( BlockType type );
 	
 protected:
-	unsigned char type;
-	Texture* mTex[ NUM_RENDER_PASS ];
-	unsigned flag;
+	BlockType mType;
+	unsigned  mFlag;
+	Texture*  mTex[ NUM_RENDER_PASS ];
 };
 
 

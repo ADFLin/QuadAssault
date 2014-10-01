@@ -7,8 +7,10 @@ class Particle : public LevelObject
 {
 	typedef LevelObject BaseClass;
 public:
+	Particle( Vec2f const& pos );
+
 	virtual ObjectType getType(){ return OT_PARTICLE; }
-	virtual void Init(Vec2f poz);
+	virtual void init();
 	virtual void tick();
 	virtual void onSpawn();
 

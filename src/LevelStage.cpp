@@ -112,7 +112,7 @@ bool LevelStage::init()
 
 	DEVMODE=false;
 	//FIXME
-	Block::initMap( this );
+	Block::initialize( this );
 	IRenderer::initialize();
 
 	mCamera = new Object();

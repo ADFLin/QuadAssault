@@ -8,6 +8,7 @@ class Object
 {
 public:
 	Object();
+	Object( Vec2f const& pos );
 	virtual ~Object(){}
 	
 	Vec2f const& getPos() const { return mPos; }
@@ -40,8 +41,10 @@ class ColBody;
 
 class LevelObject : public Object
 {
+	typedef Object BaseClass;
 public:
 	LevelObject();
+	LevelObject( Vec2f const& pos );
 	
 	virtual ObjectType getType() = 0;
 

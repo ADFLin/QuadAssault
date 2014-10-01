@@ -2,9 +2,14 @@
 
 #include "Level.h"
 
-void Particle::Init(Vec2f poz)
+Particle::Particle( Vec2f const& pos ) 
+	:BaseClass( pos )
 {
-	setPos( poz );
+
+}
+
+void Particle::init()
+{
 	zivot=100;
 	maxZivot=zivot;	
 }

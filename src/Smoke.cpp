@@ -68,9 +68,16 @@ public:
 
 DEFINE_RENDERER( Smoke , SmokeRenderer )
 
-void Smoke::Init(Vec2f poz)
+Smoke::Smoke( Vec2f const& pos ) 
+	:BaseClass( pos )
 {
-	BaseClass::Init(poz);
+
+}
+
+
+void Smoke::init()
+{
+	BaseClass::init();
 	maxZivot=45;
 	zivot=maxZivot;
 }
@@ -87,4 +94,3 @@ void Smoke::tick()
 {
 	BaseClass::tick();
 }
-

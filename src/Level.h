@@ -85,7 +85,7 @@ public:
 
 	Mob*              spawnMobByName(string const& name , Vec2f const& pos );
 
-	void              playSound( char const* name , bool canRepeat = false );
+	Sound*            playSound( char const* name , bool canRepeat = false );
 	virtual Message*  addMessage( Message* p ) = 0;
 	
 

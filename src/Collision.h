@@ -1,17 +1,23 @@
 #ifndef Collision_h__
 #define Collision_h__
 
+#include "Base.h"
+
 class LevelObject;
+
+
+enum 
+{
+	COL_BULLET = BIT(0) ,
+	COL_MOB    = BIT(1) ,
+	COL_ALL    = 0xffffffff ,
+};
 
 class ColBody
 {
-	ColBody()
-	{
-		idxCell = -1;
-	}
-
+	ColBody();
 	void setMask( unsigned mask ){ colMask = mask; }
-
+	void setSize( Vec2f const& size ){ halfSize = size / 2; }
 
 private:
 	friend class CollisionManager;
@@ -19,86 +25,36 @@ private:
 	unsigned     colMask;
 	Vec2f        halfSize;
 	Rect         boundBox;
-	HookNode     cellHook;
+	
 	int          idxCell;
 	LevelObject* object;
+
+	HookNode     cellHook;
+	HookNode     managerHook;
 };
 
 class CollisionManager
 {
 public:
+	void init( float length , float width , float cellLength );
 
-	bool testCollision( ColBody& body , Cell& cell )
-	{
-		for ( CellBodyList::iterator iter = cell.bodies.begin() , itEnd = cell.bodies.end();
-			 iter != itEnd ; ++iter )
-		{
-			ColBody* bodyTest = *iter;
-
-			if ( bodyTest == &body )
-				continue;
-
-			unsigned mask = body.colMask & bodyTest->colMask;
-
-			if ( mask == 0 )
-				continue;
-
-			if ( !body.boundBox.intersect( bodyTest->boundBox ) )
-				continue;
-
-
-
-			return true;
-		}
-
-		return false;
-	}
-
-	void addBody( LevelObject& object , ColBody& body )
-	{
-		body.object = &object;
-
-		Vec2f pos = body.object->getPos();
-
-		int cx = Math::clamp( pos.x / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-		int cy = Math::clamp( pos.y / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-		int idxCell = mCellMap.toIndex( cx , cy );
-
-		body.idxCell = idxCell;
-		mCellMap[ idxCell ].bodies.push_back( &body );
-	}
+	void update();
+	bool testCollision( Vec2f const& pos , ColBody& body );
+	bool checkCollision( ColBody& body );
+	void addBody( LevelObject& obj , ColBody& body );
+	void removeBody( ColBody& body );
+	void updateBody( ColBody& body );
 	
-	void init( float length , float width , float cellLength )
-	{
-		int cx = int ( length / cellLength - 1 ) + 1;
-		int cy = int ( width / cellLength - 1 ) + 1;
-		mCellMap.resize( cx , cy );
-		mCellLength = cellLength;
-	}
+	typedef IntrList< ColBody , MemberHook< ColBody , ColBody::cellHook > >    CellBodyList;
+	typedef IntrList< ColBody , MemberHook< ColBody , ColBody::managerHook > > BodyList;
 
-	void updateBody( ColBody& body )
-	{
-		Vec2f pos = body.object->getPos();
-		
-		int cx = Math::clamp( pos.x / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-		int cy = Math::clamp( pos.y / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-		int idxCell = mCellMap.toIndex( cx , cy );
-		if ( idxCell != body.idxCell )
-		{
-			body.cellHook.unlink();
-			body.idxCell = idxCell;
-			mCellMap[ idxCell ].bodies.push_back( &body );
-		}
-	}
-
-	typedef IntrList< ColBody , MemberHook< ColBody , ColBody::cellHook > , PointerType > CellBodyList;
 	struct Cell
 	{
 		CellBodyList bodies;
 	};
 	float            mCellLength;
 	TGrid2D< Cell >  mCellMap;
-
+	BodyList         mBodies;
 
 };
 
