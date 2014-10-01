@@ -261,7 +261,7 @@ void RenderEngine::renderLighting( RenderParam& param , Light* light )
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void RenderEngine::setupLightShaderParam( Shader* shader , Light& light )
+void RenderEngine::setupLightShaderParam( Shader* shader , Light* light )
 {
 	shader->setParam( "colorLight" , light->color );
 	shader->setParam( "dir" , light->dir );

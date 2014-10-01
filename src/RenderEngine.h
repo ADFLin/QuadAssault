@@ -63,7 +63,7 @@ private:
 
 	void   renderLighting( RenderParam& param , Light* light );
 	bool   setupFBO( int width , int height );
-	void   setupLightShaderParam( Shader* shader , Light& light );
+	void   setupLightShaderParam( Shader* shader , Light* light );
 
 	std::vector<Shader*> mShaders;
 
