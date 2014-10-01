@@ -231,6 +231,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Platform.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\PlayerSetting.h"
 				>
 			</File>
@@ -673,10 +677,6 @@
 			</File>
 			<File
 				RelativePath=".\src\Player.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Player_Render.cpp"
 				>
 			</File>
 			<File

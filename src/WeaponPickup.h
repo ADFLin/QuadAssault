@@ -10,10 +10,7 @@
 class WeaponPickup : public ItemPickup
 {
 	typedef ItemPickup BaseClass;
-protected:
-	float rotation;
-	Light* s;
-	int id;
+
 public:
 	void Init(Vec2f poz, int id);
 	void tick();
@@ -23,6 +20,11 @@ public:
 	void onDestroy();
 
 	virtual IRenderer* getRenderer();
+
+protected:
+	float rotation;
+	Light* s;
+	int id;
 
 	friend class WeaponPickupRenderer;
 

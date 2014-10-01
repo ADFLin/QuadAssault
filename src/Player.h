@@ -11,7 +11,49 @@ class Light;
 class Player : public Actor
 {
 	typedef Actor BaseClass;
-private:		
+
+
+public:
+	Player();
+	~Player();
+
+
+	virtual ObjectType getType(){ return OT_PLAYER; }
+	virtual void onSpawn();
+	virtual void onDestroy();
+	virtual IRenderer* getRenderer();
+
+	void  Init( Vec2f poz );
+	void  update( Vec2f const& aimPos );
+
+	bool  isDead();
+	void  addWeapon(Weapon* o);
+	float getEnergy() const { return mEnergy; }
+	float getMaxEnergy() const { return 100; }
+	float getHP() const { return mHP; }
+	float getMaxHP() const { return 100; }
+
+	void DodajMoment(float x);
+	void shoot( Vec2f const& posTaget );
+
+	void takeDamage(Bullet* p);
+
+	void loseEnergy(float e);
+	void DodajHP(float kolicina);
+
+	void RenderHP_Bar();
+	void RenderEnergija_Bar();
+
+	
+
+
+private:
+	void clearWeapons();
+	bool checkCollision();
+	void SudarProjektila();
+
+	void updateHeadlight();
+
 	float brzina; //najveca moguca brzina kretanja	
 
 	bool  mIsDead;
@@ -20,10 +62,11 @@ private:
 
 	float rotationAim;
 
-	float hp; //zdravlje	
-	float energy; //za pucanje
+	float mHP; //zdravlje	
+	float mEnergy; //za pucanje
 
-	Weapon* weaponSlot[4];
+	static int const NUM_WEAPON_SLOT = 4;
+	Weapon* mWeaponSlot[ NUM_WEAPON_SLOT ];
 	bool    haveShoot;
 
 	Light* light;
@@ -31,39 +74,6 @@ private:
 	float  shiftTrack;
 
 	friend class PlayerRenderer;
-
-public:
-	Player();
-	~Player();
-
-
-	ObjectType getType(){ return OT_PLAYER; }
-
-	void Init( Vec2f poz );
-	void onSpawn();
-	void onDestroy();
-	void Update(float deltaT, Vec2f mis);
-	void updateHeadlight();
-
-	void DodajMoment(float x);
-
-	void RenderHP_Bar();
-	void RenderEnergija_Bar();
-
-	void shoot( Vec2f const& posTaget );
-	bool checkCollision();
-	void clearWeapons();
-	void SudarProjektila();
-
-	void takeDamage(Bullet* p);
-
-	bool isDead();
-	void loseEnergy(float e);
-	void DodajHP(float kolicina);
-
-	void addWeapon(Weapon* o);
-
-	virtual IRenderer* getRenderer();
 
 };
 

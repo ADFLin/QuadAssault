@@ -15,7 +15,9 @@ class Math
 {
 public:
 	static float toRad( float degree ){ return degree * PI / 180.0f;}
-	static float toDegree( float rad ){ return rad * 180.0f / PI; }
+	static float toDeg( float rad ){ return rad * 180.0f / PI; }
+
+	static float atan2( float y , float x ){ return ::atan2( y , x );  }
 
 	template< class T >
 	static T clamp( T value , T min , T max )

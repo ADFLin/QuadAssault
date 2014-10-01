@@ -6,6 +6,7 @@
 #include "RenderEngine.h"
 
 #include "DataPath.h"
+#include "Platform.h"
 
 #include <cassert>
 #include <iostream>
@@ -44,9 +45,9 @@ bool Game::init(char* configFile)
 	mScreenSize.x = width;
 	mScreenSize.y = height;
 
-	rw.create(sf::VideoMode(width,height,32), tile, style);	
+	mWindow.create(sf::VideoMode(width,height,32), tile, style);	
 	//rw.SetFramerateLimit(120);	
-	rw.setMouseCursorVisible(false);
+	mWindow.setMouseCursorVisible(false);
 
 	sf::Font* font = new sf::Font;
 	font->loadFromFile( DATA_DIR"DialogueFont.TTF");
@@ -70,7 +71,7 @@ bool Game::init(char* configFile)
 	cout << "Initilize Render Engine..." << endl;
 	mRenderEngine->init( width , height );
 		
-	gotovo=false;
+	mNeedEnd=false;
 	srand(time(NULL));
 		
 	cout << "Setting OpenGL..." << endl;
@@ -113,19 +114,27 @@ void Game::addStage( GameStage* stage, bool removePrev )
 
 void Game::run()
 {
-	mClock.restart();
+	int prevTime = Platform::getTickCount();
 
-	while(gotovo==false)
+	while( !mNeedEnd )
 	{
-		float deltaT = GetFrameTime();
+		int64 curTime = Platform::getTickCount();
+		float deltaT = ( curTime - prevTime ) / 1000.0f;
+		prevTime = curTime;
 
 		GameStage* state = mStageStack.back();
 
 		mSoundMgr->update( deltaT );
 
-		mStageStack.back()->update( deltaT );		
+		mStageStack.back()->update( deltaT );
+
+		mRenderEngine->prevRender();
+		
 		mStageStack.back()->render();
-		rw.display();	
+
+		mRenderEngine->postRender();
+		
+		mWindow.display();	
 
 		if( mStageStack.back()->isEnd() )
 		{
@@ -134,7 +143,7 @@ void Game::run()
 			mStageStack.pop_back();			
 		}
 		if(mStageStack.size()==0)		
-			gotovo=true;
+			mNeedEnd=true;
 	}
 }
 void Game::exit()
@@ -164,7 +173,7 @@ void Game::exit()
 	mRenderEngine->cleanup();
 	delete mRenderEngine;
 
-	rw.close();
+	mWindow.close();
 
 	cout << "Game End !!" << endl;
 	cout << "*******************" << endl;	
@@ -173,13 +182,7 @@ void Game::exit()
 
 sf::RenderWindow* Game::getWindow()
 {
-	return &rw;
-}
-
-float Game::GetFrameTime()
-{
-	sf::Time escapedTime = mClock.restart();
-	return escapedTime.asSeconds();
+	return &mWindow;
 }
 
 void Game::procWidgetEvent( int event , int id , GWidget* sender )

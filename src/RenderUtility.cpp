@@ -37,7 +37,7 @@ void drawSprite(Vec2f const& poz, Vec2f const& dim, float rot, Texture* tex )
 	Vec2f hotspot = dim / 2;
 	glPushMatrix();
 	glTranslatef( poz.x + hotspot.x , poz.y + hotspot.y , 0);
-	glRotatef( Math::toDegree( rot ),0,0,1);
+	glRotatef( Math::toDeg( rot ),0,0,1);
 	glTranslatef( -hotspot.x , -hotspot.y , 0 );
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_EQUAL,1.0f);

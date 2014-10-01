@@ -1,8 +1,5 @@
 #include "Light.h"
 
-#include "Shader.h"
-#include "GameInterface.h"
-#include "Level.h"
 
 Light::Light()
 {
@@ -20,12 +17,10 @@ void Light::init(Vec2f poz, float radius )
 	this->radius = radius;
 
 	drawShadow = false;
-	explozija = false;
+	isExplosion = false;
 
 	dir   = Vec2f(0.0, 0.0);
 	angle = 0.0;
-
-	
 }
 
 void Light::setColorParam( Vec3 const& color , float intensity)
@@ -42,7 +37,7 @@ void Light::PostavkeKuta( Vec2f const& dir, float angle)
 
 void Light::SetExplozija(bool explozija)
 {
-	this->explozija = explozija;
+	this->isExplosion = explozija;
 }
 
 void Light::tick()

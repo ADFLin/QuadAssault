@@ -75,14 +75,14 @@ public:
 
 		for(int i=0; i<4; i++)
 		{
-			Weapon* weapon = player->weaponSlot[i];
+			Weapon* weapon = player->mWeaponSlot[i];
 			if( weapon )
 			{
 				Vec2f centerPos = player->getPos();
 
 				glPushMatrix();
 				glTranslatef( centerPos.x,centerPos.y,0 );
-				glRotatef( Math::toDegree( player->rotationAim ) + 90 ,0,0,1 );
+				glRotatef( Math::toDeg( player->rotationAim ) + 90 ,0,0,1 );
 				weapon->render( pass );
 				glPopMatrix();
 			}
@@ -150,7 +150,7 @@ public:
 
 		glPushMatrix();
 		glTranslatef( centerPos.x, centerPos.y , 0 );
-		glRotatef(Math::toDegree( player->getRotation()),0,0,1);
+		glRotatef(Math::toDeg( player->getRotation()),0,0,1);
 		glTranslatef( -odmak - razmak_tracnica, -size.y/2,0);
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0, shift); glVertex2f(0.0, 0.0);
@@ -162,7 +162,7 @@ public:
 
 		glPushMatrix();
 		glTranslatef( centerPos.x, centerPos.y , 0 );
-		glRotatef(Math::toDegree( player->getRotation()),0,0,1);
+		glRotatef(Math::toDeg( player->getRotation()),0,0,1);
 		glTranslatef( odmak - razmak_tracnica, -size.y/2,0);
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0, shift); glVertex2f(0.0, 0.0);
@@ -189,7 +189,7 @@ DEFINE_RENDERER( Player , PlayerRenderer )
 Player::Player()
 {
 	for(int i=0; i<4; i++)
-		weaponSlot[i] = NULL;
+		mWeaponSlot[i] = NULL;
 }
 Player::~Player()
 {
@@ -204,10 +204,10 @@ void Player::Init(Vec2f poz)
 	akceleracija = 0;
 
 	for(int i=0; i<4; i++)
-		weaponSlot[i]=NULL;
+		mWeaponSlot[i]=NULL;
 
-	hp=100;
-	energy=100.0;
+	mHP=100;
+	mEnergy=100.0;
 	haveShoot=false;
 	mIsDead=false;
 
@@ -221,7 +221,7 @@ void Player::onSpawn()
 {
 	BaseClass::onSpawn();
 
-	light=getLevel()->createLight( Vec2f(0.0, 0.0), 1024 , false );
+	light = getLevel()->createLight( Vec2f(0.0, 0.0), 1024 , false );
 	light->setColorParam(Vec3(1.0, 1.0, 1.0), 16);
 	light->drawShadow = true;
 }
@@ -231,7 +231,7 @@ void Player::onDestroy()
 	clearWeapons();
 }
 
-void Player::Update(float deltaT, Vec2f mis)
+void Player::update( Vec2f const& aimPos )
 {
 	if( !mIsDead )
 	{
@@ -240,7 +240,7 @@ void Player::Update(float deltaT, Vec2f mis)
 		moment.x=cos(rad)*akceleracija;
 		moment.y=sin(rad)*akceleracija;	
 
-		Vec2f offset = ( brzina * deltaT ) * moment;
+		Vec2f offset = ( brzina * TICK_TIME ) * moment;
 		mPos.y += offset.y;
 		if(checkCollision())
 			mPos.y -= offset.y;
@@ -251,9 +251,9 @@ void Player::Update(float deltaT, Vec2f mis)
 		if(moment.x!=0 || moment.y!=0)
 		{
 			if(akceleracija>0)
-				shiftTrack+=deltaT;
+				shiftTrack += TICK_TIME;
 			else
-				shiftTrack-=deltaT;
+				shiftTrack -= TICK_TIME;
 			if(shiftTrack>1.0)
 				shiftTrack=0.0;
 			if(shiftTrack<0.0)
@@ -263,31 +263,28 @@ void Player::Update(float deltaT, Vec2f mis)
 
 		SudarProjektila();
 
-		Vec2f dir = mis - getPos();
-		rotationAim = atan2( dir.y , dir.x );
+		Vec2f dir = aimPos - getPos();
+		rotationAim = Math::atan2( dir.y , dir.x );
 
-		if(mIsDead==false)
+		for(int i=0; i< NUM_WEAPON_SLOT ; i++)
 		{
-			for(int i=0; i<4; i++)
-			{
-				if( weaponSlot[i] )
-					weaponSlot[i]->update(deltaT);
-			}
+			if( mWeaponSlot[i] )
+				mWeaponSlot[i]->tick();
 		}
 
 		updateHeadlight();
 
 		if( !haveShoot )
 		{
-			energy += 10*deltaT;
-			if(energy>100.0)
-				energy=100.0;		
+			mEnergy += 10* TICK_TIME;
+			if(mEnergy>100.0)
+				mEnergy=100.0;		
 		}
 		haveShoot=false;
 
-		if(hp<=0.0)
+		if(mHP<=0.0)
 		{
-			hp=0.0;
+			mHP=0.0;
 			mIsDead=true;
 
 			Explosion* e= getLevel()->createExplosion( getPos(),512 );
@@ -297,7 +294,7 @@ void Player::Update(float deltaT, Vec2f mis)
 
 			Message* gameOverMsg = new Message();
 			gameOverMsg->init("Base", "All units lost, mission Failed." , 4, "blip.wav" );
-			getLevel()->addMessage( gameOverMsg );	
+			getLevel()->addMessage( gameOverMsg );
 
 			light->setColorParam(Vec3(0,0,0), 0);
 		}
@@ -334,19 +331,19 @@ void Player::shoot( Vec2f const& posTaget )
 
 	for(int i=0; i<4; i++)
 	{		
-		if( weaponSlot[i] == NULL )
+		if( !mWeaponSlot[i] )
 			continue;
 
-		if(energy>=weaponSlot[i]->getEnergyCast())
+		if( mEnergy >= mWeaponSlot[i]->getEnergyCast() )
 		{
-			Vec2f offset = weaponSlot[i]->getPos();
+			Vec2f offset = mWeaponSlot[i]->getPos();
 
-			float angle = rotationAim + atan2(offset.y,offset.x) + Math::toRad( 90 );
+			float angle = rotationAim + Math::atan2(offset.y,offset.x) + Math::toRad( 90 );
 
 			Vec2f slotDir;
 			slotDir.x = cos( angle );
 			slotDir.y = sin( angle );
-			weaponSlot[i]->fire( getPos() + sqrt( offset.length2() ) * slotDir , dir , TEAM_PLAYER );
+			mWeaponSlot[i]->fire( getPos() + sqrt( offset.length2() ) * slotDir , dir , TEAM_PLAYER );
 			haveShoot=true;
 		}
 	}
@@ -408,7 +405,7 @@ void Player::takeDamage(Bullet* p)
 
 	if ( !gPlayerGodPower )
 	{
-		hp -= p->getDamage();
+		mHP -= p->getDamage();
 	}
 	p->destroy();
 
@@ -418,13 +415,13 @@ void Player::addWeapon( Weapon* weapon )
 {
 	for(int i=0; i<4; i++ )
 	{
-		if( weaponSlot[i] )
+		if( mWeaponSlot[i] )
 			continue;
 
 		weapon->init( this );
 		weapon->setPos( gWeaponSlotOffset[i] );
 
-		weaponSlot[i] = weapon;
+		mWeaponSlot[i] = weapon;
 		weapon = NULL;
 		break;
 	}
@@ -442,25 +439,25 @@ bool Player::isDead()
 
 void Player::loseEnergy(float e)
 {
-	energy-=e;
-	if(energy<0.0)
-		energy=0.0;
+	mEnergy-=e;
+	if(mEnergy<0.0)
+		mEnergy=0.0;
 }
 void Player::DodajHP(float kolicina)
 {
-	hp+=kolicina;
-	if(hp>100.0)
-		hp=100.0;
+	mHP+=kolicina;
+	if(mHP>100.0)
+		mHP=100.0;
 }
 
 void Player::clearWeapons()
 {
 	for(int i=0; i<4; i++)
 	{
-		if(weaponSlot[i])
+		if(mWeaponSlot[i])
 		{
-			delete weaponSlot[i];	
-			weaponSlot[i]=NULL;
+			delete mWeaponSlot[i];	
+			mWeaponSlot[i]=NULL;
 		}
 	}
 }

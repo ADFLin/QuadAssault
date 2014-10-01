@@ -8,7 +8,7 @@ class Plasma : public Weapon
 private:
 public:
 	void init( Player* player );
-	void update(float deltaT);
+	void tick();
 	void doFire( FireHelper& heler );
 };
 

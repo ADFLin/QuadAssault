@@ -19,9 +19,9 @@ void Laser::init( Player* player )
 	mEnergyCast=2;
 }
 
-void Laser::update( float deltaT )
+void Laser::tick()
 {
-	BaseClass::update(deltaT);
+	BaseClass::tick();
 }
 
 void Laser::doFire( FireHelper& helper )

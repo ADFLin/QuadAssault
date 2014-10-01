@@ -24,7 +24,7 @@ class Message;
 
 class TextureManager;
 
-typedef TGrid2D< Tile , FastMappingPolicy > TileMap;
+typedef TGrid2D< Tile , FastMapping > TileMap;
 
 namespace sf
 {

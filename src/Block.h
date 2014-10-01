@@ -4,6 +4,7 @@
 #include "Base.h"
 #include "RenderUtility.h"
 
+Vec2f const gSimpleBlockSize = Vec2f( BLOCK_SIZE , BLOCK_SIZE );
 
 enum BlockType
 {
@@ -25,11 +26,11 @@ enum DoorType
 
 enum BlockFlag
 {
-	BF_CAST_SHADOW      = 1 << 0 ,
-	BF_MOVABLE          = 1 << 1 ,
-	BF_FLYABLE          = 1 << 2 ,
-	BF_NONSIMPLE        = 1 << 3 ,
-	BF_PASS_VIEW       = 1 << 4 ,
+	BF_CAST_SHADOW   = 1 << 0 ,
+	BF_MOVABLE       = 1 << 1 ,
+	BF_FLYABLE       = 1 << 2 ,
+	BF_NONSIMPLE     = 1 << 3 ,
+	BF_PASS_VIEW     = 1 << 4 ,
 	
 };
 
@@ -41,15 +42,13 @@ struct Tile
 };
 
 class Level;
+class Light;
 
 class Block
 {
-protected:
-	Vec2f   mSize; //dimenzije
-	unsigned char type;
-	Texture* mTex[ NUM_RENDER_PASS ];
-	unsigned flag;
+
 public:
+
 	virtual ~Block(){}
 	bool  checkFlag( unsigned checkBits ){ return ( flag & checkBits) != 0; }
 
@@ -59,13 +58,20 @@ public:
 
 	void  renderNormal( Tile const& tile );
 	void  renderGlow( Tile const& tile );
-	void  renderNoTexture( Tile const& tile );
+
+	//call when block is not simple
+	virtual void  renderNoTexture( Tile const& tile );
+	virtual void  renderShadow( Tile const& tile , Light& light ){}
 
 
 	static void   initMap( Level* level );
 	static void   cleanupMap();
 	static Block* FromType( unsigned char type );
 	
+protected:
+	unsigned char type;
+	Texture* mTex[ NUM_RENDER_PASS ];
+	unsigned flag;
 };
 
 

@@ -3,7 +3,6 @@
 
 #include "Object.h"
 
-class Shader;
 
 class Light : public LevelObject
 {
@@ -30,7 +29,7 @@ public:
 	float  angle; //od 0.0 do 1.0, odredjuje angle djelovanja baterije
 
 	bool  isStatic;
-	bool  explozija;
+	bool  isExplosion;
 	bool  drawShadow;
 
 	friend class RenderEngine;

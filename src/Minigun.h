@@ -8,7 +8,7 @@ class Minigun : public Weapon
 	typedef Weapon BaseClass;
 public:
 	void init( Player* player );
-	void update(float deltaT);
+	void tick();
 	void doFire( FireHelper& heler );
 };
 

@@ -22,7 +22,7 @@ public:
 		LaserBullet* bullet = object->cast< LaserBullet >();
 
 		Vec2f size = Vec2f(16,32);
-		float rot= atan2( bullet->dir.y, bullet->dir.x ) + Math::toRad( 90 );
+		float rot= Math::atan2( bullet->dir.y, bullet->dir.x ) + Math::toRad( 90 );
 		drawSprite( bullet->getPos() - size / 2 , size , rot , texG );		
 	}
 	Texture* texG;
@@ -33,15 +33,15 @@ DEFINE_RENDERER( LaserBullet , LaserBulletRenderer )
 void LaserBullet::init(Vec2f const& poz, Vec2f const& dir , int team )
 {
 	BaseClass::init(poz,dir,team );
-	speed=910;
-	domet=600;
+	mSpeed   = 910;
+	mLifeTime= 0.6;
 	mDamage=4;
 }
 
 void LaserBullet::onSpawn()
 {
 	BaseClass::onSpawn();
-	light->init( getPos() , 128 );
+	light = getLevel()->createLight( getPos() , 128 , false );	
 	light->setColorParam(Vec3(0.5, 1.0, 0.2),12);
 
 	getLevel()->playSound("laser1.wav");		
@@ -51,6 +51,7 @@ void LaserBullet::onSpawn()
 void LaserBullet::tick()
 {
 	BaseClass::tick();
+	light->setPos( getPos() );	
 }
 
 

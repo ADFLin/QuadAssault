@@ -31,8 +31,8 @@ DEFINE_RENDERER( PlasmaBullet , PlasmaBulletRenderer )
 void PlasmaBullet::init(Vec2f const& poz, Vec2f const& dir, int team )
 {
 	Bullet::init(poz,dir,team );
-	speed=800;
-	domet=800;
+	mSpeed = 800;
+	mLifeTime = 0.8;
 	mDamage=12;
 
 	mSize = Vec2f(1,1);
@@ -44,7 +44,7 @@ void PlasmaBullet::onSpawn()
 {
 	Bullet::onSpawn();
 
-	light->init( getPos() , 256 );
+	light = getLevel()->createLight( getPos() , 256 , false );	
 	light->setColorParam(Vec3(0.25, 0.5, 1.0),18);	
 
 	getLevel()->playSound("plazma1.wav");	
@@ -53,11 +53,15 @@ void PlasmaBullet::onSpawn()
 void PlasmaBullet::tick()
 {
 	Bullet::tick();
+
+	light->setPos( getPos() );	
+	
 	dimTimer += TICK_TIME * 750;
 	if(dimTimer>=10.0)
 	{
-		Particle* c= getLevel()->addParticle(new Smoke());
-		c->Init( getPos() );
+		Smoke* p = new Smoke;
+		p->Init( getPos() );
+		getLevel()->addParticle( p );
 		dimTimer=0.0;
 	}
 }
@@ -65,7 +69,7 @@ void PlasmaBullet::tick()
 void PlasmaBullet::onDestroy()
 {		
 	light->destroy();
-	Explosion* e = getLevel()->createExplosion( getRenderPos() , 256 );	
+	Explosion* e = getLevel()->createExplosion( getPos() , 256 );	
 	e->setParam(20,1000,50);
 	e->setColor(Vec3(1.0, 0.75, 0.5));
 

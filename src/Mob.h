@@ -27,32 +27,17 @@ protected:
 class Mob : public Actor
 {
 	typedef Actor BaseClass;
-protected:			
-	float akceleracija;	
-	
-	float punjenje;
 
-	//NASLIJED:
-	float brzina;
-	float maxbrzina;
-	short hp;
-	float brzinaPunjenja;
-	float domet;
-	Player* mTarget;
-	float   mTimeCantView;
-	Vec2f   mPosLastView;
 public:
-	
 	virtual void init( Vec2f const& poz );
 
+	virtual ObjectType getType(){ return OT_MOB; }
 	virtual void onSpawn();
 	virtual void onDestroy();
-	virtual ObjectType getType(){ return OT_MOB; }
 	virtual void tick();
-	virtual void spawnEffect();
-	
-	virtual void shoot( IBulletFactory const& creator );
 
+	virtual void spawnEffect();
+	virtual void shoot( IBulletFactory const& creator );
 	virtual void takeDamage(Bullet* p);
 
 
@@ -60,6 +45,21 @@ public:
 
 	bool checkCollision();
 	void SudarProjektila();	
+
+protected:			
+	float akceleracija;	
+
+	float punjenje;
+
+	//NASLIJED:
+	float   brzina;
+	float   maxbrzina;
+	short   mHP;
+	float   brzinaPunjenja;
+	float   domet;
+	Player* mTarget;
+	float   mTimeCantView;
+	Vec2f   mPosLastView;
 
 };
 #endif

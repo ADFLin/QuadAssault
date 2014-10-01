@@ -12,7 +12,7 @@ class ItemPickup : public LevelObject
 protected:
 	GLuint tex, texN, texG;
 public:
-	virtual void Init(Vec2f poz);
+	void Init(Vec2f poz);
 
 	virtual ObjectType getType(){ return OT_ITEM; }
 	virtual void tick();

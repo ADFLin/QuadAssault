@@ -6,15 +6,17 @@
 class MinigunBullet : public Bullet
 {
 	typedef Bullet BaseClass;
-private:
-	GLuint texG;
+
 public:	
 	void init(Vec2f const& poz, Vec2f const& dir, int team);
-	void tick();
-	void onDestroy();
-	void onSpawn();
 
+	virtual void tick();
+	virtual void onDestroy();
+	virtual void onSpawn();
 	virtual IRenderer* getRenderer();
+
+private:
+	Light* light;
 
 };
 

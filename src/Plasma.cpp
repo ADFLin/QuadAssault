@@ -20,9 +20,9 @@ void Plasma::init( Player* player )
 	mEnergyCast=6;
 }
 
-void Plasma::update(float deltaT)
+void Plasma::tick()
 {
-	Weapon::update(deltaT);
+	Weapon::tick();
 }
 
 void Plasma::doFire( FireHelper& heler )

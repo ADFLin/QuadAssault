@@ -8,8 +8,24 @@ class Light;
 class Explosion : public LevelObject
 {
 	typedef LevelObject BaseClass;
-protected:
+
+public:
+	Explosion();
+	~Explosion();
+
+	void Init( Vec2f poz , float radius );
+
+	virtual ObjectType getType(){ return OT_EXPLOSION; }
+	virtual void tick();
+	virtual void onSpawn();
+	virtual void onDestroy();
 	
+	void setParam(float intensity, float brzinaRasta, float brzinaUmiranja);
+	void setColor( Vec3 const& c );
+	
+
+protected:
+
 	float  radius;
 	Light* light;
 
@@ -19,24 +35,8 @@ protected:
 	float speedUmiranja; //brzina kojom se smanjuje intensity
 	float intensity, maxIntenzitet;
 
-	Vec3 color; //boja svjetla
+	Vec3  color; //boja svjetla
 
-
-public:
-	Explosion();
-	~Explosion();
-
-	void Init(Vec2f poz, float radius );
-
-	ObjectType getType(){ return OT_EXPLOSION; }
-
-	void onSpawn();
-	void onDestroy();
-	
-	void setParam(float intensity, float brzinaRasta, float brzinaUmiranja);
-	void setColor( Vec3 const& c );
-	void tick();
-	void render( RenderPass pass );	
 
 };
 

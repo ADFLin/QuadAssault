@@ -25,8 +25,3 @@ void Particle::tick()
 	if(zivot<=0.0)
 		destroy();
 }
-
-void Particle::render(RenderPass pass)
-{
-
-}

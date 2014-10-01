@@ -48,15 +48,6 @@ void Level::tick()
 		if( obj->mNeedDestroy )
 		{
 			obj->onDestroy();
-			switch( obj->getType() )
-			{
-			//case OT_BULLET:  remove( mBullets , obj ); break;
-			//case OT_LIGHT:   remove( mLights , obj ); break;
-			//case OT_ITEM:    remove( mItems , obj ); break;
-			//case OT_PARTICLE:remove( mParticles , obj ); break;
-			//case OT_MOB:     remove( mMobs , obj );
-			}
-			//iter = mObjects.erase( iter );
 			delete obj;
 		}
 		else
@@ -69,7 +60,7 @@ void Level::tick()
 void Level::addOjectInternal( LevelObject* obj )
 {
 	assert( obj );
-	mObjects.push_back( obj );
+	mObjects.push_front( obj );
 
 	obj->mLevel = this;
 	obj->onSpawn();

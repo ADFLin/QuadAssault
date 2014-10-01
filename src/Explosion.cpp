@@ -5,6 +5,7 @@
 
 Explosion::Explosion()
 {
+
 }
 
 Explosion::~Explosion()
@@ -33,7 +34,7 @@ void Explosion::onSpawn()
 	BaseClass::onSpawn();
 	light = getLevel()->createLight( getPos() , radius , false);
 	light->setColorParam(color, 0);	
-	light->SetExplozija(true);
+	light->isExplosion = true;
 }
 
 void Explosion::onDestroy()
@@ -80,7 +81,3 @@ void Explosion::tick()
 	light->setColorParam(color, intensity);	
 }
 
-void Explosion::render( RenderPass pass )
-{
-
-}

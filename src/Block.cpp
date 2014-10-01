@@ -9,6 +9,8 @@
 
 static Block* gBlockMap[ 256 ] = { 0 };
 
+
+
 struct BlockInfo
 {
 	BlockType   type;
@@ -21,7 +23,7 @@ struct BlockInfo
 static BlockInfo const gInfo[] = 
 {
 	{ TID_FLAT , BF_MOVABLE | BF_FLYABLE | BF_PASS_VIEW , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
-	//{ TID_FLAT , BF_MOVABLE     , "synthetic_metal_diffuse.png" , "synthetic_metal_normal.png" , NULL } ,
+	//{ TID_FLAT , BF_MOVABLE | BF_FLYABLE | BF_PASS_VIEW  , "synthetic_metal_diffuse.png" , "synthetic_metal_normal.png" , NULL } ,
 	{ TID_WALL , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
 	{ TID_GAP  , BF_PASS_VIEW | BF_FLYABLE , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
 	{ TID_DOOR , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
@@ -35,8 +37,6 @@ void Block::init( unsigned char tip )
 	assert( info.type == tip );
 
 	type = info.type;
-
-	mSize  = Vec2f(BLOCK_SIZE,BLOCK_SIZE);
 	flag = info.flag;
 	
 	TextureManager* texMgr = getGame()->getTextureMgr();
@@ -49,13 +49,13 @@ void Block::init( unsigned char tip )
 void Block::render( Tile const& tile )
 {	
 	glColor3f(1,1,1);	
-	drawSprite( tile.pos , mSize , mTex[ RP_DIFFUSE ] );
+	drawSprite( tile.pos , gSimpleBlockSize , mTex[ RP_DIFFUSE ] );
 }
 
 void Block::renderNormal( Tile const& tile )
 {	
 	glColor3f(1,1,1);
-	drawSprite( tile.pos , mSize , mTex[ RP_NORMAL ] );	
+	drawSprite( tile.pos , gSimpleBlockSize , mTex[ RP_NORMAL ] );	
 }
 
 void Block::renderGlow( Tile const& tile )
@@ -70,14 +70,14 @@ void Block::renderGlow( Tile const& tile )
 		default:
 			glColor3f(1,1,1);
 		}
-		drawSprite( tile.pos, mSize , mTex[ RP_GLOW ] );
+		drawSprite( tile.pos, gSimpleBlockSize , mTex[ RP_GLOW ] );
 		glColor3f(1,1,1);
 	}
 }
 
 void Block::renderNoTexture( Tile const& tile )
 {
-	drawRect( tile.pos , mSize );
+	drawRect( tile.pos , gSimpleBlockSize );
 }
 
 Block* Block::FromType( unsigned char type )
@@ -122,7 +122,7 @@ void Rock::onCollision( Tile& tile , Bullet* bullet )
 		tile.type = TID_FLAT;
 		tile.meta = 0;
 
-		Explosion* e = bullet->getLevel()->createExplosion( tile.pos + 0.5 * mSize , 128 );
+		Explosion* e = bullet->getLevel()->createExplosion( tile.pos + 0.5 * gSimpleBlockSize , 128 );
 		e->setParam(128,3000,200);
 
 		bullet->getLevel()->playSound("explosion1.wav");		
@@ -133,6 +133,6 @@ void Rock::onCollision( Tile& tile , Bullet* bullet )
 void Rock::render( Tile const& tile )
 {
 	glColor3f(1,0,0);	
-	drawSprite( tile.pos , mSize , mTex[ RP_DIFFUSE ] );
+	drawSprite( tile.pos , gSimpleBlockSize , mTex[ RP_DIFFUSE ] );
 	glColor3f(1,1,1);
 }

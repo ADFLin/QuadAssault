@@ -15,7 +15,7 @@ class MappingPolicy
 };
 
 template< class T >
-struct SimpleMappingPolicy
+struct SimpleMapping
 {
 public:
 	static T&       getData( T* storage , int sx , int sy , int i , int j )             
@@ -25,14 +25,14 @@ public:
 
 	void build( T* storage , int sx , int sy ){}
 	void cleanup( int sx , int sy ){}
-	void swap( SimpleMappingPolicy& p ){}
+	void swap( SimpleMapping& p ){}
 };
 
 
 template < class T >
-struct FastMappingPolicy
+struct FastMapping
 {
-	FastMappingPolicy(){  mMap = 0;  }
+	FastMapping(){  mMap = 0;  }
 	T&       getData( T* storage , int sx , int sy , int i , int j )             
 	{ assert( mMap ); return mMap[j][i]; }
 	T const& getData( T const* storage , int sx , int sy , int i , int j ) const 
@@ -56,7 +56,7 @@ struct FastMappingPolicy
 		mMap = 0;
 	}
 
-	void swap( FastMappingPolicy& p )
+	void swap( FastMapping& p )
 	{
 		using std::swap;
 		swap( mMap , p.mMap );
@@ -64,7 +64,7 @@ struct FastMappingPolicy
 	T**  mMap;
 };
 
-template < class T , template< class > class MappingPolicy = SimpleMappingPolicy >
+template < class T , template< class > class MappingPolicy = SimpleMapping >
 class TGrid2D : private MappingPolicy< T >
 {
 	typedef MappingPolicy< T > MP;

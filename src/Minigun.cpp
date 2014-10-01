@@ -19,9 +19,10 @@ void Minigun::init( Player* player )
 	mCDSpeed=1500;
 	mEnergyCast=0.5;
 }
-void Minigun::update(float deltaT)
+
+void Minigun::tick()
 {
-	BaseClass::update(deltaT);
+	BaseClass::tick();
 }
 
 void Minigun::doFire( FireHelper& helper )

@@ -14,18 +14,7 @@ enum Team
 class Bullet : public LevelObject
 {
 	typedef LevelObject BaseClass;
-protected:
-	Vec2f  dir;
-	
 
-	float  domet, domet_timer;
-
-	Light* light;
-
-	float mDamage;
-
-public:
-	float  speed;
 
 public:
 	Bullet();
@@ -39,11 +28,17 @@ public:
 	virtual void tick();
 	
 	float getDamage(){ return mDamage; }
+	int  team;
 
+protected:
 
 	friend class MinigunBulletRenderer;
 	friend class LaserBulletRenderer;
-	int  team;
+	Vec2f  dir;
+	float  mLifeTime;
+	float  mTime;
+	float  mDamage;
+	float  mSpeed;
 };
 
 #endif // Bullet_h__

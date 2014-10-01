@@ -7,15 +7,18 @@ class LevelStage;
 
 class PlasmaBullet : public Bullet
 {
-private:
-	float dimTimer; //dok ostvari 10, ostavlja cesticu dima
+
 public:	
 	void init(Vec2f const& poz, Vec2f const& dir, int team );
-	void tick();
-	void onDestroy();
-	void onSpawn();
 
+	virtual void tick();
+	virtual void onDestroy();
+	virtual void onSpawn();
 	virtual IRenderer* getRenderer();
+
+private:
+	Light* light;
+	float  dimTimer; //dok ostvari 10, ostavlja cesticu dima
 };
 
 #endif // PlasmaBullet_h__

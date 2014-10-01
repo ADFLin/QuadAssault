@@ -22,7 +22,7 @@ public:
 		MinigunBullet* bullet = object->cast< MinigunBullet >();
 
 		Vec2f size = Vec2f(16,32);
-		float rot= atan2( bullet->dir.y, bullet->dir.x ) + Math::toRad( 90 );
+		float rot= Math::atan2( bullet->dir.y, bullet->dir.x ) + Math::toRad( 90 );
 		drawSprite( bullet->getPos() - size / 2 , size , rot , texG );
 
 	}
@@ -36,16 +36,16 @@ void MinigunBullet::init(Vec2f const& poz, Vec2f const& dir, int team )
 {
 	Bullet::init(poz,dir,team );
 
-	speed=1000;
-	domet=500;
-	mDamage=0.5;
+	mSpeed    = 1000;
+	mLifeTime = 0.5;
+	mDamage   = 0.5;
 }
 
 void MinigunBullet::onSpawn()
 {
 	BaseClass::onSpawn();
 
-	light->init( getPos() , 128 );
+	light = getLevel()->createLight( getPos() , 128 , false );	
 	light->setColorParam(Vec3(1.0, 1.0, 0.1),12);
 
 	getLevel()->playSound("minigun1.wav");		
@@ -55,6 +55,7 @@ void MinigunBullet::onSpawn()
 void MinigunBullet::tick()
 {
 	Bullet::tick();
+	light->setPos( getPos() );	
 }
 
 

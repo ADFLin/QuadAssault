@@ -50,10 +50,12 @@ public:
 	virtual void tick(){}
 	virtual void postTick(){}
 	virtual void updateRender( float dt ){}
-	virtual IRenderer* getRenderer(){ return NULL; }
+	
 	virtual void render( RenderPass pass ){}
 	virtual void enumProp( PropEditor& editor ){}
 	virtual void onCollision( ColBody& self , ColBody& other ){}
+
+	virtual IRenderer* getRenderer(){ return NULL; }
 
 	Level* getLevel(){ return mLevel; }
 	void   destroy(){ mNeedDestroy = true; }

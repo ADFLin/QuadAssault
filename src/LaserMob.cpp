@@ -31,7 +31,7 @@ void LaserMob::init(Vec2f const& poz)
 	brzinaPunjenja=250;	
 	domet=512;
 
-	hp=40;
+	mHP=40;
 }
 
 void LaserMob::onSpawn()

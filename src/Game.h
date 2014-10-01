@@ -5,6 +5,7 @@
 #include "Base.h"
 #include "Dependence.h"
 #include "GameStage.h"
+#include "IntegerType.h"
 
 
 #include <vector>
@@ -18,7 +19,6 @@ public:
 	void run();
 	void exit();
 
-	float GetFrameTime();
 	void  addStage( GameStage* stage, bool removePrev );
 	void  procWidgetEvent( int event , int id , GWidget* sender );
 	void  procSystemEvent();
@@ -28,11 +28,10 @@ public:
 private:
 
 	unsigned mMouseState;
-	bool     gotovo;
+	bool     mNeedEnd;
 	std::vector<GameStage*> mStageStack;
 	std::vector<sf::Font*>  mFonts;
-	sf::RenderWindow rw;
-	sf::Clock mClock;
+	sf::RenderWindow mWindow;
 
 };
 

@@ -261,14 +261,14 @@ void RenderEngine::renderLighting( RenderParam& param , Light* light )
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void RenderEngine::setupLightShaderParam( Shader* shader , Light& light )
+void RenderEngine::setupLightShaderParam( Shader* shader , Light* light )
 {
 	shader->setParam( "colorLight" , light->color );
 	shader->setParam( "dir" , light->dir );
 	shader->setParam( "angle" , light->angle );
 	shader->setParam( "radius", light->radius );
 	shader->setParam( "intensity" ,light->intensity );
-	shader->setParam( "isExplosion" , ( light->explozija ) ? 1 : 0 );
+	shader->setParam( "isExplosion" , ( light->isExplosion ) ? 1 : 0 );
 }
 
 void RenderEngine::renderGeometryFBO( RenderParam& param )
@@ -414,8 +414,17 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 			{
 				Tile const& tile = terrain.getData( i , j );
 				Block* block = Block::FromType( tile.type );
-				if ( block->checkFlag( BF_CAST_SHADOW ) )
+				if ( !block->checkFlag( BF_CAST_SHADOW ) )
+					continue;
+
+				if ( block->checkFlag( BF_NONSIMPLE ) )
+				{
 					block->renderNoTexture( tile );
+				}
+				else
+				{
+					drawRect( tile.pos , gSimpleBlockSize );
+				}
 			}
 #endif
 
@@ -449,7 +458,6 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 {
 	TileMap& terrain = level->getTerrain();
 
-
 	for(int i = range.xMin; i < range.xMax ; ++i )
 	{
 		for(int j = range.yMin; j < range.yMax; ++j )
@@ -460,29 +468,36 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 			if ( !block->checkFlag( BF_CAST_SHADOW ) )
 				continue;
 
-			Vec2f tileOffset = tile.pos - light->getRenderPos();
-
-			for( int idxCur = 0 , idxPrev = 3; idxCur < 4; idxPrev = idxCur , ++idxCur )
+			if ( block->checkFlag( BF_NONSIMPLE ) )
 			{
-				int nx = i + offsetX[idxCur];
-				int ny = j + offsetY[idxCur];
+				block->renderShadow( tile , *light );
+			}
+			else
+			{
+				Vec2f tileOffset = tile.pos - light->getPos();
+
+				for( int idxCur = 0 , idxPrev = 3; idxCur < 4; idxPrev = idxCur , ++idxCur )
+				{
+					int nx = i + offsetX[idxCur];
+					int ny = j + offsetY[idxCur];
 
 #if 1
-				if ( terrain.checkRange( nx , ny ) && 
-					Block::FromType( terrain.getData( nx , ny ).type )->checkFlag( BF_CAST_SHADOW )  )
-					continue;
+					if ( terrain.checkRange( nx , ny ) && 
+						 Block::FromType( terrain.getData( nx , ny ).type )->checkFlag( BF_CAST_SHADOW )  )
+						continue;
 #endif
-				Vec2f offsetCur  = tileVertex[ idxCur ]  + tileOffset;
-				
-				if ( offsetCur.dot( tileNormal[ idxCur ] ) < 0 )
-				{
+					Vec2f offsetCur  = tileVertex[ idxCur ]  + tileOffset;
+
+					if ( offsetCur.dot( tileNormal[ idxCur ] ) >= 0 )
+						continue;
+	
 					Vec2f offsetPrev = tileVertex[ idxPrev ] + tileOffset;
 
 					Vec2f const& cur  = tile.pos + tileVertex[ idxCur ];
 					Vec2f const& prev = tile.pos + tileVertex[ idxPrev ];
 
-					Vec2f v1 = light->getRenderPos() + 5000 * offsetPrev;
-					Vec2f v2 = light->getRenderPos() + 5000 * offsetCur;
+					Vec2f v1 = light->getPos() + 5000 * offsetPrev;
+					Vec2f v2 = light->getPos() + 5000 * offsetCur;
 
 					glBegin( GL_QUADS );
 					glVertex2f( prev.x , prev.y );
@@ -490,8 +505,19 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 					glVertex2f( v2.x , v2.y  );
 					glVertex2f( cur.x , cur.y );
 					glEnd();
+	
 				}
 			}
 		}
 	}
+}
+
+void RenderEngine::prevRender()
+{
+
+}
+
+void RenderEngine::postRender()
+{
+	::glFlush();
 }

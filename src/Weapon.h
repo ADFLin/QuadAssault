@@ -22,7 +22,7 @@ class Weapon : public Object
 {
 public:
 	virtual void init( Player* player );
-	virtual void update(float deltaT);
+	virtual void tick();
 
 	virtual IRenderer* getRenderer(){ return NULL; }
 

@@ -26,6 +26,21 @@ enum RenderMode
 	
 };
 
+class IFont
+{
+public:
+	static IFont* loadFont( char const* path );
+};
+
+class Text
+{
+
+
+
+
+
+};
+
 struct RenderParam
 {
 	Level*     level;
@@ -49,6 +64,8 @@ public:
 	Vec3 const& getAmbientLight() const { return mAmbientLight; }
 	void        setAmbientLight( Vec3 const& color ) { mAmbientLight = color; }
 
+	void        prevRender();
+	void        postRender();
 private:
 
 	void   renderLightFBO( RenderParam& param );
@@ -63,7 +80,7 @@ private:
 
 	void   renderLighting( RenderParam& param , Light* light );
 	bool   setupFBO( int width , int height );
-	void   setupLightShaderParam( Shader* shader , Light& light );
+	void   setupLightShaderParam( Shader* shader , Light* light );
 
 	std::vector<Shader*> mShaders;
 

@@ -32,7 +32,7 @@ void MinigunMob::init(Vec2f const& poz)
 	brzinaPunjenja=750;	
 	domet=512;
 
-	hp=35;
+	mHP=35;
 
 }
 

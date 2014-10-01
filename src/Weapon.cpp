@@ -25,9 +25,9 @@ void Weapon::init( Player* player )
 	mEnergyCast = 1;
 }
 
-void Weapon::update(float deltaT)
+void Weapon::tick()
 {	
-	mFireTimer += mCDSpeed * deltaT;
+	mFireTimer += mCDSpeed * TICK_TIME;
 }
 
 void Weapon::fire( Vec2f const& pos, Vec2f const& dir, int team )

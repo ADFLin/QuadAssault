@@ -5,8 +5,7 @@
 void ItemPickup::Init( Vec2f poz )
 {
 	setPos( poz );
-	mSize.x=32;
-	mSize.y=32;	
+	setSize( Vec2f( 32 , 32 ) );
 }
 
 void ItemPickup::tick()

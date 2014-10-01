@@ -15,6 +15,8 @@ public:
 
 	virtual IRenderer* getRenderer();
 
+private:
+	Light* light;
 };
 
 

@@ -32,7 +32,7 @@ void PlasmaMob::init(Vec2f const& poz )
 	brzinaPunjenja=50;	
 	domet=512;
 
-	hp=60;
+	mHP=60;
 
 }
 

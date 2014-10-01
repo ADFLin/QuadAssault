@@ -25,7 +25,7 @@ void Mob::init( Vec2f const& poz )
 	punjenje=0;
 	domet=512;
 
-	hp=100;	
+	mHP=100;	
 }
 
 void Mob::onSpawn()
@@ -96,7 +96,7 @@ void Mob::tick()
 		punjenje+=brzinaPunjenja* TICK_TIME;
 	}
 
-	if( hp<=0 )
+	if( mHP<=0 )
 	{
 		destroy();
 	}
@@ -179,7 +179,7 @@ void Mob::SudarProjektila()
 
 void Mob::takeDamage(Bullet* bullet)
 {
-	hp -= bullet->getDamage();
+	mHP -= bullet->getDamage();
 	bullet->destroy();
 }
 

@@ -59,9 +59,9 @@ void MinePickup::onSpawn()
 	dir.y/=5;
 	Math::normalize( dir );
 
-	light = getLevel()->createLight( getRenderPos() ,64 , false);
+	light = getLevel()->createLight( getPos() ,64 , false);
 	light->setColorParam(Vec3(1.0, 0.75, 0.5),4);	
-	light->SetExplozija(true);
+	light->isExplosion = true;
 }
 
 void MinePickup::onDestroy()

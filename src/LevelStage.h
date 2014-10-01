@@ -97,7 +97,7 @@ private:
 	float       mWorldScaleFactor;
 
 
-	sf::Music mMusic;
+	sf::Music  mMusic;
 
 	Texture* mTexCursor;
 	

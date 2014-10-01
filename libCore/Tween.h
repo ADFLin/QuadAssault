@@ -426,7 +426,7 @@ namespace Tween
 			{
 				typedef CTween< Fun , ValueAccess< T > , FunParam  > MyTween;
 				MyTween* t = new MyTween( data , from , to , durtion , delay , param );
-				_this()->addImpl( t );
+				_this()->addComponent( t );
 				return *t;
 			}
 
