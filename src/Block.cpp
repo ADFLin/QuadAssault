@@ -28,7 +28,7 @@ static BlockInfo const gInfo[] =
 	{ TID_ROCK , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
 };
 
-void Block::Init( unsigned char tip )
+void Block::init( unsigned char tip )
 {
 	BlockInfo const& info = gInfo[ tip ];
 
@@ -95,7 +95,7 @@ void Block::initMap( Level* level )
 
 	for( int i = 0 ; i < NUM_BLOCK_TYPE ; ++i )
 	{
-		gBlockMap[i]->Init( i );
+		gBlockMap[i]->init( i );
 	}
 }
 

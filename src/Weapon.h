@@ -45,6 +45,7 @@ protected:
 	float   mCDSpeed;
 	float   mEnergyCast;
 	Player* mOwner;
+	Vec2f   mSize;
 };
 
 

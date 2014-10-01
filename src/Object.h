@@ -10,18 +10,12 @@ public:
 	Object();
 	virtual ~Object(){}
 	
-	Vec2f const& getSize() const { return mSize; }
 	Vec2f const& getPos() const { return mPos; }
+	void         setPos(Vec2f const& pos){ mPos = pos; }
 
-	Vec2f getRenderPos() const { return mPos - mSize / 2; }
-
-	void  setPos(Vec2f const& pos){ mPos = pos; }
-	void  setSize(Vec2f const& size ){ mSize = size; }
-
-	void calcBoundBox( Rect& bBox );
 protected:
 	Vec2f mPos;
-	Vec2f mSize;	
+		
 };
 
 class Level;
@@ -42,15 +36,12 @@ enum ObjectType
 
 
 class IRenderer;
+class ColBody;
 
 class LevelObject : public Object
 {
 public:
-	LevelObject()
-	{
-		mNeedDestroy = false;
-		mLevel = NULL;
-	}
+	LevelObject();
 	
 	virtual ObjectType getType() = 0;
 
@@ -62,6 +53,7 @@ public:
 	virtual IRenderer* getRenderer(){ return NULL; }
 	virtual void render( RenderPass pass ){}
 	virtual void enumProp( PropEditor& editor ){}
+	virtual void onCollision( ColBody& self , ColBody& other ){}
 
 	Level* getLevel(){ return mLevel; }
 	void   destroy(){ mNeedDestroy = true; }
@@ -76,7 +68,15 @@ public:
 #endif
 	}
 
+	Vec2f        getRenderPos() const { return mPos - mSize / 2; }
+	Vec2f const& getSize() const { return mSize; }
+	void         setSize(Vec2f const& size ){ mSize = size; }
+
+	void         calcBoundBox( Rect& bBox );
+
 protected:
+
+	Vec2f mSize;
 	friend class Level;
 
 	HookNode baseHook;

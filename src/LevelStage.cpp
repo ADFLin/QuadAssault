@@ -441,7 +441,7 @@ void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 		mPause = false;
 		break;
 	case UI_EXIT_GAME:
-		tranzicija=ST_FADEOUT;
+		tranzicija = ST_FADEOUT;
 		break;
 	}
 }

@@ -1,17 +1,26 @@
 #include "Object.h"
 
 Object::Object()
+	:mPos( 0 , 0 )
 {
-	mPos  = Vec2f(0,0);
-	mSize = Vec2f(0,0);
+
 }
 
-void Object::calcBoundBox( Rect& bBox )
+LevelObject::LevelObject() 
+	:mSize( 0 , 0 )
+{
+	mNeedDestroy = false;
+	mLevel = NULL;
+}
+
+
+void LevelObject::calcBoundBox( Rect& bBox )
 {
 	Vec2f half = mSize / 2;
 	bBox.min = mPos - half;
 	bBox.max = mPos + half;
 }
+
 
 
 IRenderer* gLink;

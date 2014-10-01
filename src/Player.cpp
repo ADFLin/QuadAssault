@@ -15,6 +15,14 @@
 
 bool gPlayerGodPower = true;
 
+Vec2f const gWeaponSlotOffset[] = 
+{
+	Vec2f(-9,-20) ,
+	Vec2f( 9,-20) , 
+	Vec2f(-24,0 ) ,
+	Vec2f( 24,0 ) ,
+};
+
 class PlayerRenderer : public IRenderer
 {
 public:
@@ -75,7 +83,6 @@ public:
 				glPushMatrix();
 				glTranslatef( centerPos.x,centerPos.y,0 );
 				glRotatef( Math::toDegree( player->rotationAim ) + 90 ,0,0,1 );
-				glTranslatef(weapon->getRenderPos().x ,weapon->getRenderPos().y ,0 );
 				weapon->render( pass );
 				glPopMatrix();
 			}
@@ -409,20 +416,13 @@ void Player::takeDamage(Bullet* p)
 
 void Player::addWeapon( Weapon* weapon )
 {
-	Vec2f const posSlot[] = 
-	{
-		Vec2f(-8,-12) ,
-		Vec2f(8,-12), 
-		Vec2f(-24,0),
-		Vec2f(24,0) ,
-	};
 	for(int i=0; i<4; i++ )
 	{
 		if( weaponSlot[i] )
 			continue;
 
 		weapon->init( this );
-		weapon->setPos( posSlot[i] );
+		weapon->setPos( gWeaponSlotOffset[i] );
 
 		weaponSlot[i] = weapon;
 		weapon = NULL;

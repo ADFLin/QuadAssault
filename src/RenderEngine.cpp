@@ -113,8 +113,8 @@ void RenderEngine::renderScene( RenderParam& param )
 
 	TileRange& renderRange = param.terrainRange;
 
-	renderRange.xMin = int( param.camera->getRenderPos().x/BLOCK_SIZE )-1;
-	renderRange.yMin = int( param.camera->getRenderPos().y/BLOCK_SIZE )-1;
+	renderRange.xMin = int( param.camera->getPos().x/BLOCK_SIZE )-1;
+	renderRange.yMin = int( param.camera->getPos().y/BLOCK_SIZE )-1;
 	renderRange.xMax = renderRange.xMin + int( param.renderWidth / BLOCK_SIZE ) + 3;
 	renderRange.yMax = renderRange.yMin + int( param.renderHeight / BLOCK_SIZE ) + 3;
 
@@ -235,7 +235,7 @@ void RenderEngine::renderLighting( RenderParam& param , Light* light )
 {
 	mShaderLighting->bind();
 
-	Vec2f posLight = light->getRenderPos() - param.camera->getRenderPos();
+	Vec2f posLight = light->getPos() - param.camera->getPos();
 
 	mShaderLighting->setParam( "posLight" , posLight );
 
@@ -246,7 +246,7 @@ void RenderEngine::renderLighting( RenderParam& param , Light* light )
 	glBindTexture(GL_TEXTURE_2D, mTexNormalMap );
 	mShaderLighting->setParam( "texNormalMap" , 0 );	
 	
-	light->setupShader( mShaderLighting );
+	setupLightShaderParam( mShaderLighting , light );
 
 	glColor3f(1,1,1);	
 
@@ -261,6 +261,16 @@ void RenderEngine::renderLighting( RenderParam& param , Light* light )
 	glActiveTexture(GL_TEXTURE0);
 }
 
+void RenderEngine::setupLightShaderParam( Shader* shader , Light& light )
+{
+	shader->setParam( "colorLight" , light->color );
+	shader->setParam( "dir" , light->dir );
+	shader->setParam( "angle" , light->angle );
+	shader->setParam( "radius", light->radius );
+	shader->setParam( "intensity" ,light->intensity );
+	shader->setParam( "isExplosion" , ( light->explozija ) ? 1 : 0 );
+}
+
 void RenderEngine::renderGeometryFBO( RenderParam& param )
 {
 	glBindFramebuffer(GL_FRAMEBUFFER ,mFBOColor);		
@@ -273,7 +283,7 @@ void RenderEngine::renderGeometryFBO( RenderParam& param )
 
 	glPushMatrix();
 	//Sprite(Vec2(0,0),Vec2(igra->DajRW()->getSize().x, igra->DajRW()->getSize().y),mt->DajTexturu(1)->id);
-	glTranslatef( - param.camera->getRenderPos().x, - param.camera->getRenderPos().y, 0);			
+	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
 
 	renderTerrain( param.level , param.terrainRange );
 	param.level->renderObjects(RP_DIFFUSE);	
@@ -295,7 +305,7 @@ void RenderEngine::renderNormalFBO( RenderParam& param )
 
 	glPushMatrix();	
 
-	glTranslatef( - param.camera->getRenderPos().x, - param.camera->getRenderPos().y, 0);			
+	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
 
 	//Sprite(Vec2(0,0),Vec2(igra->DajRW()->getSize().x, igra->DajRW()->getSize().y),mt->DajTexturu(1)->id);
 	renderTerrainNormal( param.level , param.terrainRange );		
@@ -332,7 +342,7 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 
 	glPushMatrix();
-	glTranslatef(-camera->getRenderPos().x, -camera->getRenderPos().y, 0);
+	glTranslatef(-camera->getPos().x, -camera->getPos().y, 0);
 	renderTerrainGlow( param.level , param.terrainRange );
 	param.level->renderObjects(RP_GLOW);
 	glPopMatrix();
@@ -350,10 +360,10 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 	{		
 		Light* light = *iter;
 
-		if( light->getRenderPos().x + light->radius < camera->getRenderPos().x ||
-			light->getRenderPos().x - light->radius > camera->getRenderPos().x + w ||
-			light->getRenderPos().y + light->radius < camera->getRenderPos().y || 
-			light->getRenderPos().y - light->radius > camera->getRenderPos().y + h )
+		if( light->getPos().x + light->radius < camera->getPos().x ||
+			light->getPos().x - light->radius > camera->getPos().x + w ||
+			light->getPos().y + light->radius < camera->getPos().y || 
+			light->getPos().y - light->radius > camera->getPos().y + h )
 			continue;
 
 		if ( light->drawShadow )
@@ -371,12 +381,12 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 			
 			glPushMatrix();
-			glTranslatef(-camera->getRenderPos().x, -camera->getRenderPos().y, 0);
+			glTranslatef(-camera->getPos().x, -camera->getPos().y, 0);
 
 			TileRange range = param.terrainRange;
 
-			int tx = int( light->getRenderPos().x / BLOCK_SIZE );
-			int ty = int( light->getRenderPos().y / BLOCK_SIZE );
+			int tx = int( light->getPos().x / BLOCK_SIZE );
+			int ty = int( light->getPos().y / BLOCK_SIZE );
 
 			if ( tx < range.xMin )
 				range.xMin = tx;
@@ -458,7 +468,7 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 				int ny = j + offsetY[idxCur];
 
 #if 1
-				if ( terrain.isVaildRange( nx , ny ) && 
+				if ( terrain.checkRange( nx , ny ) && 
 					Block::FromType( terrain.getData( nx , ny ).type )->checkFlag( BF_CAST_SHADOW )  )
 					continue;
 #endif

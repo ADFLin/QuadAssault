@@ -116,7 +116,7 @@ void LevelStage::onSystemEventDev( sf::Event const& event )
 
 				Vec2i tPos = convertToTilePos( getGame()->getMousePos() );
 
-				if ( getTerrain().isVaildRange( tPos.x , tPos.y ) )
+				if ( getTerrain().checkRange( tPos.x , tPos.y ) )
 				{
 					Tile& tile = getTerrain().getData( tPos.x , tPos.y );
 					tile.type = mEditTileType;

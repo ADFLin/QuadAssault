@@ -18,7 +18,7 @@ struct TileRange
 
 enum RenderMode
 {
-	RM_ALL = 0,
+	RM_ALL = 0 ,
 	RM_GEOMETRY  ,
 	RM_LINGHTING ,
 	RM_NORMAL_MAP ,
@@ -63,6 +63,7 @@ private:
 
 	void   renderLighting( RenderParam& param , Light* light );
 	bool   setupFBO( int width , int height );
+	void   setupLightShaderParam( Shader* shader , Light& light );
 
 	std::vector<Shader*> mShaders;
 

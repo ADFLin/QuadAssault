@@ -17,9 +17,7 @@ void FireHelper::fire( Bullet* bullet , Vec2f const& offset )
 void Weapon::init( Player* player )
 {	
 	mOwner = player;
-
-	setPos( Vec2f(0,0) );
-	setSize( Vec2f( 16 , 32 ) );
+	mSize = Vec2f( 16 , 32 );
 
 	mCDTime    = 100;
 	mFireTimer = mCDTime;
@@ -56,6 +54,8 @@ void Weapon::render( RenderPass pass )
 {
 	float factor = std::min( 1.0f , mFireTimer / mCDTime );
 
+	Vec2f rPos = getPos() - mSize / 2;
+
 	float off;
 	float len = 20;
 	if ( factor < 0.5 )
@@ -74,7 +74,7 @@ void Weapon::render( RenderPass pass )
 	mTextues[ pass ]->bind();
 
 	glPushMatrix();
-	glTranslatef( 0 , off , 0 );
+	glTranslatef( rPos.x , rPos.y + off , 0 );
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0, 0.0); glVertex2f(0,0);	

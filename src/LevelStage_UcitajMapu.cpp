@@ -75,7 +75,7 @@ void LevelStage::LoadLevel()
 					getline(lstring,token,' ');
 					int meta = atoi(token.c_str());
 
-					if ( mTerrain.isVaildRange( x , y ) )
+					if ( mTerrain.checkRange( x , y ) )
 					{
 						Tile& tile = mTerrain.getData( x , y ); 
 						tile.type = type;

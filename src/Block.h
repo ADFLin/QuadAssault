@@ -53,7 +53,7 @@ public:
 	virtual ~Block(){}
 	bool  checkFlag( unsigned checkBits ){ return ( flag & checkBits) != 0; }
 
-	virtual void  Init( unsigned char tip );
+	virtual void  init( unsigned char tip );
 	virtual void  onCollision( Tile& tile , Bullet* bullet );
 	virtual void  render( Tile const& tile );
 

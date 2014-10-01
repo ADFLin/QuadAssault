@@ -240,7 +240,7 @@ void Level::changeState( State state )
 
 Tile* Level::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned skipFlag )
 {
-	if ( !mTerrain.isVaildRange( tPos.x , tPos.y ) )
+	if ( !mTerrain.checkRange( tPos.x , tPos.y ) )
 		return NULL;
 
 	Tile& tile = mTerrain.getData( tPos.x , tPos.y );

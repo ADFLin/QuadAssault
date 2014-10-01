@@ -50,13 +50,3 @@ void Light::tick()
 
 }
 
-void Light::setupShader(Shader* s )
-{
-	s->setParam( "colorLight" , color );
-	s->setParam( "dir" , dir );
-	s->setParam( "angle" , angle );
-	s->setParam( "radius", radius );
-	s->setParam( "intensity" ,intensity );
-	s->setParam( "isExplosion" , ( explozija ) ? 1 : 0 );
-
-}

@@ -96,24 +96,24 @@ bool MenuStage::init()
 	string linija;
 	while(getline(file,linija))
 	{
-		std::istringstream lstring(linija, std::ios::in);
-		string vrijednost;
-		while(getline(lstring,vrijednost,' '))
+		std::istringstream stream(linija, std::ios::in);
+		string token;
+		while(getline(stream,token,' '))
 		{
-			if(vrijednost=="[NIVO]")
+			if(token=="[NIVO]")
 			{				
 				mLevels.push_back(LevelInfo());
 				mLevels.back().index = mLevels.size() - 1;
 			}
-			else if(vrijednost=="datoteka")
+			else if(token=="datoteka")
 			{
-				getline(lstring,vrijednost,' ');
-				mLevels.back().datoteka=vrijednost;
+				getline(stream,token,' ');
+				mLevels.back().datoteka=token;
 			}
-			else if(vrijednost=="datoteka_g")
+			else if(token=="datoteka_g")
 			{
-				getline(lstring,vrijednost,' ');
-				mLevels.back().datoteka_g=vrijednost;
+				getline(stream,token,' ');
+				mLevels.back().datoteka_g=token;
 			}
 		}
 	}
