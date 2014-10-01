@@ -60,19 +60,7 @@ void Block::renderNormal( Tile const& tile )
 
 void Block::renderGlow( Tile const& tile )
 {
-	if( type == TID_DOOR )
-	{
-		switch ( tile.meta )
-		{
-		case DOOR_RED:   glColor3f(1.0f, 0.2f, 0.2f); break;
-		case DOOR_BLUE:  glColor3f(0.2f, 0.2f, 1.0f); break;
-		case DOOR_GREEN: glColor3f(0.2f, 1.0f, 0.2f); break;
-		default:
-			glColor3f(1,1,1);
-		}
-		drawSprite( tile.pos, gSimpleBlockSize , mTex[ RP_GLOW ] );
-		glColor3f(1,1,1);
-	}
+
 }
 
 void Block::renderNoTexture( Tile const& tile )
@@ -90,8 +78,8 @@ void Block::initMap( Level* level )
 	gBlockMap[ TID_FLAT ] = new Block;
 	gBlockMap[ TID_WALL ] = new Block;
 	gBlockMap[ TID_GAP  ] = new Block;
-	gBlockMap[ TID_DOOR ] = new Block;
-	gBlockMap[ TID_ROCK ] = new Rock;
+	gBlockMap[ TID_DOOR ] = new DoorBlock;
+	gBlockMap[ TID_ROCK ] = new RockBlock;
 
 	for( int i = 0 ; i < NUM_BLOCK_TYPE ; ++i )
 	{
@@ -114,7 +102,7 @@ void Block::onCollision( Tile& tile , Bullet* bullet )
 	bullet->destroy();
 }
 
-void Rock::onCollision( Tile& tile , Bullet* bullet )
+void RockBlock::onCollision( Tile& tile , Bullet* bullet )
 {
 	tile.meta -= 100 * bullet->getDamage();
 	if ( tile.meta < 0 )
@@ -130,9 +118,23 @@ void Rock::onCollision( Tile& tile , Bullet* bullet )
 	bullet->destroy();
 }
 
-void Rock::render( Tile const& tile )
+void RockBlock::render( Tile const& tile )
 {
 	glColor3f(1,0,0);	
 	drawSprite( tile.pos , gSimpleBlockSize , mTex[ RP_DIFFUSE ] );
+	glColor3f(1,1,1);
+}
+
+void DoorBlock::renderGlow( Tile const& tile )
+{
+	switch ( tile.meta )
+	{
+	case DOOR_RED:   glColor3f(1.0f, 0.2f, 0.2f); break;
+	case DOOR_BLUE:  glColor3f(0.2f, 0.2f, 1.0f); break;
+	case DOOR_GREEN: glColor3f(0.2f, 1.0f, 0.2f); break;
+	default:
+		glColor3f(1,1,1);
+	}
+	drawSprite( tile.pos, gSimpleBlockSize , mTex[ RP_GLOW ] );
 	glColor3f(1,1,1);
 }

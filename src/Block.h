@@ -54,10 +54,10 @@ public:
 
 	virtual void  init( unsigned char tip );
 	virtual void  onCollision( Tile& tile , Bullet* bullet );
-	virtual void  render( Tile const& tile );
 
-	void  renderNormal( Tile const& tile );
-	void  renderGlow( Tile const& tile );
+	virtual void  render( Tile const& tile );
+	virtual void  renderNormal( Tile const& tile );
+	virtual void  renderGlow( Tile const& tile );
 
 	//call when block is not simple
 	virtual void  renderNoTexture( Tile const& tile );
@@ -75,11 +75,18 @@ protected:
 };
 
 
-class Rock : public Block
+class RockBlock : public Block
 {
 public:
 	virtual void  onCollision( Tile& tile , Bullet* bullet );
 	void render( Tile const& tile );
+};
+
+class DoorBlock : public Block
+{
+public:
+	virtual void renderGlow( Tile const& tile );
+
 };
 
 

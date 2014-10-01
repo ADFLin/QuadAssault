@@ -417,14 +417,7 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 				if ( !block->checkFlag( BF_CAST_SHADOW ) )
 					continue;
 
-				if ( block->checkFlag( BF_NONSIMPLE ) )
-				{
-					block->renderNoTexture( tile );
-				}
-				else
-				{
-					drawRect( tile.pos , gSimpleBlockSize );
-				}
+				block->renderNoTexture( tile );
 			}
 #endif
 
