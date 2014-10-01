@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "SysMsg.h"
-
-#define PROFILE_ENTRY( NAME )
+//#include "ProfileSystem.h"
+#define PROFILE_ENTRY(...)
 
 
 #ifndef BIT
@@ -172,6 +172,7 @@ protected:
 	
 public:
 
+	virtual void  deleteThis(){ delete this; }
 	virtual bool  onKeyMsg( char key , bool beDown ){ (void)key; (void)beDown; return true; }
 	virtual bool  onCharMsg( char c ){ (void)c; return true; }
 	virtual bool  onMouseMsg( MouseMsg const& msg){ (void)msg; return false; }

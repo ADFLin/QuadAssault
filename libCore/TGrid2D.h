@@ -3,6 +3,7 @@
 
 #include <cassert>
 
+
 template< class T >
 class MappingPolicy
 {
@@ -10,6 +11,7 @@ class MappingPolicy
 	T const& getData( T const* storage , int sx , int sy , int i , int j ) const;
 	void build( T* storage , int sx , int sy );
 	void cleanup();
+	void swap( MappingPolicy& p );
 };
 
 template< class T >
@@ -17,12 +19,13 @@ struct SimpleMappingPolicy
 {
 public:
 	static T&       getData( T* storage , int sx , int sy , int i , int j )             
-	{ assert( storage ); return storage[ j + sy * i ];  }
+	{ assert( storage ); return storage[ i + sx * j ];  }
 	static T const& getData( T const* storage , int sx , int sy , int i , int j )
-	{ assert( storage ); return storage[ j + sy * i ];  }
+	{ assert( storage ); return storage[ i + sx * j ];  }
 
 	void build( T* storage , int sx , int sy ){}
 	void cleanup( int sx , int sy ){}
+	void swap( SimpleMappingPolicy& p ){}
 };
 
 
@@ -31,26 +34,32 @@ struct FastMappingPolicy
 {
 	FastMappingPolicy(){  mMap = 0;  }
 	T&       getData( T* storage , int sx , int sy , int i , int j )             
-	{ assert( mMap ); return mMap[i][j]; }
+	{ assert( mMap ); return mMap[j][i]; }
 	T const& getData( T const* storage , int sx , int sy , int i , int j ) const 
-	{ assert( mMap ); return mMap[i][j]; }
+	{ assert( mMap ); return mMap[j][i]; }
 
 	inline void build( T* storage , int sx , int sy )
 	{
-		mMap     = new T*[ sx ];
+		mMap     = new T*[ sy ];
 		
 		T**  ptrMap = mMap;
-		for( int i = 0 ; i < sx; ++i )
+		for( int i = 0 ; i < sy; ++i )
 		{
 			*ptrMap = storage;
 			++ptrMap;
-			storage += sy;
+			storage += sx;
 		}
 	}
 	inline void cleanup( int sx , int sy )
 	{
 		delete [] mMap;
 		mMap = 0;
+	}
+
+	void swap( FastMappingPolicy& p )
+	{
+		using std::swap;
+		swap( mMap , p.mMap );
 	}
 	T**  mMap;
 };
@@ -81,23 +90,29 @@ public:
 	iterator begin(){ return mStorage; }
 	iterator end()  { return mStorage + mSizeX * mSizeY; }
 
-	T&       getData( int i , int j )       { assert( isVaildRange( i , j ) ); return MP::getData( mStorage , mSizeX , mSizeY , i , j ); }
-	T const& getData( int i , int j ) const { assert( isVaildRange( i , j ) ); return MP::getData( mStorage , mSizeX , mSizeY , i , j ); }
+	T&       getData( int i , int j )       { assert( checkRange( i , j ) ); return MP::getData( mStorage , mSizeX , mSizeY , i , j ); }
+	T const& getData( int i , int j ) const { assert( checkRange( i , j ) ); return MP::getData( mStorage , mSizeX , mSizeY , i , j ); }
 
 	T&       operator()( int i , int j )       { return getData( i , j ); }
 	T const& operator()( int i , int j ) const { return getData( i , j ); }
 
+
 	T&       operator[]( int idx )       { assert( 0 <= idx && idx < mSizeX * mSizeY ); return mStorage[ idx ]; }
 	T const& operator[]( int idx ) const { assert( 0 <= idx && idx < mSizeX * mSizeY ); return mStorage[ idx ]; }
+
+	T*       getRawData()       { return mStorage; }
+	T const* getRawData() const { return mStorage; }
+
+	int  toIndex( int x , int y ) const { return x + y * mSizeX; }
 
 	void resize( int x , int y )
 	{
 		cleanup();
 		build( x , y );
 	}
-	void fillData( T const& val ){	std::fill_n( mStorage , mSizeX * mSizeY , val );  }
+	void fillValue( T const& val ){	std::fill_n( mStorage , mSizeX * mSizeY , val );  }
 
-	bool isVaildRange( int i , int j ) const
+	bool checkRange( int i , int j ) const
 	{
 		return 0 <= i && i < mSizeX && 
 			   0 <= j && j < mSizeY;
@@ -112,10 +127,17 @@ public:
 	int      getSizeX() const { return mSizeX; }
 	int      getSizeY() const { return mSizeY; }
 	int      getRawDataSize() const { return mSizeX * mSizeY; }
-	T*       getRawData()       { return mStorage; }
-	T const* getRawData() const { return mStorage; }
 
-	int toIndex( int x , int y ) const { return y + x * mSizeY; }
+
+	void     swap( TGrid2D& other )
+	{
+		using std::swap;
+		swap( mStorage , other.mStorage );
+		swap( mSizeX , other.mSizeX );
+		swap( mSizeY , other.mSizeY );
+		MP::swap( *this );
+	}
+
 
 private:
 

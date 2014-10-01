@@ -683,7 +683,7 @@ void TUIManager<T>::destroyNoCheck( TUICore<T>* ui )
 	removeRefUI( ui );
 	ui->_destroyChildren();
 	ui->_unlinkInternal();
-	delete ui;
+	ui->deleteThis();
 }
 
 template< class T >
