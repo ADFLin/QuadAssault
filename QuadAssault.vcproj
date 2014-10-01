@@ -468,7 +468,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libCore\EasingFun.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libCore\IntegerType.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libCore\IntrList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libCore\MetaBase.hpp"
 				>
 			</File>
 			<File
