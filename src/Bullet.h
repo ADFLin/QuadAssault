@@ -28,10 +28,9 @@ public:
 	virtual void onSpawn();
 	virtual void onDestroy();
 	virtual void tick();
-	
-	float getDamage(){ return mDamage; }
-
 	virtual void onTileCollision( ColBody& self , Tile& tile );
+
+	float getDamage(){ return mDamage; }
 
 	int  team;
 

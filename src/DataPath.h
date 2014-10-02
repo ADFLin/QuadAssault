@@ -7,7 +7,7 @@
 #define TEXTURE_DIR "data/Textures/"
 #define SHADER_DIR  "shader/"
 
-#define LEVEL_LOCK_FILE "nivoLock.gdf"
+#define LEVEL_LOCK_FILE "LevelLock.gdf"
 
 
 #endif // DataPath_h__

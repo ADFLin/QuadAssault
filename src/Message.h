@@ -27,7 +27,7 @@ private:
 	float   mDurstion; //trajanje poruke u sekundama
 
 	float    timer; //pocinje od nule	
-	Texture* portret;
+	Texture* portrait;
 	string   mSoundName;	
 	Sound*   sound;
 

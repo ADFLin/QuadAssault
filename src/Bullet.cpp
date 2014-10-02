@@ -58,17 +58,6 @@ void Bullet::tick()
 
 	if( mTime > mLifeTime )
 		destroy();
-
-	//Rect bBox;
-	//calcBoundBox( bBox );
-
-	//TileMap& terrain = getLevel()->getTerrain();
-	//Tile* tile = getLevel()->testTerrainCollision( bBox , COL_FLY_SOILD );
-	//if ( tile )
-	//{
-	//	Block* block = Block::FromType( tile->type );
-	//	block->onCollision( *tile , this );
-	//}
 }
 
 void Bullet::onTileCollision( ColBody& self , Tile& tile )

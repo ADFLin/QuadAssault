@@ -43,8 +43,9 @@ bool LevelStage::init()
 	mStepEdit=0;
 	sr=1.0; sg=10; sb=1.0; si=8.0; srad=128.0;
 
-	mTexCursor = getGame()->getTextureMgr()->getTexture("kurzor.tga");	
-	getGame()->getTextureMgr()->loadTexture("pozadinaSvemir.tga");
+	mTexCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
+
+	getGame()->getTextureMgr()->loadTexture("backgroundUniverse.tga");
 
 	GUISystem::getInstance().cleanupWidget();
 
@@ -57,16 +58,16 @@ bool LevelStage::init()
 		GImageButton* button;
 
 		button = new GImageButton( UI_CREATE_LIGHT , Vec2i(16,32),Vec2i(32,32) , frame );
-		button->texImag = getGame()->getTextureMgr()->getTexture("gumb_svjetlo.tga");
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
 
 		button = new GImageButton( UI_CREATE_TRIGGER ,Vec2i(64,32),Vec2i(32,32) , frame );
-		button->texImag = getGame()->getTextureMgr()->getTexture("gumb_svjetlo.tga");
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
 
 		button = new GImageButton( UI_EMPTY_MAP  ,Vec2i(16,72),Vec2i(32,32) , frame );
-		button->texImag = getGame()->getTextureMgr()->getTexture("gumb_gen.tga");
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
 
 		button = new GImageButton( UI_SAVE_MAP ,Vec2i(64,72),Vec2i(32,32) , frame );
-		button->texImag = getGame()->getTextureMgr()->getTexture("gumb_spremi.tga");
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
 	}
 
 	{

@@ -1,10 +1,13 @@
 #ifndef LevelEditStage_h__
 #define LevelEditStage_h__
 
-#include ""
+#include "LevelStage.h"
 
-class LevelEditStage
+class LevelEditStage : public LevelStageBase
 {
+
+
+
 
 };
 

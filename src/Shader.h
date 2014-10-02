@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef Shader_h__
+#define Shader_h__
 
 #include "Dependence.h"
 #include "MathCore.h"
@@ -58,4 +58,6 @@ private:
 	GLuint vertex_program;
 	GLuint fragment_program;
 };
-#endif
+
+
+#endif // Shader_h__

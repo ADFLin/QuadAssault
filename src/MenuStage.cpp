@@ -19,7 +19,7 @@ bool MenuStage::init()
 {
 	mNeedExit=false;	
 
-	texCursor = getGame()->getTextureMgr()->getTexture("kurzor.tga");
+	texCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
 	texBG     = getGame()->getTextureMgr()->getTexture("Menu1.tga");
 	texBG2    = getGame()->getTextureMgr()->getTexture("MenuLoading1.tga");		
 
@@ -66,7 +66,7 @@ bool MenuStage::init()
 
 	mAboutText.setFont( *font );		
 	mAboutText.setColor(sf::Color(50,255,25));
-	mAboutText.setCharacterSize(18);
+	mAboutText.setCharacterSize( 22 );
 	char const* text =
 		"QuadAssault v1.0\n"
 		"----------------\n"
@@ -93,7 +93,7 @@ bool MenuStage::init()
 	mAboutText.setString(text);		
 	mAboutText.setPosition(32, 32);	
 
-	std::ifstream file( LEVEL_DIR "nivoLista.gdf" , std::ios::in );
+	std::ifstream file( LEVEL_DIR "LevelList.gdf" , std::ios::in );
 	string linija;
 	while(getline(file,linija))
 	{
@@ -101,20 +101,20 @@ bool MenuStage::init()
 		string token;
 		while(getline(stream,token,' '))
 		{
-			if(token=="[NIVO]")
+			if(token=="[LEVEL]")
 			{				
 				mLevels.push_back(LevelInfo());
 				mLevels.back().index = mLevels.size() - 1;
 			}
-			else if(token=="datoteka")
+			else if(token=="level_file")
 			{
 				getline(stream,token,' ');
-				mLevels.back().datoteka=token;
+				mLevels.back().levelFile = token;
 			}
-			else if(token=="datoteka_g")
+			else if(token=="map_file")
 			{
 				getline(stream,token,' ');
-				mLevels.back().datoteka_g=token;
+				mLevels.back().mapFile = token;
 			}
 		}
 	}
@@ -219,8 +219,8 @@ void MenuStage::onWidgetEvent( int event , int id , GWidget* sender )
 		{
 			LevelInfo* info = static_cast< LevelInfo* >( sender->getUserData() );
 			renderLoading();
-			gLevelFileName   = info->datoteka;
-			gMapFileName     = info->datoteka_g;
+			gLevelFileName   = info->levelFile;
+			gMapFileName     = info->mapFile;
 			gIdxCurLevel     = info->index;
 			getGame()->addStage(new LevelStage(), true);
 		}

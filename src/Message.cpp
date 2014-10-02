@@ -28,7 +28,7 @@ void Message::init( string const& sender, string const& content, float durstion,
 	text.setCharacterSize(24);
 	text.setColor(sf::Color(255,255,255));
 
-	portret = getGame()->getTextureMgr()->getTexture("portret2.tga");	
+	portrait = getGame()->getTextureMgr()->getTexture("portrait2.tga");	
 }
 
 void Message::nodifyShow()
@@ -75,9 +75,9 @@ void Message::renderFrame()
 
 	glColor3f(1.0, 1.0, 1.0);	
 
-	glEnable(GL_TEXTURE_2D);//PORTRET
+	glEnable(GL_TEXTURE_2D);//portrait
 
-	portret->bind();
+	portrait->bind();
 	glBegin(GL_QUADS); 
 	glTexCoord2f(0.0, 0.0); glVertex2f(mPos.x-32,mPos.y);
 	glTexCoord2f(1.0, 0.0); glVertex2f(mPos.x+32,mPos.y);
@@ -96,6 +96,7 @@ void Message::renderFrame()
 	glEnd();
 	glColor3f(1.0, 1.0, 1.0);	
 }
+
 void Message::render()
 {	
 	renderFrame();

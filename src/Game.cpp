@@ -63,9 +63,7 @@ bool Game::init(char* configFile)
 
 	if(greska!=GLEW_OK)
 	{
-		MessageBox(NULL,
-			TEXT("Nemoguce je inicijalizirati GLEW. Vasa graficka kartica vjerojatno ne podrzava Shader Model 2.0."),
-			TEXT("Greska"),MB_OK);
+		std::cerr << "ERROR: Impossible to initialize Glew. Your graphics card probably does not support Shader Model 2.0.\n";
 		return false;
 	}
 
@@ -96,25 +94,38 @@ bool Game::init(char* configFile)
 	return true;
 }
 
-void Game::addStage( GameStage* stage, bool removePrev )
-{	
+void Game::exit()
+{
 	using std::cout;
 	using std::endl;
 
-	if( removePrev )
+	for(int i= mStageStack.size() - 1 ; i > 0 ; --i )
 	{
-		mStageStack.back()->exit();
-		delete mStageStack.back();
-		mStageStack.pop_back();
-		
-		cout << "Old stage deleted." << endl;
+		mStageStack[i]->exit();
+		delete mStageStack[i];
 	}
+	mStageStack.clear();
 
-	mStageStack.push_back(stage);
+	for( int i = 0 ; i < mFonts.size() ; ++i )
+	{
+		delete mFonts[i];
+	}
+	mFonts.clear();	
+	
+	mTextureMgr->cleanup();	
+	delete mTextureMgr;
 
-	cout << "Setup new state..." << endl;
-	mStageStack.back()->init();
-	cout << "Stage Init !" << endl;
+	mSoundMgr->cleanup();
+	delete mSoundMgr;
+
+	mRenderEngine->cleanup();
+	delete mRenderEngine;
+
+	mWindow.close();
+
+	cout << "Game End !!" << endl;
+	cout << "*******************" << endl;	
+
 }
 
 void Game::run()
@@ -128,7 +139,7 @@ void Game::run()
 	text.setColor(sf::Color(50,255,25));
 	text.setCharacterSize(18);
 		
-	text.setPosition(32, 32);	
+	text.setPosition( getGame()->getScreenSize().x - 100 , 10 );	
 
 	while( !mNeedEnd )
 	{
@@ -175,38 +186,25 @@ void Game::run()
 	}
 }
 
-void Game::exit()
-{
+void Game::addStage( GameStage* stage, bool removePrev )
+{	
 	using std::cout;
 	using std::endl;
 
-	for(int i= mStageStack.size() - 1 ; i > 0 ; --i )
+	if( removePrev )
 	{
-		mStageStack[i]->exit();
-		delete mStageStack[i];
+		mStageStack.back()->exit();
+		delete mStageStack.back();
+		mStageStack.pop_back();
+		
+		cout << "Old stage deleted." << endl;
 	}
-	mStageStack.clear();
 
-	for( int i = 0 ; i < mFonts.size() ; ++i )
-	{
-		delete mFonts[i];
-	}
-	mFonts.clear();	
-	
-	mTextureMgr->cleanup();	
-	delete mTextureMgr;
+	mStageStack.push_back(stage);
 
-	mSoundMgr->cleanup();
-	delete mSoundMgr;
-
-	mRenderEngine->cleanup();
-	delete mRenderEngine;
-
-	mWindow.close();
-
-	cout << "Game End !!" << endl;
-	cout << "*******************" << endl;	
-
+	cout << "Setup new state..." << endl;
+	mStageStack.back()->init();
+	cout << "Stage Init !" << endl;
 }
 
 sf::RenderWindow* Game::getWindow()
