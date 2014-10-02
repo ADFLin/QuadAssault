@@ -1,13 +1,13 @@
-#ifndef Smoke_h__
-#define Smoke_h__
+#ifndef SmokeParticle_h__
+#define SmokeParticle_h__
 
 #include "Particle.h"
 
-class Smoke : public Particle
+class SmokeParticle : public Particle
 {
 	typedef Particle BaseClass;
 public:
-	Smoke( Vec2f const& pos );
+	SmokeParticle( Vec2f const& pos );
 	virtual void init();
 	virtual void tick();
 	virtual void onSpawn();
@@ -15,4 +15,4 @@ public:
 
 };
 
-#endif // Smoke_h__
+#endif // SmokeParticle_h__

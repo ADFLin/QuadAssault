@@ -3,7 +3,7 @@
 #include "GameInterface.h"
 #include "Level.h"
 #include "TextureManager.h"
-#include "Smoke.h"
+#include "SmokeParticle.h"
 #include "Explosion.h"
 #include "Light.h"
 #include "RenderUtility.h"
@@ -60,7 +60,7 @@ void PlasmaBullet::tick()
 	dimTimer += TICK_TIME * 750;
 	if(dimTimer>=10.0)
 	{
-		Smoke* p = new Smoke( getPos() );
+		SmokeParticle* p = new SmokeParticle( getPos() );
 		p->init();
 		getLevel()->addParticle( p );
 		dimTimer=0.0;

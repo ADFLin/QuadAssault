@@ -58,7 +58,7 @@ void Mob::tick()
 	BaseClass::tick();
 
 	Player* player = getLevel()->getPlayer();
-	if ( !getLevel()->rayTerrainTest( getPos() , player->getPos() , COL_VIEW ) )
+	if ( !getLevel()->getColManager().rayTerrainTest( getPos() , player->getPos() , COL_VIEW ) )
 	{
 		mTarget = player;
 		mTimeCantView = 0;

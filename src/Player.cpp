@@ -186,20 +186,10 @@ public:
 
 DEFINE_RENDERER( Player , PlayerRenderer )
 
-Player::Player()
-{
-	for(int i=0; i<4; i++)
-		mWeaponSlot[i] = NULL;
-}
-Player::~Player()
-{
-	
-}
 
-void Player::Init(Vec2f poz)
+void Player::init()
 {
-	setPos( poz );
-	setSize( Vec2f(64,64));
+	setSize( Vec2f(64,64) );
 
 	akceleracija = 0;
 
@@ -225,10 +215,12 @@ void Player::onSpawn()
 {
 	BaseClass::onSpawn();
 
+	getLevel()->getColManager().addBody( *this , mBody );
+
 	light = getLevel()->createLight( Vec2f(0.0, 0.0), 1024 , false );
 	light->setColorParam(Vec3(1.0, 1.0, 1.0), 16);
 	light->drawShadow = true;
-	getLevel()->getColManager().addBody( *this , mBody );
+	
 }
 
 void Player::onDestroy()

@@ -1,4 +1,4 @@
-#include "Smoke.h"
+#include "SmokeParticle.h"
 
 #include "GameInterface.h"
 #include "Level.h"
@@ -17,7 +17,7 @@ public:
 
 	virtual void render( RenderPass pass , LevelObject* object )
 	{
-		Smoke* smoke = object->cast< Smoke >();
+		SmokeParticle* smoke = object->cast< SmokeParticle >();
 
 		if(pass==RP_DIFFUSE)// || pass==NORMAL)
 		{
@@ -66,23 +66,23 @@ public:
 };
 
 
-DEFINE_RENDERER( Smoke , SmokeRenderer )
+DEFINE_RENDERER( SmokeParticle , SmokeRenderer )
 
-Smoke::Smoke( Vec2f const& pos ) 
+SmokeParticle::SmokeParticle( Vec2f const& pos ) 
 	:BaseClass( pos )
 {
 
 }
 
 
-void Smoke::init()
+void SmokeParticle::init()
 {
 	BaseClass::init();
 	maxZivot=45;
 	zivot=maxZivot;
 }
 
-void Smoke::onSpawn()
+void SmokeParticle::onSpawn()
 {
 	BaseClass::onSpawn();
 
@@ -90,7 +90,7 @@ void Smoke::onSpawn()
 	mPos.y += getLevel()->random(8,16)-8;
 }
 
-void Smoke::tick()
+void SmokeParticle::tick()
 {
 	BaseClass::tick();
 }

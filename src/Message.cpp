@@ -28,34 +28,35 @@ void Message::init( string const& sender, string const& content, float durstion,
 	text.setCharacterSize(24);
 	text.setColor(sf::Color(255,255,255));
 
-	playSound = true;	
-
 	portret = getGame()->getTextureMgr()->getTexture("portret2.tga");	
 }
 
-void Message::Update(float deltaT)
+void Message::nodifyShow()
 {
-	if(timer<mDurstion)
+	sound = getGame()->getSoundMgr()->addSound( mSoundName.c_str() );			
+	sound->play();
+}
+
+void Message::tick()
+{
+	if( timer < mDurstion )
 	{
-		timer+=deltaT;
+		timer += TICK_TIME;
 	}
 	else
 	{
-		if(sound)
+		if( sound )
 			sound->stop();
 		unisten=true;		
 		sound=NULL;
 	}
-	if( playSound )
-	{
-		sound = getGame()->getSoundMgr()->addSound( mSoundName.c_str() );			
-		sound->play();	
-		
-		playSound=false;
-	}
-	
 }
-void Message::RenderOkvir()
+void Message::updateRender( float dt )
+{
+
+}
+
+void Message::renderFrame()
 {
 
 	float width=text.getLocalBounds().width;
@@ -95,8 +96,10 @@ void Message::RenderOkvir()
 	glEnd();
 	glColor3f(1.0, 1.0, 1.0);	
 }
-void Message::Render()
-{		
+void Message::render()
+{	
+	renderFrame();
+
 	getGame()->getWindow()->pushGLStates();
 	getGame()->getWindow()->draw(p_text);	
 	getGame()->getWindow()->draw(text);

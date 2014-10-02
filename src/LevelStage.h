@@ -13,15 +13,22 @@
 class SoundManager;
 class GUIManager;
 
-
-class LevelStage : public GameStage
-	             , public Level
+class LevelStageBase : public GameStage
 {
+
+protected:
+	Level* mLevel;
+};
+
+
+class LevelStage : public LevelStageBase
+{
+	typedef LevelStageBase BaseClass;
+
 public:
-	
 	bool init();
 	void update(float deltaT);	
-	void UpdateDev(float deltaT);
+	
 	void render();
 	void exit();
 
@@ -32,9 +39,9 @@ public:
 	void LoadLevel();
 	bool saveMap( char const* path );
 
-	void UpdateajNizove(float deltaT);
 
 
+	void UpdateDev(float deltaT);
 
 	Message*   addMessage(Message* p);
 
@@ -99,10 +106,8 @@ private:
 
 	sf::Music  mMusic;
 
-	Texture* mTexCursor;
-	
+	Texture*   mTexCursor;
 
-	std::vector<Message*> mMsgQueue;
 
 	typedef Tween::GroupTweener< float > CTweener;
 
@@ -112,9 +117,6 @@ private:
 	float brzinaFadeanja;
 
 	float tickTimer;
-
-	
-
 };
 
 #endif // LevelState_h__

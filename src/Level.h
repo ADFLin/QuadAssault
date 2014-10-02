@@ -1,13 +1,13 @@
 #ifndef Level_h__
 #define Level_h__
 
-#include "TGrid2D.h"
-#include "IntrList.h"
-
+#include "Collision.h"
 #include "Block.h"
 #include "Object.h"
 #include "Light.h"
-#include "Collision.h"
+
+#include "TGrid2D.h"
+#include "IntrList.h"
 
 #include <list>
 #include <vector>
@@ -25,14 +25,6 @@ class Message;
 
 class TextureManager;
 
-
-namespace sf
-{
-	class Font;
-}
-
-
-
 class Level
 {
 public:
@@ -44,23 +36,12 @@ public:
 	void              updateRender( float dt );
 	void              cleanup();
 
-	void              restart()
-	{
-
-
-
-
-
-	}
-
-
 	enum State
 	{
 		eRunning ,
 		eFinish   ,
 		eFreeze  ,
 	};
-
 
 	class Listener
 	{
@@ -70,6 +51,8 @@ public:
 	};
 	State             getState(){ return mState; }
 	void              changeState( State state );
+
+	void              setupTerrain( int w , int h );
 
 	TileMap&          getTerrain(){ return mTerrain; }
 	CollisionManager& getColManager(){  return mColManager; }
@@ -88,20 +71,19 @@ public:
 	Mob*              spawnMobByName(string const& name , Vec2f const& pos );
 
 	Sound*            playSound( char const* name , bool canRepeat = false );
-	virtual Message*  addMessage( Message* p ) = 0;
-	
+	Message*          addMessage(Message* msg );
 
+	Message*          getTopMessage(){ return mTopMessage; }
 	int               random(int i1, int i2);
+
 
 	void              renderObjects( RenderPass pass );
 
-	Tile*             rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned colMsk )
-	{
-		return mColManager.rayTerrainTest( from , to , colMsk );
-	}
-
 	
 public:
+
+	void       addOjectInternal( LevelObject* obj );
+
 	typedef MemberHook< LevelObject , &LevelObject::baseHook > ObjHook;
 	typedef MemberHook< LevelObject , &LevelObject::typeHook > TypeHook;
 
@@ -119,9 +101,13 @@ protected:
 	typedef IntrList< Particle , TypeHook , PointerType > ParticleList;
 
 	void       destroyObject( LevelObject* object );
-	void       addOjectInternal( LevelObject* obj );
+	
 
+	typedef std::vector< Message* > MessageVec;
 
+	MessageVec       mMsgQueue;
+	Message*         mTopMessage;
+	State            mState;
 
 	ObjectList       mObjects;
 	MobList          mMobs;
@@ -129,17 +115,13 @@ protected:
 	ItemList         mItems;
 	LightList        mLights;
 	ParticleList     mParticles;
-
-	State           mState;
-	Player*         mPlayer;
-	TileMap         mTerrain;
-
+	
+	Player*          mPlayer;
+	TileMap          mTerrain;
 	CollisionManager mColManager;
 	Listener*        mListener;
 };
 
-typedef Level::MobList    MobList;
-typedef Level::BulletList BulletList;
 typedef Level::LightList  LightList;
 
 

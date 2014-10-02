@@ -13,12 +13,7 @@ class Light;
 class Player : public Actor
 {
 	typedef Actor BaseClass;
-
-
 public:
-	Player();
-	~Player();
-
 
 	virtual ObjectType getType(){ return OT_PLAYER; }
 	virtual void onSpawn();
@@ -26,11 +21,9 @@ public:
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
 	virtual IRenderer* getRenderer();
 
-
-	void  Init( Vec2f poz );
+	void  init();
 	void  update( Vec2f const& aimPos );
 
-	
 	void  shoot( Vec2f const& posTaget );
 	void  addWeapon(Weapon* o);
 	void  addHP(float kolicina);

@@ -19,15 +19,48 @@
 
 
 Level::Level() 
-	:mColManager( mTerrain )
 {
-
+	mTopMessage = NULL;
 }
 
 
 void Level::init()
 {
+	Block::initialize( this );
+	mColManager.setTerrain( mTerrain );
 
+	mPlayer = new Player();
+	mPlayer->init();
+}
+
+void Level::cleanup()
+{
+	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end();
+		iter != itEnd;  )
+	{
+		LevelObject* obj = *iter;
+		++iter;
+		obj->onDestroy();
+		delete obj;
+	}
+
+	mObjects.clear();
+
+	mLights.clear();
+	mBullets.clear();
+	mMobs.clear();	
+	mItems.clear();
+	mParticles.clear();
+
+	mPlayer = NULL;
+
+	mTopMessage = NULL;
+	for(int i=0; i<mMsgQueue.size(); i++)
+		delete mMsgQueue[i];
+	mMsgQueue.clear();
+
+	//FIXME
+	Block::cleanup();
 }
 
 void Level::tick()
@@ -57,6 +90,46 @@ void Level::tick()
 			obj->postTick();
 		}
 	}
+
+	if ( mTopMessage == NULL )
+	{
+		if ( !mMsgQueue.empty() )
+		{
+			mTopMessage = mMsgQueue.front();
+			mTopMessage->nodifyShow();
+		}
+	}
+	if ( mTopMessage )
+	{
+		mTopMessage->tick();
+		if ( mTopMessage->unisten )
+		{
+			delete mTopMessage;
+			mMsgQueue.erase(mMsgQueue.begin());
+			mTopMessage = NULL;
+		}
+	}
+}
+
+void Level:: setupTerrain( int w , int h )
+{
+	mTerrain.resize( w ,  h );
+	mColManager.setup( w * BLOCK_SIZE ,  h * BLOCK_SIZE ,  10 * BLOCK_SIZE );
+
+	addOjectInternal( mPlayer );
+}
+
+
+void Level::updateRender( float dt )
+{
+	for( ObjectList::iterator iter = mObjects.begin() ; iter != mObjects.end(); ++iter )
+	{
+		LevelObject* obj = *iter;
+		obj->updateRender( dt );
+	}
+
+	if ( mTopMessage )
+		mTopMessage->updateRender( dt );
 }
 
 void Level::addOjectInternal( LevelObject* obj )
@@ -112,30 +185,6 @@ Particle* Level::addParticle( Particle* particle )
 	mParticles.push_back( particle );
 	addOjectInternal( particle );
 	return particle;
-}
-
-void Level::cleanup()
-{
-	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end();
-		iter != itEnd;  )
-	{
-		LevelObject* obj = *iter;
-		++iter;
-		obj->onDestroy();
-		delete obj;
-	}
-	mObjects.clear();
-
-	mLights.clear();
-	mBullets.clear();
-	mMobs.clear();	
-	mItems.clear();
-	mParticles.clear();
-
-	mPlayer = NULL;
-
-	//FIXME
-	Block::cleanup();
 }
 
 int Level::random( int i1, int i2 )
@@ -210,15 +259,6 @@ Sound* Level::playSound( char const* name , bool canRepeat /*= false */ )
 	return sound;
 }
 
-void Level::updateRender( float dt )
-{
-	for( ObjectList::iterator iter = mObjects.begin() ; iter != mObjects.end(); ++iter )
-	{
-		LevelObject* obj = *iter;
-		obj->updateRender( dt );
-	}
-}
-
 void Level::destroyObject( LevelObject* object )
 {
 	object->onDestroy();
@@ -231,4 +271,10 @@ void Level::changeState( State state )
 		return;
 
 	mState = state;
+}
+
+Message* Level::addMessage( Message* msg )
+{
+	mMsgQueue.push_back( msg );
+	return mMsgQueue.back();
 }

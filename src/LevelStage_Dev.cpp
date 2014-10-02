@@ -103,7 +103,7 @@ void LevelStage::onSystemEventDev( sf::Event const& event )
 				case 3:
 					t3 = wPos;
 					mEditTrigger->init(t1,t2);
-					Level::addOjectInternal( mEditTrigger );
+					mLevel->addOjectInternal( mEditTrigger );
 					mEditTrigger = NULL;
 					mStepEdit=0;
 					break;
@@ -113,12 +113,13 @@ void LevelStage::onSystemEventDev( sf::Event const& event )
 			}			
 			else if(event.mouseButton.button==sf::Mouse::Button::Right)
 			{				
+				TileMap& terrain = mLevel->getTerrain();
 
 				Vec2i tPos = convertToTilePos( getGame()->getMousePos() );
 
-				if ( getTerrain().checkRange( tPos.x , tPos.y ) )
+				if ( terrain.checkRange( tPos.x , tPos.y ) )
 				{
-					Tile& tile = getTerrain().getData( tPos.x , tPos.y );
+					Tile& tile = terrain.getData( tPos.x , tPos.y );
 					tile.type = mEditTileType;
 					tile.meta = mEditTileMeta;
 				}
@@ -203,7 +204,7 @@ bool LevelStage::saveMap( char const* path )
 	if ( !of.is_open() )
 		return false;
 
-	TileMap& terrain = getTerrain();
+	TileMap& terrain = mLevel->getTerrain();
 
 	of << terrain.getSizeX() << " " << terrain.getSizeY() << "\n";
 
@@ -220,7 +221,9 @@ bool LevelStage::saveMap( char const* path )
 		   << (int)tile.meta << "\n";		
 	}
 
-	for( LightList::iterator iter = mLights.begin() , itEnd = mLights.end();
+
+	LightList lights = mLevel->getLights();
+	for( LightList::iterator iter = lights.begin() , itEnd = lights.end();
 		iter != itEnd ; ++iter )
 	{
 		Light* light = *iter;

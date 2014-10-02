@@ -19,6 +19,13 @@ void ColBody::updateCache()
 	boundBox.max = cachePos + halfSize;
 }
 
+CollisionManager::CollisionManager() 
+	:mTerrain( NULL )
+	,mCellLength( 0 )
+{
+
+}
+
 void CollisionManager::setup( float width , float height  , float cellLength  )
 {
 	int cx = int ( width / cellLength - 1 ) + 1;

@@ -27,7 +27,7 @@ public:
 
 private:
 
-	int      mFrameCount;
+
 	float    mFPS;
 	unsigned mMouseState;
 	bool     mNeedEnd;

@@ -46,10 +46,6 @@ bool LevelStage::init()
 	mTexCursor = getGame()->getTextureMgr()->getTexture("kurzor.tga");	
 	getGame()->getTextureMgr()->loadTexture("pozadinaSvemir.tga");
 
-
-	Level::init();
-
-
 	GUISystem::getInstance().cleanupWidget();
 
 	{
@@ -113,16 +109,16 @@ bool LevelStage::init()
 	}
 
 	DEVMODE=false;
-	//FIXME
-	Block::initialize( this );
+
+
+	mLevel = new Level;
+	mLevel->init();
+
 	IRenderer::initialize();
 
 	mCamera = new Object();
 	mCamera->setPos(Vec2f(0,0));
 	mWorldScaleFactor = 1.0f;
-
-
-	LoadLevel();
 
 	tranzicija=ST_FADEIN;
 	tBoja=0.0f;
@@ -132,24 +128,19 @@ bool LevelStage::init()
 	tickTimer = 0.0f;
 	mPause = false;
 
+	LoadLevel();
+
 	return true;
 }
 
 
 void LevelStage::exit()
 {
-	Level::cleanup();
-
-
-	for(int i=0; i<mMsgQueue.size(); i++)
-		delete mMsgQueue[i];
-	mMsgQueue.clear();
-	
+	mLevel->cleanup();
 
 	mMusic.stop();	
 
 	delete mCamera;
-
 }
 
 
@@ -201,7 +192,7 @@ void LevelStage::update(float deltaT)
 			tBoja = 0.0f;
 			if( !mNeedExit )
 			{
-				if( Level::getState() == Level::eFinish || mPlayer->isDead() )
+				if(  mLevel->getState() == Level::eFinish || mLevel->getPlayer()->isDead() )
 					odabir_levela_odmah = true;
 				else
 					odabir_levela_odmah = false;		
@@ -218,27 +209,28 @@ void LevelStage::tick()
 
 	Vec2f wPosMouse = convertToWorldPos( getGame()->getMousePos() );
 
+	Player* player = mLevel->getPlayer();
+
 	float rotateSpeed = Math::toRad( 150 );
 	float moveAcc = 1;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-		mPlayer->rotate(-rotateSpeed*TICK_TIME);
+		player->rotate(-rotateSpeed*TICK_TIME);
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-		mPlayer->rotate( rotateSpeed*TICK_TIME);
+		player->rotate( rotateSpeed*TICK_TIME);
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-		mPlayer->DodajMoment( moveAcc);
+		player->DodajMoment( moveAcc);
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-		mPlayer->DodajMoment(-moveAcc);
+		player->DodajMoment(-moveAcc);
 	if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-		mPlayer->shoot( wPosMouse );
+		player->shoot( wPosMouse );
 
-	mPlayer->update( wPosMouse );
+	player->update( wPosMouse );
 
-	Level::tick();
-	UpdateajNizove(TICK_TIME);
+	mLevel->tick();
 
 	//mCamera->changePos( mPlayer->getCenterPos() - ( 0.5f * mWorldScaleFactor ) * Vec2f( getGame()->getScreenSize() ) );
 
-	if ( Level::getState() == Level::eFinish )
+	if ( mLevel->getState() == Level::eFinish )
 	{
 
 
@@ -247,28 +239,11 @@ void LevelStage::tick()
 
 	}
 
-	if( Level::getState() == Level::eFinish || mPlayer->isDead() )
+	if( mLevel->getState() == Level::eFinish || player->isDead() )
 		gameOverTimer -= TICK_TIME;
 
 	if(gameOverTimer<=0.0)
 		tranzicija = ST_FADEOUT;
-}
-
-
-void LevelStage::UpdateajNizove(float deltaT)
-{
-
-	if( !mMsgQueue.empty() )
-	{
-		Message* message = mMsgQueue.front();
-
-		message->Update( deltaT );
-		if( message->unisten == true )
-		{
-			delete message;
-			mMsgQueue.erase(mMsgQueue.begin());
-		}
-	}
 }
 
 
@@ -280,10 +255,10 @@ void LevelStage::updateRender( float dt )
 		return;
 	}
 
-	Level::updateRender( dt );
+	mLevel->updateRender( dt );
 	mTweener.update( dt );
 
-	mCamera->setPos( mPlayer->getPos() - ( 0.5f * mWorldScaleFactor ) * Vec2f( getGame()->getScreenSize() ) );
+	mCamera->setPos( mLevel->getPlayer()->getPos() - ( 0.5f * mWorldScaleFactor ) * Vec2f( getGame()->getScreenSize() ) );
 
 }
 
@@ -327,18 +302,17 @@ void LevelStage::render()
 	//mWorldScaleFactor = 0.5f;
 
 	mRenderParam.camera      = mCamera;
-	mRenderParam.level       = this;
+	mRenderParam.level       = mLevel;
 	mRenderParam.scaleFactor = mWorldScaleFactor;
 	mRenderParam.mode        = RM_ALL;
 
 	renderEngine->renderScene( mRenderParam );
 
-	if( !mMsgQueue.empty() )
-	{
-		mMsgQueue[0]->RenderOkvir();
-		mMsgQueue[0]->Render();	
-	}
+	Message* msg = mLevel->getTopMessage();
+	if ( msg )
+		msg->render();
 
+	Player* player = mLevel->getPlayer();
 	glLoadIdentity();
 
 	glPushMatrix();
@@ -348,7 +322,7 @@ void LevelStage::render()
 		float colorAD[] = { 0.0, 0.1, 0.0 };
 		float colorBT[] = { 0.0, 0.75, 0.0 };
 		float colorBD[] = {	0.0, 0.25, 0.0 };
-		float flac = mPlayer->getHP() / mPlayer->getMaxHP();
+		float flac = player->getHP() / player->getMaxHP();
 		RenderBar( 200 , 16 , flac , 0.75 , colorAT , colorAD , colorBT , colorBD );
 	}
 	glPopMatrix();	
@@ -360,7 +334,7 @@ void LevelStage::render()
 		float colorAD[] = { 0.05, 0.05, 0.1 };
 		float colorBT[] = { 0.2, 0.3, 0.75 };
 		float colorBD[] = {	0.1, 0.1, 0.25 };
-		float flac = mPlayer->getEnergy() / mPlayer->getMaxEnergy();
+		float flac = player->getEnergy() / player->getMaxEnergy();
 		RenderBar( 200 , 16 , flac , 0.75 , colorAT , colorAD , colorBT , colorBD );
 	}
 	glPopMatrix();
@@ -395,7 +369,7 @@ void LevelStage::render()
 	t.setColor(sf::Color(50,255,50));
 	t.setCharacterSize(18);
 	char buf[256];
-	::sprintf( buf ,"x = %f , y = %f " , mPlayer->getPos().x , mPlayer->getPos().y );
+	::sprintf( buf ,"x = %f , y = %f " , player->getPos().x , player->getPos().y );
 	t.setString( buf );
 	t.setPosition( 10 , t.getLocalBounds().height/2);
 
@@ -478,7 +452,7 @@ void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 		if(postavljaLight==false)
 		{
 			postavljaLight = true;
-			mEditLight = createLight( getGame()->getMousePos() , 128 , true);
+			mEditLight = mLevel->createLight( getGame()->getMousePos() , 128 , true);
 			mEditLight->setColorParam(Vec3(1.0, 1.0, 1.0), 8);
 		}
 		break;
@@ -492,8 +466,4 @@ void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 	}
 }
 
-Message* LevelStage::addMessage(Message* p)
-{
-	mMsgQueue.push_back(p);
-	return mMsgQueue.back();
-}
+

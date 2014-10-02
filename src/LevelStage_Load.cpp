@@ -26,7 +26,6 @@
 
 void LevelStage::LoadLevel()
 {
-
 	int mapWidth  = MX;
 	int mapHeight = MY;
 
@@ -41,13 +40,18 @@ void LevelStage::LoadLevel()
 		mapFS >> mapHeight;
 	}
 
-	mTerrain.resize( mapWidth , mapHeight );
-	mColManager.setup( mapWidth * BLOCK_SIZE , mapHeight * BLOCK_SIZE ,  10 * BLOCK_SIZE );
+	mLevel->setupTerrain( mapWidth , mapHeight );
+
+	Player* player = mLevel->getPlayer();
+
+
+	TileMap& terrain = mLevel->getTerrain();
+
 	for(int i=0; i< mapWidth ; i++)
 	{
 		for(int j=0; j< mapHeight; j++)
 		{		
-			Tile& tile = mTerrain.getData( i , j );
+			Tile& tile = terrain.getData( i , j );
 			tile.pos  = Vec2f( BLOCK_SIZE * i , BLOCK_SIZE * j );
 			tile.type = TID_FLAT;
 			tile.meta = 0;
@@ -76,9 +80,9 @@ void LevelStage::LoadLevel()
 					getline(lstring,token,' ');
 					int meta = atoi(token.c_str());
 
-					if ( mTerrain.checkRange( x , y ) )
+					if ( terrain.checkRange( x , y ) )
 					{
-						Tile& tile = mTerrain.getData( x , y ); 
+						Tile& tile = terrain.getData( x , y ); 
 						tile.type = type;
 						tile.meta = meta;
 					}
@@ -103,7 +107,7 @@ void LevelStage::LoadLevel()
 					getline(lstring,token,' ');
 					color.z = atof(token.c_str());
 
-					Light* light = createLight( pos , radius , true );
+					Light* light = mLevel->createLight( pos , radius , true );
 					light->setColorParam( color ,intensity);
 					//light->drawShadow = true;
 				}
@@ -111,10 +115,6 @@ void LevelStage::LoadLevel()
 		}
 		mapFS.close();
 	}
-
-
-	mPlayer = new Player();	
-
 
 
 	Vec2f posPlayer = Vec2f(0,0);
@@ -150,7 +150,7 @@ void LevelStage::LoadLevel()
 
 				WeaponPickup* item = new WeaponPickup( pos , id );
 				item->init();
-				addItem( item );
+				mLevel->addItem( item );
 			}
 			else if(token=="key")
 			{
@@ -164,7 +164,7 @@ void LevelStage::LoadLevel()
 
 				KeyPickup* item = new KeyPickup( pos , id );
 				item->init();
-				addItem( item );
+				mLevel->addItem( item );
 			}
 			else if(token=="preload_sound")
 			{
@@ -187,7 +187,7 @@ void LevelStage::LoadLevel()
 				getline(lstring,token,' ');
 				pos.y=atof(token.c_str());
 				getline(lstring,token,' ');
-				Mob* m = spawnMobByName( token , pos );
+				Mob* m = mLevel->spawnMobByName( token , pos );
 			}
 			else if(token=="mob_trigger")
 			{
@@ -213,7 +213,7 @@ void LevelStage::LoadLevel()
 				act->mobName = token;
 				trigger->addAction( act );
 
-				Level::addOjectInternal( trigger );
+				mLevel->addOjectInternal( trigger );
 			}
 			else if(token=="goal_trigger")
 			{
@@ -233,7 +233,7 @@ void LevelStage::LoadLevel()
 
 				trigger->addAction( new GoalAct );
 
-				Level::addOjectInternal( trigger );
+				mLevel->addOjectInternal( trigger );
 			}
 			else if(token=="msg_trigger")
 			{				
@@ -262,35 +262,32 @@ void LevelStage::LoadLevel()
 				act->soundName = token;
 				trigger->addAction( act );
 
-				Level::addOjectInternal( trigger );
+				mLevel->addOjectInternal( trigger );
 			}
 		}
 	}
 	levelFS.close();
 
-	mPlayer->Init( posPlayer );
-	addOjectInternal( mPlayer );
+	player->setPos( posPlayer );
 	//player->addWeapon(new Plasma());
 	//player->addWeapon(new Laser());
 	//player->addWeapon(new Laser());
 	//player->addWeapon(new Plasma());
-	mPlayer->addWeapon(new Minigun());
-	mPlayer->addWeapon(new Minigun());
+	player->addWeapon(new Minigun());
+	player->addWeapon(new Minigun());
 
 	for ( int i = 0 ; i < 20 ; ++i )
 	{
-		Mob* mob = Level::spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
-		mob = Level::spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
+		Mob* mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
+		mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
 	}
-
-	
 
 }
 
 
 void LevelStage::generateEmptyLevel()
 {
-	TileMap& terrain = Level::getTerrain();
+	TileMap& terrain = mLevel->getTerrain();
 	for(int i=0; i< terrain.getSizeX() ; i++)
 	{
 		for(int j=0; j< terrain.getSizeY(); j++)
@@ -303,7 +300,7 @@ void LevelStage::generateEmptyLevel()
 		}	
 	}
 
-	LightList& lights = Level::getLights();
+	LightList& lights = mLevel->getLights();
 	for(LightList::iterator iter = lights.begin();
 		 iter != lights.end() ; )
 	{

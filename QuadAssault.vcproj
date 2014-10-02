@@ -408,6 +408,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\LevelEditStage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\LevelStage.cpp"
 				>
 			</File>
@@ -420,7 +424,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\LevelStage_UcitajMapu.cpp"
+				RelativePath=".\src\LevelStage_Load.cpp"
 				>
 			</File>
 			<File
@@ -688,11 +692,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Smoke.cpp"
+				RelativePath=".\src\SmokeParticle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\Smoke.h"
+				RelativePath=".\src\SmokeParticle.h"
 				>
 			</File>
 			<File
@@ -721,6 +725,10 @@
 			</File>
 			<File
 				RelativePath=".\src\GUISystem.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PropFrame.h"
 				>
 			</File>
 		</Filter>

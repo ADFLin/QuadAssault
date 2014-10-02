@@ -37,7 +37,7 @@ enum ObjectType
 
 
 class IRenderer;
-class Tile;
+struct Tile;
 class ColBody;
 
 class LevelObject : public Object

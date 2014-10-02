@@ -23,7 +23,6 @@ Game::Game()
 	gGame = this;
 
 	mFPS = 0;
-	mFrameCount = 0;
 
 	mMouseState = 0;
 }
@@ -52,7 +51,7 @@ bool Game::init(char* configFile)
 	mScreenSize.y = height;
 
 	mWindow.create(sf::VideoMode(width,height,32), tile, style);	
-	//rw.SetFramerateLimit(120);	
+	//mWindow.SetFramerateLimit(120);	
 	mWindow.setMouseCursorVisible(false);
 
 	sf::Font* font = new sf::Font;
@@ -121,8 +120,8 @@ void Game::addStage( GameStage* stage, bool removePrev )
 void Game::run()
 {
 	int prevTime = Platform::getTickCount();
-
 	int64 timeFrame = Platform::getTickCount();
+	int frameCount = 0;
 
 	sf::Text text;
 	text.setFont( *mFonts[0] );		
@@ -137,24 +136,22 @@ void Game::run()
 		float deltaT = ( curTime - prevTime ) / 1000.0f;
 		prevTime = curTime;
 
-		GameStage* state = mStageStack.back();
+		GameStage* stage = mStageStack.back();
 
 		mSoundMgr->update( deltaT );
-
 		mStageStack.back()->update( deltaT );
 
 		mRenderEngine->prevRender();
-		
 		mStageStack.back()->render();
 
-		++mFrameCount;
+		++frameCount;
 
-		if ( mFrameCount > 50 )
+		if ( frameCount > 50 )
 		{
 			int64 temp = Platform::getTickCount();
-			mFPS = 1000.0f * ( mFrameCount ) / (  temp - timeFrame );
+			mFPS = 1000.0f * ( frameCount ) / (  temp - timeFrame );
 			timeFrame = temp;
-			mFrameCount = 0;
+			frameCount = 0;
 		}
 
 		FixString< 256 > str;
