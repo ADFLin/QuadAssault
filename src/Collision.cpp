@@ -31,6 +31,8 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 {
 	unsigned maskCheck = ( maskCheckReplace ) ? maskCheckReplace : body.colMaskCheck;
 
+	assert( body.halfSize.x < mCellLength / 2 && body.halfSize.y < mCellLength / 2 );
+
 	Rect bBox;
 	bBox.min = body.boundBox.min + offset;
 	bBox.max = body.boundBox.max + offset;
@@ -93,6 +95,7 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 bool CollisionManager::checkCollision( ColBody& body )
 {
 	int cx , cy;
+	assert( body.halfSize.x < mCellLength / 2 && body.halfSize.y < mCellLength / 2 );
 	calcCellPos( body.cachePos , cx , cy );
 
 	bool result = false;
@@ -151,7 +154,6 @@ bool CollisionManager::checkCollision( ColBody& body )
 void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 {
 	assert( body.idxCell = -1 );
-	assert( body.halfSize.x < mCellLength / 2 && body.halfSize.y < mCellLength / 2 );
 	body.object = &obj;
 
 	Vec2f posBody = body.object->getPos() + body.getOffset();

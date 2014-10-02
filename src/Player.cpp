@@ -446,5 +446,5 @@ void Player::clearWeapons()
 bool Player::testCollision( Vec2f const& offset )
 {
 	ColInfo info;
-	return getLevel()->getColManager().testCollision( info , offset , mBody );
+	return getLevel()->getColManager().testCollision( info , offset , mBody , COL_SOILD | COL_TERRAIN );
 }

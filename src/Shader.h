@@ -46,6 +46,13 @@ public:
 		glUniform1i( loc , v1 );	
 	}
 
+	void setTexture2D( char const* name , GLuint idTex , int idx )
+	{
+		glActiveTexture( GL_TEXTURE0 + idx );
+		glBindTexture(GL_TEXTURE_2D, idTex);
+		setParam( name , idx );
+	}
+
 private:	
 	GLuint ID;
 	GLuint vertex_program;

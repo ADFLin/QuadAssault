@@ -18,15 +18,16 @@
 #include "PlasmaMob.h"
 
 
-void Level::init()
+Level::Level() 
+	:mColManager( mTerrain )
 {
 
 }
 
-template< class C , class T >
-static void remove( C& c , T obj )
+
+void Level::init()
 {
-	c.erase( std::find( c.begin() , c.end() , obj ) );
+
 }
 
 void Level::tick()
@@ -231,10 +232,3 @@ void Level::changeState( State state )
 
 	mState = state;
 }
-
-Level::Level() 
-	:mColManager( mTerrain )
-{
-
-}
-

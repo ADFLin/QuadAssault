@@ -22,8 +22,8 @@ enum RenderMode
 	RM_GEOMETRY  ,
 	RM_LINGHTING ,
 	RM_NORMAL_MAP ,
-	
-	
+
+	NUM_RENDER_MODE ,
 };
 
 class IFont

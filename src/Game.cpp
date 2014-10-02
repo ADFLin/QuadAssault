@@ -8,8 +8,11 @@
 #include "DataPath.h"
 #include "Platform.h"
 
+#include "FixString.h"
+
 #include <cassert>
 #include <iostream>
+
 
 static Game* gGame = NULL;
 IGame* getGame(){ return gGame; }
@@ -18,6 +21,9 @@ Game::Game()
 {
 	assert( gGame == NULL );
 	gGame = this;
+
+	mFPS = 0;
+	mFrameCount = 0;
 
 	mMouseState = 0;
 }
@@ -116,6 +122,15 @@ void Game::run()
 {
 	int prevTime = Platform::getTickCount();
 
+	int64 timeFrame = Platform::getTickCount();
+
+	sf::Text text;
+	text.setFont( *mFonts[0] );		
+	text.setColor(sf::Color(50,255,25));
+	text.setCharacterSize(18);
+		
+	text.setPosition(32, 32);	
+
 	while( !mNeedEnd )
 	{
 		int64 curTime = Platform::getTickCount();
@@ -132,8 +147,24 @@ void Game::run()
 		
 		mStageStack.back()->render();
 
-		mRenderEngine->postRender();
+		++mFrameCount;
+
+		if ( mFrameCount > 50 )
+		{
+			int64 temp = Platform::getTickCount();
+			mFPS = 1000.0f * ( mFrameCount ) / (  temp - timeFrame );
+			timeFrame = temp;
+			mFrameCount = 0;
+		}
+
+		FixString< 256 > str;
+		str.format( "FPS = %f" , mFPS );
+		text.setString( str.c_str() );
+		mWindow.pushGLStates();
+		mWindow.draw( text );
+		mWindow.popGLStates();
 		
+		mRenderEngine->postRender();
 		mWindow.display();	
 
 		if( mStageStack.back()->isEnd() )
@@ -146,6 +177,7 @@ void Game::run()
 			mNeedEnd=true;
 	}
 }
+
 void Game::exit()
 {
 	using std::cout;

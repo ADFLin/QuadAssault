@@ -34,7 +34,7 @@ void Mob::onSpawn()
 	BaseClass::onSpawn();
 	mBody.setSize( getSize()- Vec2f(4,4) );
 	mBody.setMask( COL_SOILD );
-	mBody.setMaskCheck( COL_BULLET | COL_SOILD );
+	mBody.setMaskCheck( COL_BULLET | COL_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
 }
 
@@ -132,7 +132,7 @@ void Mob::DodajMoment(float x)
 bool Mob::testCollision( Vec2f const& offset )
 {
 	ColInfo info;
-	return getLevel()->getColManager().testCollision( info , offset , mBody );
+	return getLevel()->getColManager().testCollision( info , offset , mBody , COL_SOILD | COL_TERRAIN );
 }
 
 void Mob::takeDamage(Bullet* bullet)

@@ -26,6 +26,22 @@ bool RenderEngine::init( int width , int height )
 	return true;
 }
 
+void RenderEngine::cleanup()
+{
+	for(int i=0; i<mShaders.size(); i++)
+		delete mShaders[i];
+
+	mShaderLighting = NULL;
+	for( int i = 0 ; i < NumMode ; ++i )
+		mShaderScene[i] = NULL;
+	mShaders.clear();	
+
+	glDeleteFramebuffers(1,&mFBOColor);
+	glDeleteTextures(1,&mTexLightmap);
+	glDeleteTextures(1,&mTexNormalMap);
+	glDeleteTextures(1,&mTexGeometry);
+}
+
 bool RenderEngine::setupFBO( int width , int height )
 {
 	glGenFramebuffers(1,&mFBOColor);
@@ -69,33 +85,15 @@ bool RenderEngine::setupFBO( int width , int height )
 	return true;
 }
 
-void RenderEngine::cleanup()
+void RenderEngine::prevRender()
 {
-	for(int i=0; i<mShaders.size(); i++)
-		delete mShaders[i];
 
-	mShaderLighting = NULL;
-	for( int i = 0 ; i < NumMode ; ++i )
-		mShaderScene[i] = NULL;
-	mShaders.clear();	
-
-	glDeleteFramebuffers(1,&mFBOColor);
-	glDeleteTextures(1,&mTexLightmap);
-	glDeleteTextures(1,&mTexNormalMap);
-	glDeleteTextures(1,&mTexGeometry);
 }
 
-Shader* RenderEngine::createShader( char const* vsName , char const* fsName )
+void RenderEngine::postRender()
 {
-	string vsPath = SHADER_DIR;
-	vsPath += vsName;
-	string fsPath = SHADER_DIR;
-	fsPath += fsName;
-	Shader* shader = new Shader( vsPath.c_str() , fsPath.c_str() );
-	mShaders.push_back( shader );
-	return shader;
+	::glFlush();
 }
-
 
 void RenderEngine::renderScene( RenderParam& param )
 {
@@ -168,20 +166,27 @@ void RenderEngine::renderScene( RenderParam& param )
 	renderSceneFinal( param );
 }
 
+Shader* RenderEngine::createShader( char const* vsName , char const* fsName )
+{
+	string vsPath = SHADER_DIR;
+	vsPath += vsName;
+	string fsPath = SHADER_DIR;
+	fsPath += fsName;
+	Shader* shader = new Shader( vsPath.c_str() , fsPath.c_str() );
+	mShaders.push_back( shader );
+	return shader;
+}
+
+
 void RenderEngine::renderSceneFinal( RenderParam& param )
 {
 	Shader* shader = mShaderScene[ param.mode ];
 
 	shader->bind();
+
 	glEnable(GL_TEXTURE_2D);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mTexGeometry);
-	shader->setParam( "texGeometry" , 0 );
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, mTexLightmap);
-	shader->setParam( "texLightmap" , 1 );
+	shader->setTexture2D( "texGeometry" , mTexGeometry , 0 );
+	shader->setTexture2D( "texLightmap" , mTexLightmap , 1 );
 	shader->setParam( "ambientLight" , mAmbientLight );
 
 	glBegin(GL_QUADS);
@@ -233,19 +238,14 @@ void RenderEngine::renderTerrainGlow( Level* level , TileRange const& range )
 
 void RenderEngine::renderLighting( RenderParam& param , Light* light )
 {
-	mShaderLighting->bind();
-
 	Vec2f posLight = light->getPos() - param.camera->getPos();
 
-	mShaderLighting->setParam( "posLight" , posLight );
+	mShaderLighting->bind();
 
+	mShaderLighting->setTexture2D( "texNormalMap" , mTexNormalMap , 0 );	
 	//mShaderLighting->setParam( "frameHeight", mFrameHeight );
 	//mShaderLighting->setParam( "scaleFactor" , param.scaleFactor );
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mTexNormalMap );
-	mShaderLighting->setParam( "texNormalMap" , 0 );	
-	
+	mShaderLighting->setParam( "posLight" , posLight );
 	setupLightShaderParam( mShaderLighting , light );
 
 	glColor3f(1,1,1);	
@@ -503,14 +503,4 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 			}
 		}
 	}
-}
-
-void RenderEngine::prevRender()
-{
-
-}
-
-void RenderEngine::postRender()
-{
-	::glFlush();
 }

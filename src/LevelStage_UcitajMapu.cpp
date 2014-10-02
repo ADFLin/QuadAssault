@@ -277,6 +277,14 @@ void LevelStage::LoadLevel()
 	mPlayer->addWeapon(new Minigun());
 	mPlayer->addWeapon(new Minigun());
 
+	for ( int i = 0 ; i < 20 ; ++i )
+	{
+		Mob* mob = Level::spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
+		mob = Level::spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
+	}
+
+	
+
 }
 
 

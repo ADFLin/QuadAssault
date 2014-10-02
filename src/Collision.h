@@ -2,10 +2,10 @@
 #define Collision_h__
 
 #include "Base.h"
-#include "Block.h"
 #include "ColBody.h"
-#include "IntrList.h"
+#include "Block.h"
 
+#include "IntrList.h"
 
 struct ColInfo
 {

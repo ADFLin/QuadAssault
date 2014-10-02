@@ -480,6 +480,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libCore\FixString.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libCore\IntegerType.h"
 				>
 			</File>
