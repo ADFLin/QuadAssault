@@ -35,7 +35,7 @@ public:
 	float getHP() const { return mHP; }
 	float getMaxHP() const { return 100; }
 
-	void DodajMoment(float x);
+	void addMoment(float x);
 	void takeDamage(Bullet* p);
 	
 private:

@@ -335,7 +335,7 @@ void Player::updateHeadlight()
 	light->setPos(getPos()+ 34 * offset);
 }
 
-void Player::DodajMoment(float x)
+void Player::addMoment(float x)
 {
 	akceleracija=x;
 }

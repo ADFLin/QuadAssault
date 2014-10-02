@@ -22,6 +22,10 @@
 #include "PlasmaMob.h"
 #include "MinigunMob.h"
 
+#include "Laser.h"
+#include "Plasma.h"
+#include "Minigun.h"
+
 #include "GlobalVariable.h"
 #include "DataPath.h"
 #include "RenderUtility.h"
@@ -131,6 +135,20 @@ bool LevelStage::init()
 
 	LoadLevel();
 
+	Player* player = mLevel->getPlayer();
+	//player->addWeapon(new Plasma());
+	//player->addWeapon(new Laser());
+	//player->addWeapon(new Laser());
+	//player->addWeapon(new Plasma());
+	player->addWeapon(new Minigun());
+	player->addWeapon(new Minigun());
+
+	for ( int i = 0 ; i < 20 ; ++i )
+	{
+		Mob* mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
+		mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
+	}
+
 	return true;
 }
 
@@ -219,17 +237,15 @@ void LevelStage::tick()
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
 		player->rotate( rotateSpeed*TICK_TIME);
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-		player->DodajMoment( moveAcc);
+		player->addMoment( moveAcc);
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-		player->DodajMoment(-moveAcc);
+		player->addMoment(-moveAcc);
 	if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 		player->shoot( wPosMouse );
 
 	player->update( wPosMouse );
 
 	mLevel->tick();
-
-	//mCamera->changePos( mPlayer->getCenterPos() - ( 0.5f * mWorldScaleFactor ) * Vec2f( getGame()->getScreenSize() ) );
 
 	if ( mLevel->getState() == Level::eFinish )
 	{

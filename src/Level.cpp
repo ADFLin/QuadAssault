@@ -113,9 +113,21 @@ void Level::tick()
 
 void Level:: setupTerrain( int w , int h )
 {
-	mTerrain.resize( w ,  h );
 	mColManager.setup( w * BLOCK_SIZE ,  h * BLOCK_SIZE ,  10 * BLOCK_SIZE );
 
+	mTerrain.resize( w ,  h );
+	for(int i=0; i< w ; i++)
+	{
+		for(int j=0; j< h; j++)
+		{		
+			Tile& tile = mTerrain.getData( i , j );
+			tile.pos  = Vec2f( BLOCK_SIZE * i , BLOCK_SIZE * j );
+			tile.type = TID_FLAT;
+			tile.meta = 0;
+			if(i==0 || j==0 || i== w-1 || j== h-1)
+				tile.type = TID_WALL;
+		}	
+	}
 	addOjectInternal( mPlayer );
 }
 

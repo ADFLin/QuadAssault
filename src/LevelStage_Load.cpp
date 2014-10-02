@@ -8,10 +8,6 @@
 #include "Mob.h"
 #include "Trigger.h"
 
-#include "Laser.h"
-#include "Plasma.h"
-#include "Minigun.h"
-
 #include "WeaponPickup.h"
 #include "KeyPickup.h"
 
@@ -44,21 +40,7 @@ void LevelStage::LoadLevel()
 
 	Player* player = mLevel->getPlayer();
 
-
 	TileMap& terrain = mLevel->getTerrain();
-
-	for(int i=0; i< mapWidth ; i++)
-	{
-		for(int j=0; j< mapHeight; j++)
-		{		
-			Tile& tile = terrain.getData( i , j );
-			tile.pos  = Vec2f( BLOCK_SIZE * i , BLOCK_SIZE * j );
-			tile.type = TID_FLAT;
-			tile.meta = 0;
-			if(i==0 || j==0 || i== mapWidth-1 || j==mapHeight-1)
-				tile.type = TID_WALL;
-		}	
-	}
 
 	if ( mapFS.good() )
 	{
@@ -137,6 +119,7 @@ void LevelStage::LoadLevel()
 				getline(lstring,token,' ');
 				float y=atof(token.c_str());
 				posPlayer=Vec2f(x,y);
+				player->setPos( posPlayer );
 			}	
 			else if(token=="weapon")
 			{
@@ -267,20 +250,6 @@ void LevelStage::LoadLevel()
 		}
 	}
 	levelFS.close();
-
-	player->setPos( posPlayer );
-	//player->addWeapon(new Plasma());
-	//player->addWeapon(new Laser());
-	//player->addWeapon(new Laser());
-	//player->addWeapon(new Plasma());
-	player->addWeapon(new Minigun());
-	player->addWeapon(new Minigun());
-
-	for ( int i = 0 ; i < 20 ; ++i )
-	{
-		Mob* mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
-		mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
-	}
 
 }
 
