@@ -30,10 +30,17 @@ void Bullet::init( Vec2f const& poz, Vec2f const& dir, int team )
 void Bullet::onSpawn()
 {
 	BaseClass::onSpawn();
+	mBody.setSize( Vec2f( 2 , 2 ) );
+	mBody.setMask( COL_BULLET );
+	mBody.setMaskCheck( COL_SOILD | COL_FLY_SOILD | COL_TERRAIN );
+	getLevel()->getColManager().addBody( *this , mBody );
 }
 
 void Bullet::onDestroy()
 {
+	getLevel()->getColManager().removeBody( mBody );
+
+
 	Explosion* e = getLevel()->createExplosion( getPos() , 128 );
 	e->setParam(4,100,20);
 	e->setColor(Vec3(0.25, 0.5, 1.0));	
@@ -52,15 +59,21 @@ void Bullet::tick()
 	if( mTime > mLifeTime )
 		destroy();
 
-	Rect bBox;
-	calcBoundBox( bBox );
+	//Rect bBox;
+	//calcBoundBox( bBox );
 
-	TileMap& terrain = getLevel()->getTerrain();
-	Tile* tile = getLevel()->testTerrainCollision( bBox , BF_MOVABLE | BF_FLYABLE );
-	if ( tile )
-	{
-		Block* block = Block::FromType( tile->type );
-		block->onCollision( *tile , this );
-	}
+	//TileMap& terrain = getLevel()->getTerrain();
+	//Tile* tile = getLevel()->testTerrainCollision( bBox , COL_FLY_SOILD );
+	//if ( tile )
+	//{
+	//	Block* block = Block::FromType( tile->type );
+	//	block->onCollision( *tile , this );
+	//}
+}
+
+void Bullet::onTileCollision( ColBody& self , Tile& tile )
+{
+	Block* block = Block::FromType( tile.type );
+	block->onCollision( tile , this );
 }
 

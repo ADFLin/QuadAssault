@@ -12,9 +12,11 @@ class WeaponPickup : public ItemPickup
 	typedef ItemPickup BaseClass;
 
 public:
-	void Init(Vec2f poz, int id);
+
+	WeaponPickup( Vec2f const& pos , int id );
+	void init();
 	void tick();
-	void onPick(Player* igrac);
+	void onPick(Player* player);
 
 	void onSpawn();
 	void onDestroy();
@@ -24,7 +26,7 @@ public:
 protected:
 	float rotation;
 	Light* s;
-	int id;
+	int mId;
 
 	friend class WeaponPickupRenderer;
 

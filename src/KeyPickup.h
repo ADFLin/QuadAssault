@@ -1,32 +1,30 @@
-#ifndef KP_H
-#define KP_H
-#include "ItemPickup.h"
-#include "Light.h"
+#ifndef KeyPickup_h__
+#define KeyPickup_h__
 
-#define KEY_RED 0
-#define KEY_BLUE 1
-#define KEY_GREEN 2
+#include "ItemPickup.h"
+
 
 class KeyPickup : public ItemPickup
 {
 	typedef ItemPickup BaseClass;
 
-protected:
-	float rotation;
-	Light* s;
-	int   id;
 public:
-	void Init(Vec2f poz, int id);
-	void tick();
-	void onDestroy();
-	void onPick(Player* igrac);
-	void onSpawn();
+	KeyPickup( Vec2f const& pos , int id );
+	void init();
 
+	virtual void tick();
+	virtual void onDestroy();
+	virtual void onPick( Player* player );
+	virtual void onSpawn();
 	virtual IRenderer* getRenderer();
 
 
+protected:
+	float  mRotation;
+	Light* mLight;
+	int    mDoorId;
 	friend class KeyPickupRenderer;
 
 };
 
-#endif
+#endif // KeyPickup_h__

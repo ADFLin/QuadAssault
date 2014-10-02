@@ -37,6 +37,7 @@ enum ObjectType
 
 
 class IRenderer;
+class Tile;
 class ColBody;
 
 class LevelObject : public Object
@@ -56,7 +57,9 @@ public:
 	
 	virtual void render( RenderPass pass ){}
 	virtual void enumProp( PropEditor& editor ){}
-	virtual void onCollision( ColBody& self , ColBody& other ){}
+
+	virtual void onTileCollision( ColBody& self , Tile& tile ){}
+	virtual void onBodyCollision( ColBody& self , ColBody& other ){}
 
 	virtual IRenderer* getRenderer(){ return NULL; }
 

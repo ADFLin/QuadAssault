@@ -3,22 +3,26 @@
 
 #include "Object.h"
 
-class LevelStage;
+#include "ColBody.h"
+
 class Player;
 
 class ItemPickup : public LevelObject
 {
 	typedef LevelObject BaseClass;
-protected:
-	GLuint tex, texN, texG;
 public:
-	void Init(Vec2f poz);
+	ItemPickup( Vec2f const& pos );
+	void init();
 
 	virtual ObjectType getType(){ return OT_ITEM; }
 	virtual void tick();
+	virtual void onSpawn();
 	virtual void onDestroy();
-	virtual void onPick(Player* igrac);
+	virtual void onPick(Player* player);
+	virtual void onBodyCollision( ColBody& self , ColBody& other );
 
+protected:
+	ColBody mBody;
 };
 
 

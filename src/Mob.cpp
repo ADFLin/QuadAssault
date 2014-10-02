@@ -32,16 +32,22 @@ void Mob::init( Vec2f const& poz )
 void Mob::onSpawn()
 {
 	BaseClass::onSpawn();
+	mBody.setSize( getSize()- Vec2f(4,4) );
+	mBody.setMask( COL_SOILD );
+	mBody.setMaskCheck( COL_BULLET | COL_SOILD );
+	getLevel()->getColManager().addBody( *this , mBody );
 }
 
 void Mob::onDestroy()
 {
+	getLevel()->getColManager().removeBody( mBody );
+
 	Explosion* e = getLevel()->createExplosion( getPos(), 128 );
 	e->setParam(128,3000,200);
 	for(int i=0; i<4; i++)
 	{
-		DebrisPickup* c= new DebrisPickup;
-		c->Init( getPos() );
+		DebrisPickup* c = new DebrisPickup( getPos() );
+		c->init();
 		getLevel()->addItem( c );
 	}
 	BaseClass::onDestroy();
@@ -52,7 +58,7 @@ void Mob::tick()
 	BaseClass::tick();
 
 	Player* player = getLevel()->getPlayer();
-	if ( !getLevel()->rayTerrainTest( getPos() , player->getPos() , BF_PASS_VIEW ) )
+	if ( !getLevel()->rayTerrainTest( getPos() , player->getPos() , COL_VIEW ) )
 	{
 		mTarget = player;
 		mTimeCantView = 0;
@@ -81,16 +87,19 @@ void Mob::tick()
 		moment.x = cos( angle )*akceleracija;
 		moment.y = sin( angle )*akceleracija;
 
-		Vec2f offset = ( brzina * TICK_TIME ) * moment;
-		mPos.y += offset.y;
-		if(checkCollision())
-			mPos.y -= offset.y;
-		mPos.x += offset.x;
-		if(checkCollision())
-			mPos.x -= offset.x;
-	}
+		Vec2f off = ( brzina * TICK_TIME ) * moment;
 
-	SudarProjektila();
+		Vec2f offset = Vec2f( 0 , 0 );
+
+		offset.y += off.y;
+		if( testCollision( offset ) )
+			offset.y = 0;
+		offset.x += off.x;
+		if( testCollision( offset ) )
+			offset.x = 0;
+
+		mPos += offset;
+	}
 
 	if(punjenje<100)
 	{
@@ -120,62 +129,10 @@ void Mob::DodajMoment(float x)
 }
 
 
-bool Mob::checkCollision()
+bool Mob::testCollision( Vec2f const& offset )
 {
-	Rect bBox;
-	calcBoundBox( bBox );
-	bBox.min += Vec2f(4,4);
-	bBox.max -= Vec2f(4,4);
-
-	TileMap& terrain = getLevel()->getTerrain();
-
-	if ( getLevel()->testTerrainCollision( bBox , BF_MOVABLE ) )
-		return true;
-
-	for( MobList::iterator iter = getLevel()->getMobs().begin() , itEnd = getLevel()->getMobs().end();
-		 iter != itEnd ; ++iter )
-	{
-		Mob* mob = *iter;
-		if( mob == this )
-			continue;
-
-		Rect bBoxOther;
-		mob->calcBoundBox( bBoxOther );
-		if( bBox.intersect(bBoxOther) )
-			return true;
-	}
-
-	Rect bBoxOther;
-	Player* player = getLevel()->getPlayer();
-	player->calcBoundBox( bBoxOther );
-	if( bBox.intersect(bBoxOther) )
-		return true;
-
-	return false;
-}
-
-void Mob::SudarProjektila()
-{
-	Rect bBox;
-	calcBoundBox( bBox );
-	bBox.min += Vec2f(4,4);
-	bBox.max -= Vec2f(4,4);
-
-	for( BulletList::iterator iter = getLevel()->getBullets().begin() , itEnd = getLevel()->getBullets().end();
-		 iter != itEnd ; ++iter )
-	{
-		Bullet* bt = *iter;
-		if( bt->team == TEAM_PLAYER )
-		{
-			Rect bBoxOther;
-			bt->calcBoundBox( bBoxOther );
-
-			if( bBox.intersect(bBoxOther) )
-			{
-				takeDamage( bt );				
-			}
-		}
-	}
+	ColInfo info;
+	return getLevel()->getColManager().testCollision( info , offset , mBody );
 }
 
 void Mob::takeDamage(Bullet* bullet)
@@ -204,6 +161,23 @@ void Mob::shoot( IBulletFactory const& creator )
 		}	
 		punjenje=0;
 	}
+}
+
+void Mob::onBodyCollision( ColBody& self , ColBody& other )
+{
+	LevelObject* obj = other.getClient();
+	switch( obj->getType() )
+	{
+	case OT_BULLET:
+		{
+			Bullet* bullet = obj->cast< Bullet >();
+			if ( bullet->team == TEAM_PLAYER )
+			{
+				takeDamage( bullet );
+			}
+		}
+		break;
+	}	
 }
 
 void MobRenderer::render( RenderPass pass , LevelObject* object )

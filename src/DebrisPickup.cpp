@@ -39,17 +39,21 @@ public:
 
 DEFINE_RENDERER( DebrisPickup , DebrisPickupRenderer )
 
-void DebrisPickup::Init(Vec2f poz)
+DebrisPickup::DebrisPickup( Vec2f const& pos ) 
+	:BaseClass( pos )
 {
-	BaseClass::Init(poz);
+
+}
+
+void DebrisPickup::init()
+{
+	BaseClass::init();
 
 	mSize.x=16;
 	mSize.y=16;	
 
 	brzina=200;
 	cesticaTimer=1.0;
-
-
 }
 
 void DebrisPickup::onSpawn()
@@ -93,19 +97,24 @@ void DebrisPickup::tick()
 			cesticaTimer += TICK_TIME*10;
 		}
 
-		Vec2f offset = ( brzina*TICK_TIME ) * dir;
-		mPos.y += offset.y;
-		if( checkCollision() )
+		Vec2f off = ( brzina * TICK_TIME ) * dir;
+
+		Vec2f offset = Vec2f( 0 , 0 );
+
+		offset.y += off.y;
+		if( testCollision( offset ) )
 		{
-			mPos.y-= offset.y;
+			offset.y = 0;
 			dir.y =-dir.y;
 		}
-		mPos.x+=offset.x;
-		if( checkCollision() )
+		offset.x += off.x;
+		if( testCollision( offset ) )
 		{
-			mPos.x-=offset.x;
+			offset.x = 0;
 			dir.x=-dir.x;
 		}
+
+		mPos += offset;
 		brzina-=100*TICK_TIME;
 	}
 	else
@@ -114,15 +123,10 @@ void DebrisPickup::tick()
 	}
 }
 
-bool DebrisPickup::checkCollision()
+bool DebrisPickup::testCollision( Vec2f const& offset )
 {
-	Rect bBox;
-	calcBoundBox( bBox );
-
-	if ( getLevel()->testTerrainCollision( bBox , BF_MOVABLE ) )
-		return true;
-
-	return false;
+	ColInfo info;
+	return getLevel()->getColManager().testCollision( info , offset , mBody  , COL_TERRAIN );
 }
 
 void DebrisPickup::onPick(Player* player)

@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ColBody.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Collision.h"
 				>
 			</File>

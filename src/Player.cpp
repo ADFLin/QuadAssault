@@ -28,7 +28,6 @@ class PlayerRenderer : public IRenderer
 public:
 	virtual void init()
 	{
-
 		TextureManager* texMgr = getGame()->getTextureMgr();
 		textura = texMgr->getTexture("tenkTorzoDiffuse.tga");	
 		texturaN = texMgr->getTexture("tenkTorzoNormal.tga");
@@ -117,6 +116,7 @@ public:
 		drawSprite( player->getRenderPos() , player->getSize() , player->getRotation() ,tex);	
 		glPopMatrix();
 	}
+
 	void RenderTorzo(RenderPass pass , Player* player )
 	{
 		Texture* tex;	
@@ -215,6 +215,10 @@ void Player::Init(Vec2f poz)
 	rotation=0.0;
 
 	brzina=200;
+
+	mBody.setSize( getSize() - Vec2f(4,4) );
+	mBody.setMask( COL_SOILD | COL_PLAYER );
+	mBody.setMaskCheck( COL_TERRAIN | COL_OBJECT );
 }
 
 void Player::onSpawn()
@@ -224,11 +228,14 @@ void Player::onSpawn()
 	light = getLevel()->createLight( Vec2f(0.0, 0.0), 1024 , false );
 	light->setColorParam(Vec3(1.0, 1.0, 1.0), 16);
 	light->drawShadow = true;
+	getLevel()->getColManager().addBody( *this , mBody );
 }
 
 void Player::onDestroy()
 {
+	getLevel()->getColManager().removeBody( mBody );
 	clearWeapons();
+	BaseClass::onDestroy();
 }
 
 void Player::update( Vec2f const& aimPos )
@@ -240,13 +247,18 @@ void Player::update( Vec2f const& aimPos )
 		moment.x=cos(rad)*akceleracija;
 		moment.y=sin(rad)*akceleracija;	
 
-		Vec2f offset = ( brzina * TICK_TIME ) * moment;
-		mPos.y += offset.y;
-		if(checkCollision())
-			mPos.y -= offset.y;
-		mPos.x += offset.x;
-		if(checkCollision())
-			mPos.x -= offset.x;
+		Vec2f off = ( brzina * TICK_TIME ) * moment;
+
+		Vec2f offset = Vec2f( 0 , 0 );
+
+		offset.y += off.y;
+		if( testCollision( offset ) )
+			offset.y = 0;
+		offset.x += off.x;
+		if( testCollision( offset ) )
+			offset.x = 0;
+
+		mPos += offset;
 
 		if(moment.x!=0 || moment.y!=0)
 		{
@@ -260,8 +272,6 @@ void Player::update( Vec2f const& aimPos )
 				shiftTrack=1.0;
 		}
 		akceleracija=0;
-
-		SudarProjektila();
 
 		Vec2f dir = aimPos - getPos();
 		rotationAim = Math::atan2( dir.y , dir.x );
@@ -300,6 +310,24 @@ void Player::update( Vec2f const& aimPos )
 		}
 	}
 }
+
+void Player::onBodyCollision( ColBody& self , ColBody& other )
+{
+	LevelObject* obj = other.getClient();
+	switch( obj->getType() )
+	{
+	case OT_BULLET:
+		{
+			Bullet* bullet = obj->cast< Bullet >();
+			if ( bullet->team == TEAM_EMPTY )
+			{
+				takeDamage( bullet );
+			}
+		}
+		break;
+	}
+}
+
 void Player::updateHeadlight()
 {
 	Vec2f dir;
@@ -348,53 +376,6 @@ void Player::shoot( Vec2f const& posTaget )
 		}
 	}
 
-}
-bool Player::checkCollision()
-{
-	Rect bBox;
-	calcBoundBox( bBox );
-	bBox.min += Vec2f(4,4);
-	bBox.max -= Vec2f(4,4);
-
-	TileMap& terrian = getLevel()->getTerrain();
-
-	if ( getLevel()->testTerrainCollision( bBox , BF_MOVABLE ) )
-		return true;
-
-	for( MobList::iterator iter = getLevel()->getMobs().begin() , itEnd = getLevel()->getMobs().end();
-		iter != itEnd ; ++iter )
-	{
-		Mob* mob = *iter;
-
-		Rect bBoxOther;
-		mob->calcBoundBox( bBoxOther );
-		if( bBox.intersect(bBoxOther) )
-			return true;		
-	}
-
-	return false;
-}
-void Player::SudarProjektila()
-{
-	Rect bBox;
-	calcBoundBox( bBox );
-	bBox.min += Vec2f(4,4);
-	bBox.max -= Vec2f(4,4);
-
-	for( BulletList::iterator iter = getLevel()->getBullets().begin() , itEnd = getLevel()->getBullets().end();
-		iter != itEnd ; ++iter )
-	{
-		Bullet* bt = *iter;
-		if( bt->team == TEAM_EMPTY )
-		{
-			Rect bBoxOther;
-			bt->calcBoundBox( bBoxOther );
-			if( bBox.intersect(bBoxOther) )
-			{
-				takeDamage( bt );				
-			}
-		}
-	}
 }
 
 
@@ -460,4 +441,10 @@ void Player::clearWeapons()
 			mWeaponSlot[i]=NULL;
 		}
 	}
+}
+
+bool Player::testCollision( Vec2f const& offset )
+{
+	ColInfo info;
+	return getLevel()->getColManager().testCollision( info , offset , mBody );
 }

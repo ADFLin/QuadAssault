@@ -2,6 +2,9 @@
 #define MOB_H
 
 #include "Actor.h"
+
+
+#include "ColBody.h"
 #include "ObjectFactory.h"
 
 class Bullet;
@@ -35,19 +38,21 @@ public:
 	virtual void onSpawn();
 	virtual void onDestroy();
 	virtual void tick();
+	virtual void onBodyCollision( ColBody& self , ColBody& other );
 
 	virtual void spawnEffect();
 	virtual void shoot( IBulletFactory const& creator );
 	virtual void takeDamage(Bullet* p);
 
-
 	void DodajMoment(float x);
-
-	bool checkCollision();
 	void SudarProjektila();	
 
-protected:			
-	float akceleracija;	
+
+protected:
+	bool testCollision( Vec2f const& offset );
+
+	ColBody mBody;
+	float   akceleracija;
 
 	float punjenje;
 

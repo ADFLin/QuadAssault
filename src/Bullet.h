@@ -3,6 +3,8 @@
 
 #include "Object.h"
 
+#include "ColBody.h"
+
 class Light;
 
 enum Team
@@ -28,17 +30,21 @@ public:
 	virtual void tick();
 	
 	float getDamage(){ return mDamage; }
+
+	virtual void onTileCollision( ColBody& self , Tile& tile );
+
 	int  team;
 
 protected:
 
 	friend class MinigunBulletRenderer;
 	friend class LaserBulletRenderer;
-	Vec2f  dir;
-	float  mLifeTime;
-	float  mTime;
-	float  mDamage;
-	float  mSpeed;
+	Vec2f   dir;
+	float   mLifeTime;
+	float   mTime;
+	float   mDamage;
+	float   mSpeed;
+	ColBody mBody;
 };
 
 #endif // Bullet_h__

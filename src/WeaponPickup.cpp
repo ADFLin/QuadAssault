@@ -35,7 +35,7 @@ public:
 	virtual void render( RenderPass pass , LevelObject* object )
 	{
 		WeaponPickup* pickup = static_cast< WeaponPickup* >( object );
-		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->rotation , mTex[ pickup->id ][ pass ] );
+		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->rotation , mTex[ pickup->mId ][ pass ] );
 	}
 	Texture* mTex[ 3 ][ NUM_RENDER_PASS ];
 };
@@ -43,13 +43,18 @@ public:
 DEFINE_RENDERER( WeaponPickup , WeaponPickupRenderer )
 
 
-void WeaponPickup::Init(Vec2f poz,int id)
+WeaponPickup::WeaponPickup( Vec2f const& pos , int id ) 
+	:BaseClass( pos ),mId( id )
 {
-	ItemPickup::Init(poz);
+
+}
+
+void WeaponPickup::init()
+{
+	BaseClass::init();
 
 	mSize.x=32;
 	mSize.y=32;
-	this->id=id;
 	rotation=0;
 }
 
@@ -58,9 +63,9 @@ void WeaponPickup::onSpawn()
 	BaseClass::onSpawn();
 
 	s = getLevel()->createLight( getPos() , 256 , false );
-	if(id==LASER1)
+	if(mId==LASER1)
 		s->setColorParam(Vec3(0.2,1.0,0.2),6);
-	else if(id==PLAZMA1)
+	else if(mId==PLAZMA1)
 		s->setColorParam(Vec3(0.2,0.2,1.0),6);
 }
 
@@ -81,14 +86,20 @@ void WeaponPickup::tick()
 
 void WeaponPickup::onPick(Player* player)
 {
-	getLevel()->playSound("pickup.wav");		
+	getLevel()->playSound("pickup.wav");
 
-	if(id==LASER1)
-		player->addWeapon(new Laser());
-	else if(id==PLAZMA1)
-		player->addWeapon(new Plasma());
-	else if(id==MINIGUN1)
-		player->addWeapon(new Minigun());
+	Weapon* weapon = NULL;
 
+	switch( mId )
+	{
+	case LASER1: weapon = new Laser; break;
+	case PLAZMA1: weapon = new Plasma; break;
+	case MINIGUN1: weapon = new Minigun; break;
+	}
+
+	if ( weapon )
+	{
+		player->addWeapon( weapon );
+	}
 	destroy();
 }

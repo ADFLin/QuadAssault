@@ -26,12 +26,8 @@ enum DoorType
 
 enum BlockFlag
 {
-	BF_CAST_SHADOW   = 1 << 0 ,
-	BF_MOVABLE       = 1 << 1 ,
-	BF_FLYABLE       = 1 << 2 ,
-	BF_NONSIMPLE     = 1 << 3 ,
-	BF_PASS_VIEW     = 1 << 4 ,
-	
+	BF_CAST_SHADOW   = BIT( 0 ),
+	BF_NONSIMPLE     = BIT( 1 ),
 };
 
 typedef unsigned char BlockType;
@@ -54,7 +50,8 @@ class Block
 public:
 
 	virtual ~Block(){}
-	bool  checkFlag( unsigned checkBits ){ return ( mFlag & checkBits) != 0; }
+	bool     checkFlag( unsigned checkBits ){ return ( mFlag & checkBits) != 0; }
+	unsigned getColMask(){ return mColMask; }
 
 	virtual void  init( BlockType type );
 	virtual void  onCollision( Tile& tile , Bullet* bullet );
@@ -77,6 +74,7 @@ public:
 protected:
 	BlockType mType;
 	unsigned  mFlag;
+	unsigned  mColMask;
 	Texture*  mTex[ NUM_RENDER_PASS ];
 };
 

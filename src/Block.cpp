@@ -13,6 +13,7 @@ static Block* gBlockMap[ 256 ] = { 0 };
 struct BlockInfo
 {
 	BlockType   type;
+	unsigned    colMask;
 	unsigned    flag;
 	char const* texDiffuse;
 	char const* texNormal;
@@ -23,12 +24,11 @@ static void createBlockClass();
 
 static BlockInfo const gInfo[] = 
 {
-	{ TID_FLAT , BF_MOVABLE | BF_FLYABLE | BF_PASS_VIEW , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
-	//{ TID_FLAT , BF_MOVABLE | BF_FLYABLE | BF_PASS_VIEW  , "synthetic_metal_diffuse.png" , "synthetic_metal_normal.png" , NULL } ,
-	{ TID_WALL , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
-	{ TID_GAP  , BF_PASS_VIEW | BF_FLYABLE , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
-	{ TID_DOOR , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
-	{ TID_ROCK , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
+	{ TID_FLAT , 0 , 0 , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
+	{ TID_WALL , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
+	{ TID_GAP  , COL_SOILD | COL_TRIGGER | COL_VIEW , 0 , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
+	{ TID_DOOR , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
+	{ TID_ROCK , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
 };
 
 void Block::init( BlockType type )
@@ -39,6 +39,7 @@ void Block::init( BlockType type )
 
 	mType = info.type;
 	mFlag = info.flag;
+	mColMask = info.colMask;
 	
 	TextureManager* texMgr = getGame()->getTextureMgr();
 	

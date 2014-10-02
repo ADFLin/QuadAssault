@@ -54,6 +54,20 @@ enum RenderPass
 	NUM_RENDER_PASS ,
 };
 
+enum
+{
+	COL_PLAYER    = BIT(0) ,
+	COL_SOILD     = BIT(1) ,
+	COL_FLY_SOILD = BIT(2) ,
+	COL_TRIGGER   = BIT(3) ,
+	COL_BULLET    = BIT(4) ,
+	COL_ITEM      = BIT(5) ,
 
+	COL_TERRAIN   = BIT(12) ,
+	COL_VIEW      = BIT(13) , //For terrain
+
+	COL_OBJECT    = COL_PLAYER | COL_SOILD | COL_FLY_SOILD | COL_TRIGGER | COL_BULLET | COL_ITEM ,
+	COL_ALL       = 0xffffffff ,
+};
 
 #endif // Base_h__

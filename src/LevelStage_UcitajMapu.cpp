@@ -42,6 +42,7 @@ void LevelStage::LoadLevel()
 	}
 
 	mTerrain.resize( mapWidth , mapHeight );
+	mColManager.setup( mapWidth * BLOCK_SIZE , mapHeight * BLOCK_SIZE ,  10 * BLOCK_SIZE );
 	for(int i=0; i< mapWidth ; i++)
 	{
 		for(int j=0; j< mapHeight; j++)
@@ -147,8 +148,8 @@ void LevelStage::LoadLevel()
 				getline(lstring,token,' ');
 				int id=atoi(token.c_str());
 
-				WeaponPickup* item = new WeaponPickup();
-				item->Init( pos , id );
+				WeaponPickup* item = new WeaponPickup( pos , id );
+				item->init();
 				addItem( item );
 			}
 			else if(token=="key")
@@ -161,8 +162,8 @@ void LevelStage::LoadLevel()
 				getline(lstring,token,' ');
 				int id=atoi(token.c_str());
 
-				KeyPickup* item = new KeyPickup();
-				item->Init( pos , id );
+				KeyPickup* item = new KeyPickup( pos , id );
+				item->init();
 				addItem( item );
 			}
 			else if(token=="preload_sound")

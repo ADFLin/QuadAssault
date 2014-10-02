@@ -9,16 +9,18 @@ class DebrisPickup : public ItemPickup
 	typedef ItemPickup BaseClass;
 
 public:
-	void Init(Vec2f poz);
+	DebrisPickup( Vec2f const& pos );;
+
+	void init();
 
 	virtual void onSpawn();
 	virtual void onDestroy();
 	virtual void tick();
 	virtual IRenderer* getRenderer();
 
-	bool checkCollision();
-	void onPick(Player* igrac);
+	void onPick(Player* player);
 
+	bool testCollision( Vec2f const& offset );
 	
 
 protected:	

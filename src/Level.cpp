@@ -38,6 +38,7 @@ void Level::tick()
 		obj->tick();
 	}
 
+	mColManager.update();
 	
 	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end(); 
 		  iter != itEnd; )
@@ -231,143 +232,9 @@ void Level::changeState( State state )
 	mState = state;
 }
 
-Tile* Level::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned skipFlag )
+Level::Level() 
+	:mColManager( mTerrain )
 {
-	if ( !mTerrain.checkRange( tPos.x , tPos.y ) )
-		return NULL;
 
-	Tile& tile = mTerrain.getData( tPos.x , tPos.y );
-	Block* block = Block::FromType( tile.type );
-
-	if ( block->checkFlag( skipFlag ) )
-		return NULL;
-
-	if ( block->checkFlag( BF_NONSIMPLE ) )
-	{
-		if ( !block->rayTest( tile , from , to ) )
-			return NULL;
-	}
-
-	return &tile;
 }
 
-Tile* Level::rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned skipFlag )
-{
-	Vec2i tpFrom = Vec2i( Math::floor( from.x / BLOCK_SIZE ) , Math::floor( from.y / BLOCK_SIZE ) );
-
-
-	Tile* out;
-	
-	if ( out = rayBlockTest( tpFrom , from , to , skipFlag ) )
-		return out;
-
-	Vec2i tpCur  = tpFrom;
-	Vec2i tpTo   = Vec2i( Math::floor( to.x / BLOCK_SIZE ) , Math::floor( to.y / BLOCK_SIZE ) );
-	Vec2i tpDif  = tpTo - tpFrom;
-
-	if ( tpDif.x == 0 )
-	{
-		int delta = tpDif.y > 0 ? 1 : -1;
-		while( tpCur.y != tpTo.y )
-		{
-			tpCur.y += delta;
-			if ( out = rayBlockTest( tpCur , from , to , skipFlag ) )
-				return out;	
-		}
-	}
-	else if ( tpDif.y == 0 )
-	{
-		int delta = tpDif.x > 0 ? 1 : -1;
-		while( tpCur.x != tpTo.x )
-		{
-			tpCur.x += delta;
-			if ( out = rayBlockTest( tpCur , from , to , skipFlag ) )
-				return out;	
-		}
-	}
-	else
-	{
-		Vec2f flac = from / float( BLOCK_SIZE ) - Vec2f( tpFrom );
-		Vec2f dif = to - from;
-		float slopeFactor = dif.y / dif.x;
-		if ( slopeFactor < 0 )
-			slopeFactor = -slopeFactor;
-
-        int deltaX = -1;
-		if ( tpDif.x > 0 )
-		{
-			flac.x = 1 - flac.x;
-			deltaX = 1;
-		}
-
-		int deltaY = -1;
-		if ( tpDif.y > 0 )
-		{
-			flac.y = 1 - flac.y;
-			deltaY = 1;
-		}
-
-		for(;;)
-		{
-			float yOff = flac.x * slopeFactor;
-
-			if ( flac.y > yOff )
-			{
-				flac.y -= yOff;
-				flac.x = 1;
-				tpCur.x += deltaX;
-			}
-			else
-			{
-				flac.x -= flac.y / slopeFactor;
-				flac.y = 1;
-				tpCur.y += deltaY;
-			}
-
-			if ( out = rayBlockTest( tpCur , from , to , skipFlag ) )
-				return out;
-
-			if ( tpCur.x == tpTo.x && tpCur.y == tpTo.y )
-				break;
-		}
-	}
-	return NULL;
-}
-
-Tile* Level::testTerrainCollision( Rect const& bBox , unsigned skipFlag )
-{
-	TileMap& terrain = getTerrain();
-
-	int xMin = Math::clamp( Math::floor( bBox.min.x / BLOCK_SIZE ) , 0 , terrain.getSizeX() - 1 );
-	int xMax = Math::clamp( Math::floor( bBox.max.x / BLOCK_SIZE ) , 0 , terrain.getSizeX() - 1 );
-	int yMin = Math::clamp( Math::floor( bBox.min.y / BLOCK_SIZE ) , 0 , terrain.getSizeY() - 1 );
-	int yMax = Math::clamp( Math::floor( bBox.max.y / BLOCK_SIZE ) , 0 , terrain.getSizeY() - 1 );
-
-	for( int x = xMin; x <= xMax ; ++x )
-	{
-		for(int y = yMin; y <= yMax; ++y  )
-		{
-			Tile& tile = mTerrain.getData( x , y );
-			Block* block = Block::FromType( tile.type );
-
-			if ( block->checkFlag( skipFlag ) )
-				continue;
-
-			Rect bBoxOther;
-			bBoxOther.min=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE);
-			bBoxOther.max=Vec2f(x*BLOCK_SIZE,y*BLOCK_SIZE)+Vec2f(BLOCK_SIZE,BLOCK_SIZE);
-
-			if( !bBox.intersect(bBoxOther) )
-				continue;
-
-			if ( block->checkFlag( BF_NONSIMPLE ) )
-			{
-				if ( !block->testIntersect( tile , bBox ) )
-					continue;
-			}
-
-			return &tile;
-		}
-	}
-	return NULL;
-}

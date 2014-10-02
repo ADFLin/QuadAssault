@@ -7,6 +7,7 @@
 #include "Block.h"
 #include "Object.h"
 #include "Light.h"
+#include "Collision.h"
 
 #include <list>
 #include <vector>
@@ -36,6 +37,7 @@ class Level
 {
 public:
 
+	Level();
 
 	void              init();
 	void              tick();
@@ -70,6 +72,7 @@ public:
 	void              changeState( State state );
 
 	TileMap&          getTerrain(){ return mTerrain; }
+	CollisionManager& getColManager(){  return mColManager; }
 
 
 	Player*           getPlayer(){  return mPlayer;  }
@@ -92,9 +95,11 @@ public:
 
 	void              renderObjects( RenderPass pass );
 
-	Tile*            rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned skipFlag );
-	Tile*            rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned skipFlag );
-	Tile*            testTerrainCollision( Rect const& bBox , unsigned skipFlag );
+	Tile*             rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned colMsk )
+	{
+		return mColManager.rayTerrainTest( from , to , colMsk );
+	}
+
 	
 public:
 	typedef MemberHook< LevelObject , &LevelObject::baseHook > ObjHook;
@@ -117,18 +122,20 @@ protected:
 	void       addOjectInternal( LevelObject* obj );
 
 
-	//CollisionManager mColMgr;
-	Listener*    mListener;
-	ObjectList   mObjects;
-	MobList      mMobs;
-	BulletList   mBullets;
-	ItemList     mItems;
-	LightList    mLights;
-	ParticleList mParticles;
+
+	ObjectList       mObjects;
+	MobList          mMobs;
+	BulletList       mBullets;
+	ItemList         mItems;
+	LightList        mLights;
+	ParticleList     mParticles;
 
 	State           mState;
 	Player*         mPlayer;
 	TileMap         mTerrain;
+
+	CollisionManager mColManager;
+	Listener*        mListener;
 };
 
 typedef Level::MobList    MobList;
