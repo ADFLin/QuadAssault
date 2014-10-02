@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include "Light.h"
 #include "Explosion.h"
+#include "RenderUtility.h"
 
 class LaserBulletRenderer : public IRenderer
 {

@@ -61,7 +61,7 @@ TUICore<T>* TUICore<T>::hitTestChildren( Vec2i const& testPos )
 	{
 		bool testFail = true;
 		if ( !ui->checkFlag( UF_DISABLE | UF_BE_HIDDEN ) )
-			// ui->isEnable() && ui->isShow()
+	    //if ( ui->isEnable() && ui->isShow() )
 		{
 			if ( ui->checkFlag( UF_HITTEST_CHILDREN ) )
 			{

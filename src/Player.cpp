@@ -88,7 +88,7 @@ public:
 			}
 		}
 
-		if ( pass == RP_GLOW )
+		if ( pass == RP_GLOW && gShowBoundBox )
 		{
 			Vec2f size = player->getSize();
 			glPushMatrix();

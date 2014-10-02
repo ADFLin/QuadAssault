@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>QuadAssault</ProjectName>
+    <ProjectGuid>{C3D05DDD-188F-4B5F-986C-E0F9C7B2EC01}</ProjectGuid>
+    <RootNamespace>QuadAssault</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>src;libCore;glew/include;SFML/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ForcedIncludeFiles>PCH.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;sfml-system-d.lib;sfml-main-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>glew/lib;SFML/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>src;libCore;glew/include;SFML/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ForcedIncludeFiles>PCH.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;sfml-system.lib;sfml-main.lib;sfml-graphics.lib;sfml-audio.lib;sfml-window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>glew/lib;SFML/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="libCore\CompilerConfig.h" />
+    <ClInclude Include="libCore\EasingFun.h" />
+    <ClInclude Include="libCore\IntegerType.h" />
+    <ClInclude Include="libCore\IntrList.h" />
+    <ClInclude Include="libCore\MetaBase.hpp" />
+    <ClInclude Include="libCore\Singleton.h" />
+    <ClInclude Include="libCore\SysMsg.h" />
+    <ClInclude Include="libCore\TGrid2D.h" />
+    <ClInclude Include="libCore\THolder.h" />
+    <ClInclude Include="libCore\TUICommon.h" />
+    <ClInclude Include="libCore\TUICommon.hpp" />
+    <ClInclude Include="libCore\TUICore.h" />
+    <ClInclude Include="libCore\TUICore.hpp" />
+    <ClInclude Include="libCore\TVector2.h" />
+    <ClInclude Include="libCore\TVector3.h" />
+    <ClInclude Include="libCore\TypeCast.h" />
+    <ClInclude Include="libCore\Win32Header.h" />
+    <ClInclude Include="src\Actor.h" />
+    <ClInclude Include="src\Base.h" />
+    <ClInclude Include="src\Block.h" />
+    <ClInclude Include="src\Bullet.h" />
+    <ClInclude Include="src\Collision.h" />
+    <ClInclude Include="src\DataPath.h" />
+    <ClInclude Include="src\DebrisParticle.h" />
+    <ClInclude Include="src\DebrisPickup.h" />
+    <ClInclude Include="src\Dependence.h" />
+    <ClInclude Include="src\Explosion.h" />
+    <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\GameInterface.h" />
+    <ClInclude Include="src\GameStage.h" />
+    <ClInclude Include="src\GlobalVariable.h" />
+    <ClInclude Include="src\GUISystem.h" />
+    <ClInclude Include="src\ItemPickup.h" />
+    <ClInclude Include="src\KeyPickup.h" />
+    <ClInclude Include="src\Laser.h" />
+    <ClInclude Include="src\LaserBullet.h" />
+    <ClInclude Include="src\LaserMob.h" />
+    <ClInclude Include="src\Level.h" />
+    <ClInclude Include="src\LevelEditor.h" />
+    <ClInclude Include="src\LevelStage.h" />
+    <ClInclude Include="src\Light.h" />
+    <ClInclude Include="src\MathCore.h" />
+    <ClInclude Include="src\MenuStage.h" />
+    <ClInclude Include="src\Message.h" />
+    <ClInclude Include="src\Minigun.h" />
+    <ClInclude Include="src\MinigunBullet.h" />
+    <ClInclude Include="src\MinigunMob.h" />
+    <ClInclude Include="src\Mob.h" />
+    <ClInclude Include="src\Object.h" />
+    <ClInclude Include="src\ObjectFactory.h" />
+    <ClInclude Include="src\Particle.h" />
+    <ClInclude Include="src\PCH.h" />
+    <ClInclude Include="src\Plasma.h" />
+    <ClInclude Include="src\PlasmaBullet.h" />
+    <ClInclude Include="src\PlasmaMob.h" />
+    <ClInclude Include="src\Platform.h" />
+    <ClInclude Include="src\Player.h" />
+    <ClInclude Include="src\PlayerSetting.h" />
+    <ClInclude Include="src\RenderEngine.h" />
+    <ClInclude Include="src\RenderUtility.h" />
+    <ClInclude Include="src\SFML.h" />
+    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Smoke.h" />
+    <ClInclude Include="src\SoundManager.h" />
+    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="src\Trigger.h" />
+    <ClInclude Include="src\Weapon.h" />
+    <ClInclude Include="src\WeaponPickup.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Block.cpp" />
+    <ClCompile Include="src\Bullet.cpp" />
+    <ClCompile Include="src\Collision.cpp" />
+    <ClCompile Include="src\DebrisParticle.cpp" />
+    <ClCompile Include="src\DebrisPickup.cpp" />
+    <ClCompile Include="src\Explosion.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameStage.cpp" />
+    <ClCompile Include="src\GlobalVariable.cpp" />
+    <ClCompile Include="src\GUISystem.cpp" />
+    <ClCompile Include="src\ItemPickup.cpp" />
+    <ClCompile Include="src\KeyPickup.cpp" />
+    <ClCompile Include="src\Laser.cpp" />
+    <ClCompile Include="src\LaserBullet.cpp" />
+    <ClCompile Include="src\LaserMob.cpp" />
+    <ClCompile Include="src\Level.cpp" />
+    <ClCompile Include="src\LevelStage.cpp" />
+    <ClCompile Include="src\LevelStage_Dev.cpp" />
+    <ClCompile Include="src\LevelStage_UcitajMapu.cpp" />
+    <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MathCore.cpp" />
+    <ClCompile Include="src\MenuStage.cpp" />
+    <ClCompile Include="src\Message.cpp" />
+    <ClCompile Include="src\Minigun.cpp" />
+    <ClCompile Include="src\MinigunBullet.cpp" />
+    <ClCompile Include="src\MinigunMob.cpp" />
+    <ClCompile Include="src\Mob.cpp" />
+    <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\Particle.cpp" />
+    <ClCompile Include="src\PCH.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\Plasma.cpp" />
+    <ClCompile Include="src\PlasmaBullet.cpp" />
+    <ClCompile Include="src\PlasmaMob.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\RenderEngine.cpp" />
+    <ClCompile Include="src\RenderUtility.cpp" />
+    <ClCompile Include="src\SFML.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Smoke.cpp" />
+    <ClCompile Include="src\SoundManager.cpp" />
+    <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="src\Trigger.cpp" />
+    <ClCompile Include="src\Weapon.cpp" />
+    <ClCompile Include="src\WeaponPickup.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="out\shader\Light.fp" />
+    <None Include="out\shader\Light.vp" />
+    <None Include="out\shader\RenderScene.fp" />
+    <None Include="out\shader\RenderScene.vp" />
+    <None Include="out\shader\RenderSceneGeometry.fp" />
+    <None Include="out\shader\RenderSceneLighting.fp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="out\shader\NormalFS.txt" />
+    <Text Include="out\shader\NormalVS.txt" />
+    <Text Include="out\shader\SjenaFS.txt" />
+    <Text Include="out\shader\SjenaVS.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

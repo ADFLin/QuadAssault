@@ -1,8 +1,25 @@
 #include "Collision.h"
 
+#include "Object.h"
+
+
 ColBody::ColBody()
+	:mOffset( 0,0 )
+	,halfSize( 0,0 )
 {
 	idxCell = -1;
+	bBBoxDirty = true;
+	colMask = COL_ALL;
+}
+
+void ColBody::updateBoundBox()
+{
+	if ( bBBoxDirty )
+	{
+		boundBox.min = mOffset - halfSize;
+		boundBox.max = mOffset + halfSize;
+		bBBoxDirty = false;
+	}
 }
 
 void CollisionManager::init( float length , float width , float cellLength )
@@ -13,15 +30,14 @@ void CollisionManager::init( float length , float width , float cellLength )
 	mCellLength = cellLength;
 }
 
-
-bool CollisionManager::testCollision( Vec2f const& pos , ColBody& body )
+bool CollisionManager::testCollision( Vec2f const& pos , ColBody& body , unsigned maskReplace )
 {
-	Rect bBox;
-	bBox.min = pos - body.halfSize;
-	bBox.min = pos + body.halfSize;
+	unsigned mask = ( maskReplace ) ? maskReplace : body.colMask;
 
-	int cx = Math::clamp( pos.x / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-	int cy = Math::clamp( pos.y / mCellLength , 0 , mCellMap.getSizeX() - 1 );
+	Vec2f const& posBody = pos + body.getOffset(); 
+
+	int cx , cy;
+	calcCellPos( posBody , cx , cy );
 
 	bool result = false;
 
@@ -42,7 +58,7 @@ bool CollisionManager::testCollision( Vec2f const& pos , ColBody& body )
 			{
 				ColBody& bodyTest = *iter;
 
-				if ( bodyTest == &body )
+				if ( &bodyTest == &body )
 					continue;
 
 				unsigned mask = body.colMask & bodyTest.colMask;
@@ -50,7 +66,9 @@ bool CollisionManager::testCollision( Vec2f const& pos , ColBody& body )
 				if ( mask == 0 )
 					continue;
 
-				if ( !body.boundBox.intersect( bodyTest.boundBox ) )
+				Vec2f offset = bodyTest.object->getPos() -  body.object->getPos();
+
+				if ( !body.boundBox.intersect( bodyTest.boundBox , offset ) )
 					continue;
 
 				return true;
@@ -62,10 +80,10 @@ bool CollisionManager::testCollision( Vec2f const& pos , ColBody& body )
 }
 bool CollisionManager::checkCollision( ColBody& body )
 {
-	Vec2f pos = body.object->getPos();
+	Vec2f posBody = body.object->getPos() + body.getOffset();
 
-	int cx = Math::clamp( pos.x / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-	int cy = Math::clamp( pos.y / mCellLength , 0 , mCellMap.getSizeX() - 1 );
+	int cx , cy;
+	calcCellPos( posBody , cx , cy );
 
 	bool result = false;
 
@@ -86,7 +104,7 @@ bool CollisionManager::checkCollision( ColBody& body )
 			{
 				ColBody& bodyTest = *iter;
 
-				if ( bodyTest == &body )
+				if ( &bodyTest == &body )
 					continue;
 
 				unsigned mask = body.colMask & bodyTest.colMask;
@@ -94,7 +112,9 @@ bool CollisionManager::checkCollision( ColBody& body )
 				if ( mask == 0 )
 					continue;
 
-				if ( !body.boundBox.intersect( bodyTest.boundBox ) )
+				Vec2f offset = bodyTest.object->getPos() -  body.object->getPos();
+
+				if ( !body.boundBox.intersect( bodyTest.boundBox , offset ) )
 					continue;
 
 				body.object->onCollision( body , bodyTest );
@@ -112,16 +132,16 @@ void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 	assert( body.halfSize.x < mCellLength / 2 && body.halfSize.y < mCellLength / 2 );
 	body.object = &obj;
 
-	Vec2f pos = body.object->getPos();
+	Vec2f posBody = body.object->getPos() + body.getOffset();
 
-	int cx = Math::clamp( pos.x / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-	int cy = Math::clamp( pos.y / mCellLength , 0 , mCellMap.getSizeX() - 1 );
+	int cx , cy;
+	calcCellPos( posBody , cx , cy );
 	int idxCell = mCellMap.toIndex( cx , cy );
 
 	body.idxCell = idxCell;
-	mCellMap[ idxCell ].bodies.push_back( &body );
+	mCellMap[ idxCell ].bodies.push_back( body );
 
-	mBodies.push_back( &body );
+	mBodies.push_back( body );
 }
 
 void CollisionManager::removeBody( ColBody& body )
@@ -133,19 +153,19 @@ void CollisionManager::removeBody( ColBody& body )
 
 void CollisionManager::updateBody( ColBody& body )
 {
-	Vec2f pos = body.object->getPos();
+	Vec2f posBody = body.object->getPos() + body.getOffset();
 
-	body.boundBox.min = pos - body.halfSize;
-	body.boundBox.max = pos + body.halfSize;
+	body.updateBoundBox();
+	int cx , cy;
+	calcCellPos( posBody , cx , cy );
 
-	int cx = Math::clamp( pos.x / mCellLength , 0 , mCellMap.getSizeX() - 1 );
-	int cy = Math::clamp( pos.y / mCellLength , 0 , mCellMap.getSizeX() - 1 );
+
 	int idxCell = mCellMap.toIndex( cx , cy );
 	if ( idxCell != body.idxCell )
 	{
 		body.cellHook.unlink();
+		mCellMap[ idxCell ].bodies.push_back( body );
 		body.idxCell = idxCell;
-		mCellMap[ idxCell ].bodies.push_back( &body );
 	}
 }
 
@@ -164,4 +184,10 @@ void CollisionManager::update()
 		ColBody& body = *iter;
 		checkCollision( body );
 	}
+}
+
+void CollisionManager::calcCellPos( Vec2f const& pos , int& cx , int& cy )
+{
+	cx = Math::clamp( int( pos.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
+	cy = Math::clamp( int( pos.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
 }

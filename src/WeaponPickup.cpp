@@ -10,6 +10,8 @@
 #include "Plasma.h"
 #include "Minigun.h"
 
+#include "RenderUtility.h"
+
 class WeaponPickupRenderer : public IRenderer
 {
 public:

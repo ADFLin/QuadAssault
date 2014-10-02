@@ -2,7 +2,7 @@
 #define BLOK_H
 
 #include "Base.h"
-#include "RenderUtility.h"
+#include "TGrid2D.h"
 
 Vec2f const gSimpleBlockSize = Vec2f( BLOCK_SIZE , BLOCK_SIZE );
 
@@ -42,8 +42,11 @@ struct Tile
 	Vec2f     pos;
 };
 
+typedef TGrid2D< Tile , FastMapping > TileMap;
+
 class Level;
 class Light;
+class Texture;
 
 class Block
 {
@@ -76,24 +79,5 @@ protected:
 	unsigned  mFlag;
 	Texture*  mTex[ NUM_RENDER_PASS ];
 };
-
-
-class RockBlock : public Block
-{
-public:
-	virtual void  onCollision( Tile& tile , Bullet* bullet );
-	void render( Tile const& tile );
-};
-
-class DoorBlock : public Block
-{
-public:
-	virtual void renderGlow( Tile const& tile );
-
-};
-
-
-
-
 
 #endif

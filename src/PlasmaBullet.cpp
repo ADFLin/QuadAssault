@@ -6,6 +6,7 @@
 #include "Smoke.h"
 #include "Explosion.h"
 #include "Light.h"
+#include "RenderUtility.h"
 
 
 class PlasmaBulletRenderer : public IRenderer

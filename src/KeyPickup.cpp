@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include "Player.h"
 #include "Explosion.h"
+#include "RenderUtility.h"
 
 class KeyPickupRenderer : public IRenderer
 {

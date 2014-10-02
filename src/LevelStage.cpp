@@ -4,6 +4,7 @@
 #include "SoundManager.h"
 #include "GUISystem.h"
 #include "TextureManager.h"
+
 #include "Block.h"
 
 #include "Player.h"
@@ -23,6 +24,7 @@
 
 #include "GlobalVariable.h"
 #include "DataPath.h"
+#include "RenderUtility.h"
 
 #include "EasingFun.h"
 

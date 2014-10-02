@@ -8,6 +8,7 @@
 
 #include "GlobalVariable.h"
 #include "DataPath.h"
+#include "RenderUtility.h"
 
 #include <fstream>
 #include <sstream>

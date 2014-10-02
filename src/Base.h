@@ -5,7 +5,7 @@
 #include <cmath>
 
 #ifndef BIT
-#define BIT( n ) (( n ) << 1 )
+#define BIT( n ) ( 1 << ( n ) )
 #endif
 
 typedef TVector2< int > Vec2i; 
@@ -33,6 +33,15 @@ struct Rect
 		if( max.x < a.min.x || max.y<a.min.y ||	
 			min.x > a.max.x || min.y>a.max.y ) 
 			return false;		
+		return true;
+	}
+
+	bool intersect( Rect const& a , Vec2f const& offset ) const
+	{
+		if( max.x < a.min.x + offset.x || max.y< a.min.y + offset.y ||	
+			min.x > a.max.x + offset.x || min.y>a.max.y + offset.y ) 
+			return false;
+
 		return true;
 	}
 };

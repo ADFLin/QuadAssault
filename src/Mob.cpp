@@ -7,6 +7,7 @@
 
 #include "DebrisPickup.h"
 #include "TextureManager.h"
+#include "RenderUtility.h"
 
 void Mob::init( Vec2f const& poz )
 {
@@ -230,7 +231,7 @@ void MobRenderer::render( RenderPass pass , LevelObject* object )
 	glPopMatrix();
 
 
-	if ( pass == RP_GLOW )
+	if ( pass == RP_GLOW && gShowBoundBox )
 	{
 		Vec2f size = mob->getSize();
 		glPushMatrix();

@@ -3,6 +3,7 @@
 #include "GameInterface.h"
 #include "Level.h"
 #include "TextureManager.h"
+#include "RenderUtility.h"
 
 class MineParticleRenderer : public IRenderer
 {

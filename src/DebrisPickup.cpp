@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "Explosion.h"
 #include "Player.h"
+#include "RenderUtility.h"
 
 class DebrisPickupRenderer : public IRenderer
 {

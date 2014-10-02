@@ -22,12 +22,7 @@ namespace Tween
 	template< class TimeType > class GroupTweener;
 	template< class TimeType > class SquenceTweener;
 
-	class EmptyBuilder
-	{
-
-	};
-
-
+	class EmptyBuilder { };
 
 	template< class T >
 	struct ValueAccess
@@ -616,10 +611,8 @@ namespace Tween
 
 	};
 
-
-
 	template< class TimeType >
-	class GroupTweener : public Detail< TimeType >::TweenerT< GroupTweener< TimeType >  >
+	class GroupTweener : public Detail< TimeType >::template TweenerT< GroupTweener< TimeType >  >
 		               , public Define< TimeType >
 	{
 		typedef GroupTweener ThisType;
@@ -735,7 +728,7 @@ namespace Tween
 	};
 
 	template< class TimeType >
-	class SquenceTweener : public Detail< TimeType >::TweenerT< SquenceTweener< TimeType > >
+	class SquenceTweener : public Detail< TimeType >::template TweenerT< SquenceTweener< TimeType > >
 		                 , public Define< TimeType >
 	{
 		typedef SquenceTweener< TimeType > ThisType;
@@ -859,24 +852,24 @@ namespace Tween
 	};
 
 	template< class T , class TimeType >
-	class Builder : public Detail< TimeType >::Builder< EmptyBuilder , T >
+	class BuilderImpl : public Detail< TimeType >::template Builder< EmptyBuilder, T >
 	{
 	public:
-		Builder( T& t ):Detail< TimeType >::Builder< EmptyBuilder , T >( EmptyBuilder() , t ){}
+		BuilderImpl(T& t) :Detail< TimeType >::template Builder< EmptyBuilder, T >(EmptyBuilder(), t){}
 	};
 
 	template< class TimeType >
-	typename Builder< GroupTweener< TimeType > , TimeType > 
+	typename BuilderImpl< GroupTweener< TimeType >, TimeType >
 		build( GroupTweener< TimeType >& tweener )
 	{ 
-		return Builder< GroupTweener< TimeType > , TimeType > ( tweener );
+		return BuilderImpl< GroupTweener< TimeType >, TimeType >(tweener);
 	}
 
 	template< class TimeType >
-	typename Builder< SquenceTweener< TimeType > , TimeType > 
+	typename BuilderImpl< SquenceTweener< TimeType >, TimeType >
 		build( SquenceTweener< TimeType >& tweener )
 	{ 
-		return Builder< SquenceTweener< TimeType > , TimeType >( tweener );
+		return BuilderImpl< SquenceTweener< TimeType >, TimeType >(tweener);
 	}
 
 }//namespace Tween

@@ -4,6 +4,7 @@
 #include "GameInterface.h"
 #include "TextureManager.h"
 
+#include "RenderUtility.h"
 #include "Bullet.h"
 #include "Explosion.h"
 
@@ -17,6 +18,8 @@ struct BlockInfo
 	char const* texNormal;
 	char const* texGlow;
 };
+
+static void createBlockClass();
 
 static BlockInfo const gInfo[] = 
 {
@@ -71,19 +74,17 @@ Block* Block::FromType( unsigned char type )
 	return gBlockMap[ type ];
 }
 
+
 void Block::initialize( Level* level )
 {
-	gBlockMap[ TID_FLAT ] = new Block;
-	gBlockMap[ TID_WALL ] = new Block;
-	gBlockMap[ TID_GAP  ] = new Block;
-	gBlockMap[ TID_DOOR ] = new DoorBlock;
-	gBlockMap[ TID_ROCK ] = new RockBlock;
+	createBlockClass();
 
 	for( int i = 0 ; i < NUM_BLOCK_TYPE ; ++i )
 	{
 		gBlockMap[i]->init( i );
 	}
 }
+
 
 void Block::cleanup()
 {
@@ -99,6 +100,20 @@ void Block::onCollision( Tile& tile , Bullet* bullet )
 {
 	bullet->destroy();
 }
+
+class RockBlock : public Block
+{
+public:
+	virtual void  onCollision( Tile& tile , Bullet* bullet );
+	void render( Tile const& tile );
+};
+
+class DoorBlock : public Block
+{
+public:
+	virtual void renderGlow( Tile const& tile );
+
+};
 
 void RockBlock::onCollision( Tile& tile , Bullet* bullet )
 {
@@ -136,3 +151,14 @@ void DoorBlock::renderGlow( Tile const& tile )
 	drawSprite( tile.pos, gSimpleBlockSize , mTex[ RP_GLOW ] );
 	glColor3f(1,1,1);
 }
+
+
+static void createBlockClass()
+{
+	gBlockMap[ TID_FLAT ] = new Block;
+	gBlockMap[ TID_WALL ] = new Block;
+	gBlockMap[ TID_GAP  ] = new Block;
+	gBlockMap[ TID_DOOR ] = new DoorBlock;
+	gBlockMap[ TID_ROCK ] = new RockBlock;
+}
+

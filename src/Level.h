@@ -24,7 +24,6 @@ class Message;
 
 class TextureManager;
 
-typedef TGrid2D< Tile , FastMapping > TileMap;
 
 namespace sf
 {
@@ -118,7 +117,7 @@ protected:
 	void       addOjectInternal( LevelObject* obj );
 
 
-
+	//CollisionManager mColMgr;
 	Listener*    mListener;
 	ObjectList   mObjects;
 	MobList      mMobs;

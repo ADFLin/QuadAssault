@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include "Explosion.h"
 #include "Light.h"
+#include "RenderUtility.h"
 
 class MinigunBulletRenderer : public IRenderer
 {

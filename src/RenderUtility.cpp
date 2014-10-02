@@ -5,6 +5,8 @@
 
 #include <cassert>
 
+bool  gShowBoundBox = false;
+
 void drawRect( Vec2f const& poz, Vec2f const& dim )
 {
 	glBegin(GL_QUADS);

@@ -230,3 +230,5 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+QuadAssault2013.vcxproj.filters
+QuadAssault.vcxproj.filters
