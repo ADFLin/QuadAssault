@@ -8,4 +8,8 @@ QuadAssault
 * Camera zoom in and zoom out
 * Improve Collision System
 * New GUI System
+
+###TODO###
+* Remove SFML Dependence
+
   
