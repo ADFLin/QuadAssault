@@ -852,24 +852,24 @@ namespace Tween
 	};
 
 	template< class T , class TimeType >
-	class BuilderImpl : public Detail< TimeType >::template Builder< EmptyBuilder, T >
+	class Builder: public Detail< TimeType >::template Builder< EmptyBuilder, T >
 	{
 	public:
-		BuilderImpl(T& t) :Detail< TimeType >::template Builder< EmptyBuilder, T >(EmptyBuilder(), t){}
+		Builder(T& t) :Detail< TimeType >::template Builder< EmptyBuilder, T >(EmptyBuilder(), t){}
 	};
 
 	template< class TimeType >
-	typename BuilderImpl< GroupTweener< TimeType >, TimeType >
+	typename Builder< GroupTweener< TimeType >, TimeType >
 		build( GroupTweener< TimeType >& tweener )
 	{ 
-		return BuilderImpl< GroupTweener< TimeType >, TimeType >(tweener);
+		return Builder< GroupTweener< TimeType >, TimeType >(tweener);
 	}
 
 	template< class TimeType >
-	typename BuilderImpl< SquenceTweener< TimeType >, TimeType >
+	typename Builder< SquenceTweener< TimeType >, TimeType >
 		build( SquenceTweener< TimeType >& tweener )
 	{ 
-		return BuilderImpl< SquenceTweener< TimeType >, TimeType >(tweener);
+		return Builder< SquenceTweener< TimeType >, TimeType >(tweener);
 	}
 
 }//namespace Tween

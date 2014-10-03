@@ -408,6 +408,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\LevelEditStage.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\LevelEditStage.h"
 				>
 			</File>
@@ -417,14 +421,6 @@
 			</File>
 			<File
 				RelativePath=".\src\LevelStage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\LevelStage_Dev.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\LevelStage_Load.cpp"
 				>
 			</File>
 			<File

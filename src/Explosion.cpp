@@ -18,12 +18,12 @@ void Explosion::Init( Vec2f poz, float radius )
 	setPos( poz );
 	this->radius=radius;
 
-	umire=false;
+	mbDead=false;
 
 	intensity=0;
 	maxIntenzitet=4;
-	speedRasta=35;
-	speedUmiranja=10;
+	growthRate=35;
+	deathRate=10;
 
 	color=Vec3(1.0, 0.75, 0.5);
 
@@ -46,8 +46,8 @@ void Explosion::onDestroy()
 void Explosion::setParam(float intensity, float brzinaRasta, float brzinaUmiranja)
 {
 	maxIntenzitet=intensity*2;
-	this->speedRasta=brzinaRasta;
-	this->speedUmiranja=brzinaUmiranja;
+	this->growthRate=brzinaRasta;
+	this->deathRate=brzinaUmiranja;
 }
 
 void Explosion::setColor( Vec3 const& c )
@@ -58,10 +58,10 @@ void Explosion::setColor( Vec3 const& c )
 void Explosion::tick()
 {
 
-	if( umire )
+	if( mbDead )
 	{
 		if( intensity>0 )
-			intensity -= speedUmiranja * TICK_TIME;
+			intensity -= deathRate * TICK_TIME;
 		else
 		{			
 			destroy();
@@ -71,10 +71,10 @@ void Explosion::tick()
 	else
 	{
 		if(intensity<maxIntenzitet)
-			intensity += speedRasta * TICK_TIME;
+			intensity += growthRate * TICK_TIME;
 		else
 		{
-			umire=true;
+			mbDead=true;
 			intensity=maxIntenzitet;
 		}
 	}	

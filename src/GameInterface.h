@@ -28,6 +28,9 @@ public:
 
 	
 	virtual void  addStage( GameStage* stage, bool removePrev ) = 0;
+	virtual void  stopPlay() = 0;
+
+
 	virtual void  procWidgetEvent( int event , int id , GWidget* sender ) = 0;
 	virtual void  procSystemEvent() = 0;
 

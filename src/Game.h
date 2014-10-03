@@ -19,14 +19,15 @@ public:
 	void run();
 	void exit();
 
-	void  addStage( GameStage* stage, bool removePrev );
-	void  procWidgetEvent( int event , int id , GWidget* sender );
-	void  procSystemEvent();
+	virtual void  addStage( GameStage* stage, bool removePrev );
+	virtual void  stopPlay(){ mNeedEnd = true; }
+	virtual void  procWidgetEvent( int event , int id , GWidget* sender );
+	virtual void  procSystemEvent();
+
 	sf::RenderWindow* getWindow();
 	sf::Font*         getFont( int idx ){  return mFonts[idx]; }
 
 private:
-
 
 	float    mFPS;
 	unsigned mMouseState;

@@ -15,44 +15,24 @@ class GUIManager;
 
 class LevelStageBase : public GameStage
 {
-
-protected:
-	Level* mLevel;
-};
-
-
-class LevelStage : public LevelStageBase
-{
-	typedef LevelStageBase BaseClass;
-
 public:
-	bool init();
-	void update(float deltaT);	
-	
-	void render();
-	void exit();
+	virtual bool init();
+	virtual void exit();
+	virtual void onWidgetEvent( int event , int id , GWidget* sender );
+	virtual void onSystemEvent( sf::Event const& event );
+protected:
 
-	void tick();
-	void updateRender( float dt );
+	enum
+	{
+		UI_MAP_TOOL = 100 ,
 
+		UI_MENU_PANEL ,
+		UI_BACK_GAME ,
+		UI_EXIT_GAME ,
+		UI_GO_MENU   ,
 
-	void LoadLevel();
-	bool saveMap( char const* path );
-
-
-
-	void UpdateDev(float deltaT);
-
-	Message*   addMessage(Message* p);
-
-
-	void generateEmptyLevel();
-	void createShader( char const* vsName , char const* fsName );
-
-	void onWidgetEvent( int event , int id , GWidget* sender );
-	void onSystemEvent( sf::Event const& event );
-	void onSystemEventDev( sf::Event const& event );
-private:
+		UI_EDIT_ID  = 400 ,
+	};
 
 	Vec2f  convertToWorldPos( Vec2i const& sPos )
 	{
@@ -64,59 +44,53 @@ private:
 		Vec2f wPos = convertToWorldPos( sPos );
 		return Vec2i( Math::floor( wPos.x / BLOCK_SIZE ) , Math::floor( wPos.y  / BLOCK_SIZE ) );
 	}
-
-	enum
-	{
-		UI_MAP_TOOL = 100 ,
-		UI_CREATE_LIGHT ,
-		UI_CREATE_TRIGGER ,
-		UI_EMPTY_MAP ,
-		UI_SAVE_MAP  ,
-
-		UI_MENU_PANEL ,
-		UI_BACK_GAME ,
-		UI_EXIT_GAME ,
-		UI_GO_MENU ,
-	};
-
-	bool DEVMODE;
-
-	Light* mEditLight;
-	float sr,sg,sb, si, srad; //boja postavljenog svjetla
-
-	int   mEditTileType; //vrsta bloka koji se postavlja
-	int   mEditTileMeta;
-	bool  postavljaLight;
-
-	int      mStepEdit;
-	AreaTrigger* mEditTrigger;
-
-
-
-	Vec2f t1, t2, t3; //pocetak, kraj i spawnpoint triggera
-
-
-	float gameOverTimer; //dok dosegne nulu, igra odlazi na glavni menu
-
-	bool        mPause;
+	
+	Texture*    mTexCursor;
 	RenderParam mRenderParam;
 	Object*     mCamera;
 	float       mWorldScaleFactor;
+	Level*      mLevel;
+	bool        mPause;
+};
+
+
+class LevelStage : public LevelStageBase
+{
+	typedef LevelStageBase BaseClass;
+
+public:
+	virtual bool init();
+	virtual void exit();
+	virtual void update(float deltaT);	
+	virtual void render();
+	
+
+	void tick();
+	void updateRender( float dt );
+
+	void LoadLevel();
+	void generateEmptyLevel();
+	void createShader( char const* vsName , char const* fsName );
+
+	void onWidgetEvent( int event , int id , GWidget* sender );
+	void onSystemEvent( sf::Event const& event );
+
+private:
 
 
 	sf::Music  mMusic;
-
-	Texture*   mTexCursor;
-
-
+	
 	typedef Tween::GroupTweener< float > CTweener;
 
 	CTweener mTweener;
-	unsigned char tranzicija; //prelazak na tamno (fade to black, ne znak kak se to zove na hrvatskom)
-	float tBoja; //boja tranzicije
-	float brzinaFadeanja;
 
-	float tickTimer;
+	unsigned char mTransition;
+	float transitionColor;
+	float transitionSpeed;
+
+	// when reaches zero, the game goes to the main menu
+	float mGameOverTimer; 
+	float mTickTimer;
 };
 
 #endif // LevelState_h__

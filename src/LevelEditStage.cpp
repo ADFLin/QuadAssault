@@ -1,17 +1,61 @@
-#include "LevelStage.h"
+#include "LevelEditStage.h"
 
 #include "GUISystem.h"
 #include "GameInterface.h"
+#include "TextureManager.h"
 
+#include "Level.h"
 #include "Light.h"
 #include "Trigger.h"
 
 #include "GlobalVariable.h"
 #include "DataPath.h"
+#include "RenderUtility.h"
 
 #include <fstream>
 
-void LevelStage::UpdateDev(float deltaT)
+bool LevelEditStage::init()
+{
+	if( !BaseClass::init() )
+		return false;
+
+	mEditTileMeta = 0;
+	mEditTileType = TID_FLAT;
+
+	postavljaLight = false;
+	mStepEdit=0;
+	sr=1.0; sg=10; sb=1.0; si=8.0; srad=128.0;
+
+	{
+		GFrame* frame = new GFrame( UI_MAP_TOOL , Vec2i(32,32), Vec2i(320, 240) , NULL );
+		//"Tools"
+		GUISystem::getInstance().addWidget( frame );
+
+		GImageButton* button;
+
+		button = new GImageButton( UI_CREATE_LIGHT , Vec2i(16,32),Vec2i(32,32) , frame );
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+
+		button = new GImageButton( UI_CREATE_TRIGGER ,Vec2i(64,32),Vec2i(32,32) , frame );
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+
+		button = new GImageButton( UI_EMPTY_MAP  ,Vec2i(16,72),Vec2i(32,32) , frame );
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
+
+		button = new GImageButton( UI_SAVE_MAP ,Vec2i(64,72),Vec2i(32,32) , frame );
+		button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
+	}
+
+
+	return true;
+}
+
+void LevelEditStage::exit()
+{
+	BaseClass::exit();
+}
+
+void LevelEditStage::update( float deltaT )
 {	
 	float speed=250;
 
@@ -69,17 +113,67 @@ void LevelStage::UpdateDev(float deltaT)
 		mEditLight->setColorParam(Vec3(sr,sg,sb),si);
 		mEditLight->setPos( convertToWorldPos( getGame()->getMousePos() ) );
 	}
-
-	updateRender( deltaT );
 }
 
-void LevelStage::onSystemEventDev( sf::Event const& event )
+
+
+void LevelEditStage::render()
+{
+
+	RenderEngine* renderEngine = getGame()->getRenderEenine();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	//mWorldScaleFactor = 0.5f;
+
+	mRenderParam.camera      = mCamera;
+	mRenderParam.level       = mLevel;
+	mRenderParam.scaleFactor = mWorldScaleFactor;
+	mRenderParam.mode        = RM_ALL;
+
+	renderEngine->renderScene( mRenderParam );
+
+	Player* player = mLevel->getPlayer();
+	glLoadIdentity();
+
+	if ( mPause )
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glColor4f( 0 , 0 , 0 , 0.8 );
+		drawRect( Vec2f(0.0, 0.0) , Vec2f( getGame()->getScreenSize() ) );
+		glDisable(GL_BLEND);
+	}
+
+	GUISystem::getInstance().render();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+	drawSprite( Vec2f( getGame()->getMousePos() ) - Vec2f(16,16) ,Vec2f(32,32), mTexCursor );
+	glDisable(GL_BLEND);
+
+
+	Vec2f posCursor = convertToWorldPos( getGame()->getMousePos() );
+	sf::Text t;
+	t.setFont( *getGame()->getFont( 0 ) );	
+	t.setColor(sf::Color(50,255,50));
+	t.setCharacterSize(18);
+	char buf[256];
+	::sprintf( buf ,"x = %f , y = %f " , posCursor.x , posCursor.y );
+	t.setString( buf );
+	t.setPosition( 10 , t.getLocalBounds().height/2);
+
+	getGame()->getWindow()->pushGLStates();
+	getGame()->getWindow()->draw(t);
+	getGame()->getWindow()->popGLStates();
+}
+
+
+void LevelEditStage::onSystemEvent( sf::Event const& event )
 {
 	switch( event.type )
 	{
-	case sf::Event::Closed:
-		mNeedExit=true;
-		break;
 	case sf::Event::MouseButtonPressed:
 		{
 			if(event.mouseButton.button==sf::Mouse::Button::Left)
@@ -136,8 +230,8 @@ void LevelStage::onSystemEventDev( sf::Event const& event )
 			switch( event.key.code )
 			{
 			case sf::Keyboard::Key::F1:
-				DEVMODE=false;
-				GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->show( false );
+				GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
+				mNeedExit = true;
 				break;
 			case sf::Keyboard::Key::F4:
 				{
@@ -152,7 +246,7 @@ void LevelStage::onSystemEventDev( sf::Event const& event )
 				{
 					string path = LEVEL_DIR;
 					path += gMapFileName;
-					saveMap( path.c_str() );				
+					saveLevel( path.c_str() );				
 				}
 				break;
 			case sf::Keyboard::Key::G:
@@ -197,7 +291,41 @@ void LevelStage::onSystemEventDev( sf::Event const& event )
 	}
 }
 
-bool LevelStage::saveMap( char const* path )
+void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
+{
+	switch( id )
+	{
+	case UI_SAVE_MAP:
+		{
+			string path = LEVEL_DIR;
+			path += gMapFileName;
+			saveLevel( path.c_str() );
+		}
+		break;
+	case UI_EMPTY_MAP:
+		{
+			generateEmptyLevel();
+		}
+		break;
+	case UI_CREATE_TRIGGER:
+		if( mStepEdit == 0 )
+		{		
+			mEditTrigger = new AreaTrigger;
+			mStepEdit    = 1;
+		}
+		break;
+	case UI_CREATE_LIGHT:
+		if(postavljaLight==false)
+		{
+			postavljaLight = true;
+			mEditLight = mLevel->createLight( getGame()->getMousePos() , 128 , true);
+			mEditLight->setColorParam(Vec3(1.0, 1.0, 1.0), 8);
+		}
+		break;
+	}
+}
+
+bool LevelEditStage::saveLevel( char const* path )
 {
 	std::ofstream of( path );
 
@@ -246,3 +374,35 @@ bool LevelStage::saveMap( char const* path )
 	return true;
 }
 
+void LevelEditStage::generateEmptyLevel()
+{
+	TileMap& terrain = mLevel->getTerrain();
+	for(int i=0; i< terrain.getSizeX() ; i++)
+	{
+		for(int j=0; j< terrain.getSizeY(); j++)
+		{		
+			Tile& tile = terrain.getData( i , j );
+			tile.type = TID_FLAT;
+			tile.meta = 0;
+			if(i==0 || j==0 || i== terrain.getSizeX()-1 || j== terrain.getSizeY() -1 )
+				tile.type = TID_WALL;
+		}	
+	}
+
+	LightList& lights = mLevel->getLights();
+	for(LightList::iterator iter = lights.begin();
+		iter != lights.end() ; )
+	{
+		Light* light = *iter;
+		if( light->isStatic )
+		{
+			++iter;
+			delete light;
+
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}

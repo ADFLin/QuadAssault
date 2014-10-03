@@ -188,10 +188,6 @@ void MenuStage::onSystemEvent( sf::Event const& event )
 {
 	switch( event.type )
 	{
-	case sf::Event::Closed:
-		mNeedExit=true;
-		break;
-
 	case sf::Event::KeyPressed:
 		{
 			if(event.key.code==sf::Keyboard::Key::Escape)

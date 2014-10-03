@@ -225,6 +225,9 @@ void Game::procSystemEvent()
 		bool needSend = true;
 		switch( event.type )
 		{
+		case sf::Event::Closed:
+			getGame()->stopPlay();
+			break;
 		case sf::Event::TextEntered:
 			{
 				
@@ -279,3 +282,4 @@ void Game::procSystemEvent()
 			mStageStack.back()->onSystemEvent( event );
 	}
 }
+

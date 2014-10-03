@@ -29,15 +29,15 @@ protected:
 	float  radius;
 	Light* light;
 
-	bool umire; //ako umire, intensity se smanjuje, ako ne, onda se povecava
-
-	float speedRasta; //brzina kojom se povezava intensity
-	float speedUmiranja; //brzina kojom se smanjuje intensity
+	// if you die, the intensity is reduced, if not, then increases
+	bool  mbDead;
+	// the speed at which the intensity is increasing
+	float growthRate; 
+	// the speed at which the intensity is decreasing
+	float deathRate;  
 	float intensity, maxIntenzitet;
-
-	Vec3  color; //boja svjetla
-
-
+	// light color
+	Vec3  color;
 };
 
 
