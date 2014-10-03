@@ -21,7 +21,7 @@ public:
 	virtual void onDestroy();
 	
 	void setParam(float intensity, float brzinaRasta, float brzinaUmiranja);
-	void setColor( Vec3 const& c );
+	void setColor( Vec3f const& c );
 	
 
 protected:
@@ -37,7 +37,7 @@ protected:
 	float deathRate;  
 	float intensity, maxIntenzitet;
 	// light color
-	Vec3  color;
+	Vec3f  color;
 };
 
 

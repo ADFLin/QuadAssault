@@ -16,8 +16,8 @@ class GUIManager;
 class LevelStageBase : public GameStage
 {
 public:
-	virtual bool init();
-	virtual void exit();
+	virtual bool onInit();
+	virtual void onExit();
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
 	virtual void onSystemEvent( sf::Event const& event );
 protected:
@@ -54,43 +54,41 @@ protected:
 };
 
 
+
+
 class LevelStage : public LevelStageBase
+	             , public Level::EventListener
 {
 	typedef LevelStageBase BaseClass;
 
 public:
-	virtual bool init();
-	virtual void exit();
-	virtual void update(float deltaT);	
-	virtual void render();
-	
+	virtual bool onInit();
+	virtual void onExit();
+	virtual void onUpdate(float deltaT);	
+	virtual void onRender();
+
+	virtual void onWidgetEvent( int event , int id , GWidget* sender );
+	virtual void onSystemEvent( sf::Event const& event );
+	virtual void onLevelEvent( LevelEvent const& event );
 
 	void tick();
 	void updateRender( float dt );
 
-	void LoadLevel();
+	void loadLevel();
 	void generateEmptyLevel();
-	void createShader( char const* vsName , char const* fsName );
-
-	void onWidgetEvent( int event , int id , GWidget* sender );
-	void onSystemEvent( sf::Event const& event );
 
 private:
 
-
+	void changeMenuStage();
 	sf::Music  mMusic;
 	
 	typedef Tween::GroupTweener< float > CTweener;
 
 	CTweener mTweener;
-
-	unsigned char mTransition;
-	float transitionColor;
-	float transitionSpeed;
-
 	// when reaches zero, the game goes to the main menu
 	float mGameOverTimer; 
 	float mTickTimer;
+	SrceenFade mScreenFade;
 };
 
 #endif // LevelState_h__

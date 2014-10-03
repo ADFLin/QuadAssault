@@ -22,6 +22,8 @@ enum DoorType
 	DOOR_RED   = 0 ,
 	DOOR_GREEN = 1 ,
 	DOOR_BLUE  = 2 ,
+
+	NUM_DOOR_TYPE ,
 };
 
 enum BlockFlag
@@ -40,7 +42,6 @@ struct Tile
 
 typedef TGrid2D< Tile , FastMapping > TileMap;
 
-class Level;
 class Light;
 class Texture;
 
@@ -67,7 +68,7 @@ public:
 	virtual bool  testIntersect( Tile const& tile , Rect const& bBox ){ return false; }
 
 
-	static void   initialize( Level* level );
+	static void   initialize();
 	static void   cleanup();
 	static Block* FromType( BlockType type );
 	

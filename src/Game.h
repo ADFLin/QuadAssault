@@ -14,7 +14,6 @@ class Game : public IGame
 {
 public:
 	Game();
-
 	bool init(char* configFile);
 	void run();
 	void exit();

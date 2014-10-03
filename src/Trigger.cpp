@@ -142,13 +142,13 @@ void MessageAct::fire( Level* level )
 
 void GoalAct::fire( Level* level )
 {
-	level->changeState( Level::eFinish );
+	level->changeState( Level::eFINISH );
 	//SPREMANJE INFORMACIJA O OTKLJUCAVANJU				
-	if(gIdxCurLevel<BROJ_NIVOA-1)
+	if(gIdxCurLevel<MAX_LEVEL_NUM-1)
 		gLevelEnabled[gIdxCurLevel+1]=true;
 
 	std::ofstream of( LEVEL_DIR LEVEL_LOCK_FILE );	
-	for(int i=0; i<BROJ_NIVOA; i++)
+	for(int i=0; i<MAX_LEVEL_NUM; i++)
 	{
 		of << gLevelEnabled[i] << " ";	
 	}

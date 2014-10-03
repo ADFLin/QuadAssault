@@ -57,8 +57,13 @@ void Mob::tick()
 {
 	BaseClass::tick();
 
+	float MaxMobViewDistance = 1000;
+
 	Player* player = getLevel()->getPlayer();
-	if ( !getLevel()->getColManager().rayTerrainTest( getPos() , player->getPos() , COL_VIEW ) )
+	Vec2f offset = player->getPos() - getPos();
+
+	if ( offset.length2() < MaxMobViewDistance * MaxMobViewDistance &&
+		 !getLevel()->getColManager().rayTerrainTest( getPos() , player->getPos() , COL_VIEW ) )
 	{
 		mTarget = player;
 		mTimeCantView = 0;
@@ -120,7 +125,7 @@ void Mob::spawnEffect()
 {
 	Explosion* e = getLevel()->createExplosion( getPos(),512 );
 	e->setParam(32,1000,100);
-	e->setColor(Vec3(0.25,0.5,1.0));
+	e->setColor(Vec3f(0.25,0.5,1.0));
 }
 
 void Mob::DodajMoment(float x)

@@ -26,7 +26,6 @@ Level::Level()
 
 void Level::init()
 {
-	Block::initialize( this );
 	mColManager.setTerrain( mTerrain );
 
 	mPlayer = new Player();
@@ -40,7 +39,6 @@ void Level::cleanup()
 	{
 		LevelObject* obj = *iter;
 		++iter;
-		obj->onDestroy();
 		delete obj;
 	}
 
@@ -59,8 +57,6 @@ void Level::cleanup()
 		delete mMsgQueue[i];
 	mMsgQueue.clear();
 
-	//FIXME
-	Block::cleanup();
 }
 
 void Level::tick()
@@ -289,4 +285,18 @@ Message* Level::addMessage( Message* msg )
 {
 	mMsgQueue.push_back( msg );
 	return mMsgQueue.back();
+}
+
+void Level::sendEvent( LevelEvent const& event )
+{
+	for( ListenerList::iterator iter = mListeners.begin() , itEnd = mListeners.end();
+		iter != itEnd ; ++iter )
+	{
+		(*iter)->onLevelEvent( event );
+	}
+}
+
+void Level::addListerner( EventListener& listener )
+{
+	mListeners.push_back( &listener );
 }

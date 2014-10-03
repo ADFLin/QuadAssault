@@ -4,11 +4,11 @@
 #include <iostream>
 using namespace std;
 
-#define BROJ_NIVOA 4
+#define MAX_LEVEL_NUM 4
 
 extern string gLevelFileName;
 extern string gMapFileName;
-extern bool   gLevelEnabled[BROJ_NIVOA];
+extern bool   gLevelEnabled[MAX_LEVEL_NUM];
 extern int    gIdxCurLevel;
 extern bool   odabir_levela_odmah;
 

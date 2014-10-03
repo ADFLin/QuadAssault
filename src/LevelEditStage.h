@@ -16,11 +16,11 @@ public:
 
 	};
 
-	virtual bool init();
-	virtual void exit();
+	virtual bool onInit();
+	virtual void onExit();
 
-	virtual void update( float deltaT );
-	virtual void render();
+	virtual void onUpdate( float deltaT );
+	virtual void onRender();
 	virtual void onSystemEvent( sf::Event const& event );
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
 

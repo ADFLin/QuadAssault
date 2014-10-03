@@ -101,7 +101,7 @@ void Game::exit()
 
 	for(int i= mStageStack.size() - 1 ; i > 0 ; --i )
 	{
-		mStageStack[i]->exit();
+		mStageStack[i]->onExit();
 		delete mStageStack[i];
 	}
 	mStageStack.clear();
@@ -130,13 +130,16 @@ void Game::exit()
 
 void Game::run()
 {
+	using std::cout;
+	using std::endl;
+
 	int prevTime = Platform::getTickCount();
 	int64 timeFrame = Platform::getTickCount();
 	int frameCount = 0;
 
 	sf::Text text;
 	text.setFont( *mFonts[0] );		
-	text.setColor(sf::Color(50,255,25));
+	text.setColor(sf::Color(255,255,25));
 	text.setCharacterSize(18);
 		
 	text.setPosition( getGame()->getScreenSize().x - 100 , 10 );	
@@ -150,10 +153,10 @@ void Game::run()
 		GameStage* stage = mStageStack.back();
 
 		mSoundMgr->update( deltaT );
-		mStageStack.back()->update( deltaT );
+		mStageStack.back()->onUpdate( deltaT );
 
 		mRenderEngine->prevRender();
-		mStageStack.back()->render();
+		mStageStack.back()->onRender();
 
 		++frameCount;
 
@@ -175,11 +178,12 @@ void Game::run()
 		mRenderEngine->postRender();
 		mWindow.display();	
 
-		if( mStageStack.back()->isEnd() )
+		if( mStageStack.back()->needStop() )
 		{
-			mStageStack.back()->exit();
+			mStageStack.back()->onExit();
 			delete mStageStack.back();
-			mStageStack.pop_back();			
+			mStageStack.pop_back();
+			cout << "Stage Exit !" << endl;
 		}
 		if(mStageStack.size()==0)		
 			mNeedEnd=true;
@@ -193,7 +197,7 @@ void Game::addStage( GameStage* stage, bool removePrev )
 
 	if( removePrev )
 	{
-		mStageStack.back()->exit();
+		mStageStack.back()->onExit();
 		delete mStageStack.back();
 		mStageStack.pop_back();
 		
@@ -203,7 +207,7 @@ void Game::addStage( GameStage* stage, bool removePrev )
 	mStageStack.push_back(stage);
 
 	cout << "Setup new state..." << endl;
-	mStageStack.back()->init();
+	mStageStack.back()->onInit();
 	cout << "Stage Init !" << endl;
 }
 

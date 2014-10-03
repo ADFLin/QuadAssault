@@ -12,10 +12,11 @@ class GTextButton;
 class MenuStage : public GameStage
 {
 public:
-	bool init();
-	void update(float deltaT);	
-	void render();
-	void exit();
+	MenuStage();
+	bool onInit();
+	void onUpdate(float deltaT);	
+	void onRender();
+	void onExit();
 
 	void onSystemEvent( sf::Event const& event );
 	void onWidgetEvent( int event , int id , GWidget* sender );
@@ -59,13 +60,9 @@ private:
 
 	std::vector<LevelInfo> mLevels;
 
-	State   mState;
-
-	unsigned char mTransition; //prelazak na tamno (fade to black, ne znak kak se to zove na hrvatskom)
-	float   mFadeColor; //boja tranzicije
-	float   mFadeSpeed;
-
-	sf::Text mAboutText;
+	State      mState;
+	SrceenFade mScreenFade;
+	sf::Text   mAboutText;
 };
 
 #endif // MenuStage_h__

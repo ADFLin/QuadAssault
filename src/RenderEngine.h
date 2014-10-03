@@ -61,8 +61,8 @@ public:
 	void        cleanup();
 	Shader*     createShader( char const* vsName , char const* fsName );
 	void        renderScene( RenderParam& param );
-	Vec3 const& getAmbientLight() const { return mAmbientLight; }
-	void        setAmbientLight( Vec3 const& color ) { mAmbientLight = color; }
+	Vec3f const& getAmbientLight() const { return mAmbientLight; }
+	void        setAmbientLight( Vec3f const& color ) { mAmbientLight = color; }
 
 	void        prevRender();
 	void        postRender();
@@ -97,7 +97,7 @@ private:
 	GLuint mTexNormalMap;
 	GLuint mTexGeometry;
 
-	Vec3   mAmbientLight;
+	Vec3f   mAmbientLight;
 
 };
 

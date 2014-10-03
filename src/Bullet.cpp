@@ -43,7 +43,7 @@ void Bullet::onDestroy()
 
 	Explosion* e = getLevel()->createExplosion( getPos() , 128 );
 	e->setParam(4,100,20);
-	e->setColor(Vec3(0.25, 0.5, 1.0));	
+	e->setColor(Vec3f(0.25, 0.5, 1.0));	
 
 	BaseClass::onDestroy();
 }

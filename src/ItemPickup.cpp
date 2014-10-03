@@ -31,17 +31,7 @@ void ItemPickup::onDestroy()
 
 void ItemPickup::tick()
 {
-	Rect bBox;
-	calcBoundBox( bBox );
 
-	Rect bBoxOther; 
-	Player* player = getLevel()->getPlayer();
-	player->calcBoundBox( bBoxOther );
-
-	if( bBox.intersect(bBoxOther) )
-	{
-		onPick( player );
-	}
 }
 
 void ItemPickup::onPick(Player* player)

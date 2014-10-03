@@ -76,7 +76,7 @@ Block* Block::FromType( unsigned char type )
 }
 
 
-void Block::initialize( Level* level )
+void Block::initialize()
 {
 	createBlockClass();
 

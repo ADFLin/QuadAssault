@@ -41,16 +41,15 @@
 #include <sstream>
 
 
-bool LevelStageBase::init()
+bool LevelStageBase::onInit()
 {
-	mNeedExit = false;
 	mPause    = false;
 	mTexCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
 
 	return true;
 }
 
-void LevelStageBase::exit()
+void LevelStageBase::onExit()
 {
 	
 }
@@ -62,6 +61,9 @@ void LevelStageBase::onWidgetEvent( int event , int id , GWidget* sender )
 	case UI_BACK_GAME:
 		GUISystem::getInstance().findTopWidget( UI_MENU_PANEL )->show( false );
 		mPause = false;
+		break;
+	case UI_GO_MENU:
+		getGame()->addStage( new MenuStage , true );
 		break;
 	}
 }
@@ -88,9 +90,9 @@ void LevelStageBase::onSystemEvent( sf::Event const& event )
 	}
 }
 
-bool LevelStage::init()
+bool LevelStage::onInit()
 {
-	if ( !BaseClass::init() )
+	if ( !BaseClass::onInit() )
 		return false;
 
 	int screenWidth   = getGame()->getScreenSize().x;
@@ -137,17 +139,20 @@ bool LevelStage::init()
 
 	}
 
+	Block::initialize();
+	IRenderer::initialize();
 
 	mLevel = new Level;
 	mLevel->init();
+	mLevel->addListerner( *this );
 
-	IRenderer::initialize();
+	
 
 	mCamera = new Object();
 	mCamera->setPos(Vec2f(0,0));
 	mWorldScaleFactor = 1.0f;
 
-	LoadLevel();
+	loadLevel();
 
 	Player* player = mLevel->getPlayer();
 	//player->addWeapon(new Plasma());
@@ -164,9 +169,8 @@ bool LevelStage::init()
 	}
 
 
-	mTransition=ST_FADEIN;
-	transitionColor=0.0f;
-	transitionSpeed=1;
+	mScreenFade.setColor( 0 );
+	mScreenFade.fadeIn();
 
 	mGameOverTimer =3;
 	mTickTimer     = 0.0f;
@@ -176,17 +180,22 @@ bool LevelStage::init()
 }
 
 
-void LevelStage::exit()
+void LevelStage::onExit()
 {
 	mLevel->cleanup();
 	mMusic.stop();
 
 	delete mLevel;
 	delete mCamera;
+
+	//FIXME
+	IRenderer::cleanup();
+	Block::cleanup();
+	
 }
 
 
-void LevelStage::update(float deltaT)
+void LevelStage::onUpdate(float deltaT)
 {	
 	
 	mTickTimer += deltaT;
@@ -211,34 +220,18 @@ void LevelStage::update(float deltaT)
 		getGame()->procSystemEvent();
 	}
 
-	if( mTransition == ST_FADEIN )
-	{
-		transitionColor+=transitionSpeed* deltaT;
-		if(transitionColor>1.0f)
-		{
-			mTransition=ST_NONE;
-			transitionColor=1.0f;
-		}
-	}
+	mScreenFade.updateRender( deltaT );
+}
 
-	if( mTransition==ST_FADEOUT )
-	{
-		transitionColor -= transitionSpeed*deltaT;
-		if( transitionColor < 0.0f )
-		{
-			transitionColor = 0.0f;
-			if( !mNeedExit )
-			{
-				if(  mLevel->getState() == Level::eFinish || mLevel->getPlayer()->isDead() )
-					odabir_levela_odmah = true;
-				else
-					odabir_levela_odmah = false;		
-				mNeedExit=true;
-			}
-		}
-	}
+void LevelStage::changeMenuStage()
+{
+	if(  mLevel->getState() == Level::eFINISH || mLevel->getPlayer()->isDead() )
+		odabir_levela_odmah = true;
+	else
+		odabir_levela_odmah = false;
 
-
+	MenuStage* stage = new MenuStage;
+	getGame()->addStage( stage , true );
 }
 
 void LevelStage::tick()
@@ -265,20 +258,12 @@ void LevelStage::tick()
 
 	mLevel->tick();
 
-	if ( mLevel->getState() == Level::eFinish )
-	{
-
-
-
-
-
-	}
-
-	if( mLevel->getState() == Level::eFinish || player->isDead() )
+	if( mLevel->getState() == Level::eFINISH || player->isDead() )
 		mGameOverTimer -= TICK_TIME;
 
-	if(mGameOverTimer<=0.0)
-		mTransition = ST_FADEOUT;
+	if( mGameOverTimer <= 0.0 )
+		mScreenFade.fadeOut( std::tr1::bind( &LevelStage::changeMenuStage , this ) );
+
 }
 
 
@@ -319,7 +304,7 @@ void RenderBar( float len , float h , float flac , float alpha , float colorAT[]
 
 
 
-void LevelStage::render()
+void LevelStage::onRender()
 {
 	RenderEngine* renderEngine = getGame()->getRenderEenine();
 
@@ -342,6 +327,7 @@ void LevelStage::render()
 	Player* player = mLevel->getPlayer();
 	glLoadIdentity();
 
+	//Render HP Bar
 	glPushMatrix();
 	glTranslatef(32, getGame()->getScreenSize().y - 32 , 0);
 	{
@@ -354,6 +340,7 @@ void LevelStage::render()
 	}
 	glPopMatrix();	
 
+	//Render Energy Bar
 	glPushMatrix();
 	glTranslatef( getGame()->getScreenSize().x -232, getGame()->getScreenSize().y - 32, 0);
 	{
@@ -378,12 +365,7 @@ void LevelStage::render()
 	GUISystem::getInstance().render();
 
 
-	glEnable(GL_BLEND);
-	glBlendFunc( GL_DST_COLOR, GL_ZERO );
-	glColor3f( transitionColor, transitionColor , transitionColor );
-	drawRect( Vec2f(0.0, 0.0) , Vec2f( getGame()->getScreenSize() ) );
-	glDisable(GL_BLEND);	
-
+	mScreenFade.render();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -446,18 +428,28 @@ void LevelStage::onSystemEvent( sf::Event const& event )
 
 void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 {
-	
 	switch( id )
 	{
 	case UI_EXIT_GAME:
-		mTransition = ST_FADEOUT;
+		mScreenFade.fadeOut( std::tr1::bind( &IGame::stopPlay , getGame() ) );
 		break;
 	}
 	BaseClass::onWidgetEvent( event , id , sender );
 }
 
 
-void LevelStage::LoadLevel()
+void LevelStage::onLevelEvent( LevelEvent const& event )
+{
+	switch( event.id )
+	{
+	case LevelEvent::ePLAYER_DEAD:
+		break;
+	case LevelEvent::eCHANGE_STATE:
+		break;
+	}
+}
+
+void LevelStage::loadLevel()
 {
 	int mapWidth  = 128;
 	int mapHeight = 128;
@@ -509,7 +501,7 @@ void LevelStage::LoadLevel()
 				else if(token=="light")
 				{
 					Vec2f pos;
-					Vec3 color;
+					Vec3f color;
 
 					getline(lstring,token,' ');
 					pos.x = atof(token.c_str());
@@ -689,3 +681,4 @@ void LevelStage::LoadLevel()
 	levelFS.close();
 
 }
+

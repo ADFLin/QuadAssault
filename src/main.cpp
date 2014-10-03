@@ -10,7 +10,7 @@ int main()
 		if( !game->init("config.txt") )
 			return -1;
 
-		game->addStage(new MenuStage(),false);
+		game->addStage( new MenuStage(),false );
 		game->run();
 		game->exit();
 

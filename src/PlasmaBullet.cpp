@@ -46,7 +46,7 @@ void PlasmaBullet::onSpawn()
 	Bullet::onSpawn();
 
 	light = getLevel()->createLight( getPos() , 256 , false );	
-	light->setColorParam(Vec3(0.25, 0.5, 1.0),18);	
+	light->setColorParam(Vec3f(0.25, 0.5, 1.0),18);	
 
 	getLevel()->playSound("plazma1.wav");	
 
@@ -72,7 +72,7 @@ void PlasmaBullet::onDestroy()
 	light->destroy();
 	Explosion* e = getLevel()->createExplosion( getPos() , 256 );	
 	e->setParam(20,1000,50);
-	e->setColor(Vec3(1.0, 0.75, 0.5));
+	e->setColor(Vec3f(1.0, 0.75, 0.5));
 
 	getLevel()->playSound("explosion1.wav");		
 }

@@ -23,7 +23,7 @@ void Light::init(Vec2f poz, float radius )
 	angle = 0.0;
 }
 
-void Light::setColorParam( Vec3 const& color , float intensity)
+void Light::setColorParam( Vec3f const& color , float intensity)
 {
 	this->color = color;
 	this->intensity=intensity;

@@ -14,9 +14,9 @@
 
 #include <fstream>
 
-bool LevelEditStage::init()
+bool LevelEditStage::onInit()
 {
-	if( !BaseClass::init() )
+	if( !BaseClass::onInit() )
 		return false;
 
 	mEditTileMeta = 0;
@@ -50,12 +50,12 @@ bool LevelEditStage::init()
 	return true;
 }
 
-void LevelEditStage::exit()
+void LevelEditStage::onExit()
 {
-	BaseClass::exit();
+	BaseClass::onExit();
 }
 
-void LevelEditStage::update( float deltaT )
+void LevelEditStage::onUpdate( float deltaT )
 {	
 	float speed=250;
 
@@ -110,14 +110,14 @@ void LevelEditStage::update( float deltaT )
 	if(postavljaLight==true)
 	{
 		mEditLight->radius=srad;
-		mEditLight->setColorParam(Vec3(sr,sg,sb),si);
+		mEditLight->setColorParam(Vec3f(sr,sg,sb),si);
 		mEditLight->setPos( convertToWorldPos( getGame()->getMousePos() ) );
 	}
 }
 
 
 
-void LevelEditStage::render()
+void LevelEditStage::onRender()
 {
 
 	RenderEngine* renderEngine = getGame()->getRenderEenine();
@@ -231,15 +231,15 @@ void LevelEditStage::onSystemEvent( sf::Event const& event )
 			{
 			case sf::Keyboard::Key::F1:
 				GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
-				mNeedExit = true;
+				stop();
 				break;
 			case sf::Keyboard::Key::F4:
 				{
 					RenderEngine* renderEngine = getGame()->getRenderEenine();
 					if( renderEngine->getAmbientLight().x==0.1f)
-						renderEngine->setAmbientLight( Vec3(0.8f, 0.8f, 0.8f) );
+						renderEngine->setAmbientLight( Vec3f(0.8f, 0.8f, 0.8f) );
 					else
-						renderEngine->setAmbientLight( Vec3(0.1f, 0.1f, 0.1f) );
+						renderEngine->setAmbientLight( Vec3f(0.1f, 0.1f, 0.1f) );
 				}
 				break;
 			case sf::Keyboard::Key::F6:
@@ -319,7 +319,7 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 		{
 			postavljaLight = true;
 			mEditLight = mLevel->createLight( getGame()->getMousePos() , 128 , true);
-			mEditLight->setColorParam(Vec3(1.0, 1.0, 1.0), 8);
+			mEditLight->setColorParam(Vec3f(1.0, 1.0, 1.0), 8);
 		}
 		break;
 	}

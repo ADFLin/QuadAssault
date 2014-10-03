@@ -25,6 +25,21 @@ class Message;
 
 class TextureManager;
 
+struct LevelEvent
+{
+	enum EventId
+	{
+		ePLAYER_DEAD ,
+		eCHANGE_STATE ,
+	};
+
+	EventId id;
+	union
+	{
+		int intVal;
+	};
+};
+
 class Level
 {
 public:
@@ -38,16 +53,16 @@ public:
 
 	enum State
 	{
-		eRunning ,
-		eFinish   ,
-		eFreeze  ,
+		eRUNNING  ,
+		eFINISH   ,
+		eFREEZE   ,
 	};
 
-	class Listener
+	class EventListener
 	{
 	public:
-		//virtual ~EventListener(){}
-		virtual void onChangeState( State state ){}
+		virtual ~EventListener(){}
+		virtual void onLevelEvent( LevelEvent const& event ){}
 	};
 	State             getState(){ return mState; }
 	void              changeState( State state );
@@ -74,10 +89,14 @@ public:
 	Message*          addMessage(Message* msg );
 
 	Message*          getTopMessage(){ return mTopMessage; }
-	int               random(int i1, int i2);
-
-
+	
 	void              renderObjects( RenderPass pass );
+
+	void              addListerner( EventListener& listener );
+	void              sendEvent( LevelEvent const& event );
+
+
+	int               random(int i1, int i2);
 
 	
 public:
@@ -119,7 +138,10 @@ protected:
 	Player*          mPlayer;
 	TileMap          mTerrain;
 	CollisionManager mColManager;
-	Listener*        mListener;
+
+
+	typedef std::vector< EventListener* > ListenerList;
+	ListenerList     mListeners;
 };
 
 typedef Level::LightList  LightList;

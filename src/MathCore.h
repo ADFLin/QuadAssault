@@ -9,7 +9,7 @@
 float const PI = 3.14159265359f;
 
 typedef TVector2< float > Vec2f;
-typedef TVector3< float > Vec3;
+typedef TVector3< float > Vec3f;
 
 class Math
 {

@@ -9,7 +9,7 @@
 
 bool RenderEngine::init( int width , int height )
 {
-	mAmbientLight=Vec3(0.1f, 0.1f, 0.1f);
+	mAmbientLight=Vec3f(0.1f, 0.1f, 0.1f);
 
 	mFrameWidth  = width;
 	mFrameHeight = height;

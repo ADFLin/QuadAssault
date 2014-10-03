@@ -7,7 +7,7 @@ struct PlayerSetting
 {
 	string name;
 	int    idxCurLevel;
-	bool   levelEnabled[BROJ_NIVOA];
+	bool   levelEnabled[ MAX_LEVEL_NUM ];
 
 	void load( char const* path )
 	{

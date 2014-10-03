@@ -23,7 +23,7 @@ public:
 		glUniform2f( loc , v.x , v.y );	
 	}
 
-	void setParam( char const* name , Vec3 const& v )
+	void setParam( char const* name , Vec3f const& v )
 	{
 		int loc = glGetUniformLocation( ID , name );
 		glUniform3f( loc , v.x, v.y , v.z );	

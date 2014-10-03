@@ -64,9 +64,9 @@ void WeaponPickup::onSpawn()
 
 	s = getLevel()->createLight( getPos() , 256 , false );
 	if(mId==LASER1)
-		s->setColorParam(Vec3(0.2,1.0,0.2),6);
+		s->setColorParam(Vec3f(0.2,1.0,0.2),6);
 	else if(mId==PLAZMA1)
-		s->setColorParam(Vec3(0.2,0.2,1.0),6);
+		s->setColorParam(Vec3f(0.2,0.2,1.0),6);
 }
 
 void WeaponPickup::onDestroy()

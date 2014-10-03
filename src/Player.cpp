@@ -13,7 +13,7 @@
 #include "RenderUtility.h"
 #include "Texture.h"
 
-bool gPlayerGodPower = true;
+bool gPlayerGodPower = false;
 
 Vec2f const gWeaponSlotOffset[] = 
 {
@@ -218,7 +218,7 @@ void Player::onSpawn()
 	getLevel()->getColManager().addBody( *this , mBody );
 
 	light = getLevel()->createLight( Vec2f(0.0, 0.0), 1024 , false );
-	light->setColorParam(Vec3(1.0, 1.0, 1.0), 16);
+	light->setColorParam(Vec3f(1.0, 1.0, 1.0), 16);
 	light->drawShadow = true;
 	
 }
@@ -284,11 +284,10 @@ void Player::update( Vec2f const& aimPos )
 		}
 		haveShoot=false;
 
-		if(mHP<=0.0)
+		if( mHP<=0.0 )
 		{
 			mHP=0.0;
-			mIsDead=true;
-
+		
 			Explosion* e= getLevel()->createExplosion( getPos(),512 );
 			e->setParam(256,3000,200);
 
@@ -297,8 +296,13 @@ void Player::update( Vec2f const& aimPos )
 			Message* gameOverMsg = new Message();
 			gameOverMsg->init("Base", "All units lost, mission Failed." , 4, "blip.wav" );
 			getLevel()->addMessage( gameOverMsg );
+			light->setColorParam(Vec3f(0,0,0), 0);
 
-			light->setColorParam(Vec3(0,0,0), 0);
+			mIsDead = true;
+
+			LevelEvent event;
+			event.id = LevelEvent::ePLAYER_DEAD;
+			getLevel()->sendEvent( event );
 		}
 	}
 }

@@ -15,16 +15,20 @@
 
 #include "Dependence.h"
 
-bool MenuStage::init()
+MenuStage::MenuStage()
 {
-	mNeedExit=false;	
+	mState = MS_NONE;
+}
 
+bool MenuStage::onInit()
+{
 	texCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
 	texBG     = getGame()->getTextureMgr()->getTexture("Menu1.tga");
 	texBG2    = getGame()->getTextureMgr()->getTexture("MenuLoading1.tga");		
 
-
 	sf::Font* font = getGame()->getFont( 0 );
+
+	GUISystem::getInstance().cleanupWidget();
 
 	Vec2f poz;
 	poz.x = getGame()->getScreenSize().x/2 - 224;
@@ -54,15 +58,6 @@ bool MenuStage::init()
 	button->text.setString( "Back" );
 	button->show( false );
 	GUISystem::getInstance().addWidget( button );
-
-
-	mTransition = ST_FADEIN;
-	mFadeColor  = 0.0f;
-	mFadeSpeed  = 1;
-
-	mState = MS_NONE;
-
-	changeState( MS_SELECT_MENU );
 
 	mAboutText.setFont( *font );		
 	mAboutText.setColor(sf::Color(50,255,25));
@@ -119,13 +114,10 @@ bool MenuStage::init()
 		}
 	}
 	file.close();
-	if(odabir_levela_odmah==NULL)
-		odabir_levela_odmah=false;
-	if(odabir_levela_odmah==true)
-		changeState( MS_SELECT_LEVEL );
+
 
 	ifstream in( LEVEL_DIR LEVEL_LOCK_FILE );	
-	for(int i=0; i<BROJ_NIVOA; i++)
+	for(int i=0; i<MAX_LEVEL_NUM; i++)
 	{
 		in >> gLevelEnabled[i];	
 	}
@@ -148,40 +140,31 @@ bool MenuStage::init()
 		mLevels[i].button = button;
 	}
 
+
+	mState = MS_NONE;
+	changeState( MS_SELECT_MENU );
+
+
+	if(odabir_levela_odmah==NULL)
+		odabir_levela_odmah=false;
+	if(odabir_levela_odmah==true)
+		changeState( MS_SELECT_LEVEL );
+
+	mScreenFade.setColor( 1 );
+	mScreenFade.fadeIn();
+
 	return true;
 }
 
-void MenuStage::exit()
+void MenuStage::onExit()
 {	
 	mLevels.clear();	
 }
 
-void MenuStage::update(float deltaT)
+void MenuStage::onUpdate(float deltaT)
 {
 	getGame()->procSystemEvent();
-
-	if(mTransition==ST_FADEIN)
-	{
-		mFadeColor+=mFadeSpeed*deltaT;
-		if(mFadeColor>1.0f)
-		{
-			mTransition=ST_NONE;
-			mFadeColor=1.0f;
-		}
-	}
-	if(mTransition==ST_FADEOUT)
-	{
-		mFadeColor-=mFadeSpeed*deltaT;
-		if(mFadeColor<0.0f)
-		{
-			mFadeColor=0.0f;
-		}
-	}	
-
-	if(mTransition==ST_FADEOUT && mFadeColor==0.0 && !mNeedExit )
-	{
-		mNeedExit = true;
-	}
+	mScreenFade.updateRender( deltaT );
 }
 
 void MenuStage::onSystemEvent( sf::Event const& event )
@@ -192,10 +175,10 @@ void MenuStage::onSystemEvent( sf::Event const& event )
 		{
 			if(event.key.code==sf::Keyboard::Key::Escape)
 			{
-				if(mState==MS_SELECT_MENU)
-					mNeedExit=true;
+				if( mState ==MS_SELECT_MENU )
+					stop();
 				else
-					mState=MS_SELECT_MENU;
+					changeState( MS_SELECT_MENU );
 			}
 		}
 		break;
@@ -232,7 +215,7 @@ void MenuStage::onWidgetEvent( int event , int id , GWidget* sender )
 		changeState( MS_SELECT_MENU );
 		break;
 	case UI_EXIT:
-		mTransition = ST_FADEOUT;
+		mScreenFade.fadeOut( std::tr1::bind( &GameStage::stop , this ) );
 		break;
 	}
 }
@@ -267,7 +250,7 @@ void MenuStage::showStateWidget( State state , bool beShow )
 	}
 }
 
-void MenuStage::render()
+void MenuStage::onRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -295,13 +278,9 @@ void MenuStage::render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	drawSprite( Vec2f( getGame()->getMousePos() )-Vec2f(16,16),Vec2f(32,32), texCursor );
-
-	glBlendFunc(GL_DST_COLOR, GL_ZERO);
-	glColor3f(mFadeColor, mFadeColor, mFadeColor);
-	drawRect( Vec2f(0.0, 0.0), Vec2f( getGame()->getScreenSize() ) );
-
 	glDisable(GL_BLEND);
 
+	mScreenFade.render();
 }
 
 void MenuStage::renderLoading()

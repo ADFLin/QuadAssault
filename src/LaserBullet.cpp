@@ -43,7 +43,7 @@ void LaserBullet::onSpawn()
 {
 	BaseClass::onSpawn();
 	light = getLevel()->createLight( getPos() , 128 , false );	
-	light->setColorParam(Vec3(0.5, 1.0, 0.2),12);
+	light->setColorParam(Vec3f(0.5, 1.0, 0.2),12);
 
 	getLevel()->playSound("laser1.wav");		
 	
@@ -61,6 +61,6 @@ void LaserBullet::onDestroy()
 	light->destroy();
 	Explosion* e = getLevel()->createExplosion( getPos() , 128 );
 	e->setParam(8,100,80);
-	e->setColor(Vec3(1.0, 0.75, 0.5));	
+	e->setColor(Vec3f(1.0, 0.75, 0.5));	
 }
 

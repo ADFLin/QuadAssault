@@ -47,7 +47,7 @@ void MinigunBullet::onSpawn()
 	BaseClass::onSpawn();
 
 	light = getLevel()->createLight( getPos() , 128 , false );	
-	light->setColorParam(Vec3(1.0, 1.0, 0.1),12);
+	light->setColorParam(Vec3f(1.0, 1.0, 0.1),12);
 
 	getLevel()->playSound("minigun1.wav");		
 
@@ -65,5 +65,5 @@ void MinigunBullet::onDestroy()
 	light->destroy();
 	Explosion* e= getLevel()->createExplosion( getPos() , 64 );
 	e->setParam(4,100,80);
-	e->setColor(Vec3(1.0, 0.75, 0.5));	
+	e->setColor(Vec3f(1.0, 0.75, 0.5));	
 }

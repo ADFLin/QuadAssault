@@ -2,6 +2,6 @@
 
 string gLevelFileName;
 string gMapFileName;
-bool   gLevelEnabled[BROJ_NIVOA];
+bool   gLevelEnabled[MAX_LEVEL_NUM ];
 int    gIdxCurLevel;
 bool   odabir_levela_odmah;

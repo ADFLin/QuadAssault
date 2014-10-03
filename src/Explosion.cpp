@@ -25,7 +25,7 @@ void Explosion::Init( Vec2f poz, float radius )
 	growthRate=35;
 	deathRate=10;
 
-	color=Vec3(1.0, 0.75, 0.5);
+	color=Vec3f(1.0, 0.75, 0.5);
 
 }
 
@@ -50,7 +50,7 @@ void Explosion::setParam(float intensity, float brzinaRasta, float brzinaUmiranj
 	this->deathRate=brzinaUmiranja;
 }
 
-void Explosion::setColor( Vec3 const& c )
+void Explosion::setColor( Vec3f const& c )
 {
 	this->color = c;
 }

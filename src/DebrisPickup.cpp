@@ -67,7 +67,7 @@ void DebrisPickup::onSpawn()
 	Math::normalize( dir );
 
 	light = getLevel()->createLight( getPos() ,64 , false);
-	light->setColorParam(Vec3(1.0, 0.75, 0.5),4);	
+	light->setColorParam(Vec3f(1.0, 0.75, 0.5),4);	
 	light->isExplosion = true;
 }
 
@@ -135,7 +135,7 @@ void DebrisPickup::onPick(Player* player)
 	
 	Explosion* e= getLevel()->createExplosion( getPos(),128 );
 	e->setParam(12,100,50);
-	e->setColor(Vec3(1.0, 0.75, 0.5));	
+	e->setColor(Vec3f(1.0, 0.75, 0.5));	
 
 	player->addHP(2);
 

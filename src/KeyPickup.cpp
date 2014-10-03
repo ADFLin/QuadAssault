@@ -8,15 +8,22 @@
 #include "Explosion.h"
 #include "RenderUtility.h"
 
+Vec3f gDoorGlowColor[ NUM_DOOR_TYPE ] =
+{
+	Vec3f( 1.0, 0.1, 0.1 ) ,
+	Vec3f( 0.1, 0.1, 1.0 ) ,
+	Vec3f( 0.1, 1.0, 0.1 ) ,
+};
+
 class KeyPickupRenderer : public IRenderer
 {
 public:
 	virtual void init()
 	{
 		TextureManager* texMgr = getGame()->getTextureMgr();
-		mTex[ RP_DIFFUSE ] = texMgr->getTexture("KljucDiffuse.tga");
-		mTex[ RP_NORMAL  ] = texMgr->getTexture("KljucNormal.tga");	
-		mTex[ RP_GLOW    ] = texMgr->getTexture("KljucGlow.tga");
+		mTex[ RP_DIFFUSE ] = texMgr->getTexture("KeyDiffuse.tga");
+		mTex[ RP_NORMAL  ] = texMgr->getTexture("KeyNormal.tga");	
+		mTex[ RP_GLOW    ] = texMgr->getTexture("KeyGlow.tga");
 	}
 
 	virtual void render( RenderPass pass , LevelObject* object )
@@ -24,12 +31,7 @@ public:
 		KeyPickup* key = static_cast< KeyPickup* >( object );
 		if ( pass == RP_GLOW )
 		{
-			switch( key->mDoorId )
-			{
-			case DOOR_RED:   glColor3f(1.0, 0.1, 0.1); break;
-			case DOOR_BLUE:  glColor3f(0.1, 0.1, 1.0); break;
-			case DOOR_GREEN: glColor3f(0.1, 1.0, 0.1); break;
-			}	
+			glColor3fv( gDoorGlowColor[ key->mDoorId ] );
 		}
 		drawSprite(key->getRenderPos(),key->getSize(),key->mRotation, mTex[ pass ] );
 		glColor3f(1.0, 1.0, 1.0);
@@ -61,9 +63,9 @@ void KeyPickup::onSpawn()
 	mLight = getLevel()->createLight( getPos() , 128 , false);
 	switch( mDoorId )
 	{
-	case DOOR_RED:   mLight->setColorParam(Vec3(1.0,0.1,0.1),4); break;
-	case DOOR_BLUE:  mLight->setColorParam(Vec3(0.1,0.25,1.0),4); break;
-	case DOOR_GREEN: mLight->setColorParam(Vec3(0.1,1.0,0.1),4); break;
+	case DOOR_RED:   mLight->setColorParam(Vec3f(1.0,0.1,0.1),4); break;
+	case DOOR_BLUE:  mLight->setColorParam(Vec3f(0.1,0.25,1.0),4); break;
+	case DOOR_GREEN: mLight->setColorParam(Vec3f(0.1,1.0,0.1),4); break;
 	}
 }
 
@@ -99,13 +101,7 @@ void KeyPickup::onPick( Player* player )
 
 			Explosion* e=getLevel()->createExplosion( Vec2f(x*BLOCK_SIZE+BLOCK_SIZE/2, y*BLOCK_SIZE+BLOCK_SIZE/2), 128 );
 			e->setParam(20,1000,50);
-
-			switch( mDoorId )
-			{
-			case DOOR_RED:   e->setColor(Vec3(1.0, 0.1, 0.1)); break;
-			case DOOR_BLUE:  e->setColor(Vec3(0.1, 0.1, 1.0)); break;
-			case DOOR_GREEN: e->setColor(Vec3(0.1, 1.0, 0.1)); break;
-			}		
+			e->setColor( gDoorGlowColor[ mDoorId ] );	
 		}
 	}
 
