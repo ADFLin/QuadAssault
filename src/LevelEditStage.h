@@ -3,6 +3,8 @@
 
 #include "LevelStage.h"
 
+class IText;
+
 class LevelEditStage : public LevelStageBase
 {
 	typedef LevelStageBase BaseClass;

@@ -13,7 +13,7 @@ void ItemPickup::init()
 
 	setSize( Vec2f( 32 , 32 ) );
 	mBody.setSize( Vec2f( 32 , 32 ) );
-	mBody.setMask( COL_ITEM );
+	mBody.setMask( COL_ITEM | COL_RENDER );
 	mBody.setMaskCheck( COL_PLAYER );
 }
 

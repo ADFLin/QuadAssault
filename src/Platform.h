@@ -1,15 +1,9 @@
 #ifndef Platform_h__
 #define Platform_h__
 
-#include "IntegerType.h"
+#include "PlatformWin.h"
+typedef PlatformWin   Platform;
+typedef GameWindowWin GameWindow;
 
-class PlatformWin
-{
-public:
-	static int64 getTickCount(){ return  ::GetTickCount();  }
-};
-
-
-typedef PlatformWin Platform;
 
 #endif // Platform_h__

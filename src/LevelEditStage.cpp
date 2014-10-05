@@ -2,6 +2,7 @@
 
 #include "GUISystem.h"
 #include "GameInterface.h"
+#include "RenderSystem.h"
 #include "TextureManager.h"
 
 #include "Level.h"
@@ -12,12 +13,14 @@
 #include "DataPath.h"
 #include "RenderUtility.h"
 
+#include "FixString.h"
 #include <fstream>
 
 bool LevelEditStage::onInit()
 {
 	if( !BaseClass::onInit() )
 		return false;
+
 
 	mEditTileMeta = 0;
 	mEditTileType = TID_FLAT;
@@ -155,18 +158,13 @@ void LevelEditStage::onRender()
 
 
 	Vec2f posCursor = convertToWorldPos( getGame()->getMousePos() );
-	sf::Text t;
-	t.setFont( *getGame()->getFont( 0 ) );	
-	t.setColor(sf::Color(50,255,50));
-	t.setCharacterSize(18);
-	char buf[256];
-	::sprintf( buf ,"x = %f , y = %f " , posCursor.x , posCursor.y );
-	t.setString( buf );
-	t.setPosition( 10 , t.getLocalBounds().height/2);
+	
 
-	getGame()->getWindow()->pushGLStates();
-	getGame()->getWindow()->draw(t);
-	getGame()->getWindow()->popGLStates();
+	FixString< 256 > str;
+	str.format( "x = %f , y = %f " , posCursor.x , posCursor.y );
+	mDevMsg->setString( str );
+	getRenderSystem()->drawText( mDevMsg , Vec2i( 10 , 10 ) , TEXT_SIDE_LEFT | TEXT_SIDE_RIGHT );
+
 }
 
 

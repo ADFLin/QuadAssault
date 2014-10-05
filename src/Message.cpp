@@ -4,8 +4,15 @@
 #include "TextureManager.h"
 #include "SoundManager.h"
 
+#include "RenderSystem.h"
 #include "GameInterface.h"
 #include "Texture.h"
+
+Message::~Message()
+{
+	p_text->release();
+	text->release();
+}
 
 void Message::init( string const& sender, string const& content, float durstion, string const& soundName )
 {	
@@ -16,17 +23,18 @@ void Message::init( string const& sender, string const& content, float durstion,
 	timer=0.0;
 	unisten=false;
 
-	p_text.setString(sender);
-	p_text.setPosition(mPos.x+48, mPos.y+4);
-	p_text.setFont( *getGame()->getFont(0) );
-	p_text.setCharacterSize(24);	
-	p_text.setColor(sf::Color(25,255,25));
+	p_text = IText::create( getGame()->getFont(0) , 24 , Color(25,255,25) );
+	p_text->setString( sender.c_str() );
 
-	text.setString(content);
-	text.setPosition(mPos.x+48, mPos.y+4+24);
-	text.setFont( *getGame()->getFont(0) );
-	text.setCharacterSize(24);
-	text.setColor(sf::Color(255,255,255));
+	
+
+	text = IText::create( getGame()->getFont(0) , 24 , Color(255,255,255) );
+	text->setString( content.c_str() );
+
+
+
+
+
 
 	portrait = getGame()->getTextureMgr()->getTexture("portrait2.tga");	
 }
@@ -59,7 +67,8 @@ void Message::updateRender( float dt )
 void Message::renderFrame()
 {
 
-	float width=text.getLocalBounds().width;
+	//float width =text.getLocalBounds().width;
+	float width = 600;
 
 	glColor3f(0.0, 0.25, 0.0);
 
@@ -100,9 +109,6 @@ void Message::renderFrame()
 void Message::render()
 {	
 	renderFrame();
-
-	getGame()->getWindow()->pushGLStates();
-	getGame()->getWindow()->draw(p_text);	
-	getGame()->getWindow()->draw(text);
-	getGame()->getWindow()->popGLStates();
+	getRenderSystem()->drawText( p_text , mPos + Vec2i( 48 , 4 ) , TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
+	getRenderSystem()->drawText( text , mPos + Vec2i( 48 , 4 + 24 ) , TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
 }

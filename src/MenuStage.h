@@ -7,7 +7,9 @@
 #include "SoundManager.h"
 #include "MathCore.h"
 
+class IText;
 class GTextButton;
+
 
 class MenuStage : public GameStage
 {
@@ -42,6 +44,7 @@ private:
 		UI_ABOUT ,
 		UI_BACK  ,
 		UI_LEVEL ,
+		UI_DEV_TEST   ,
 	};
 
 	Texture* texCursor;
@@ -62,7 +65,7 @@ private:
 
 	State      mState;
 	SrceenFade mScreenFade;
-	sf::Text   mAboutText;
+	IText*     mTextAbout;
 };
 
 #endif // MenuStage_h__

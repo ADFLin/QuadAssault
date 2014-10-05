@@ -208,7 +208,7 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( char c , bool beDown )
 				int offset = isDoubleChar( mKeyInPos - 1 ) ? 2 : 1;
 				mValue.erase( mKeyInPos - offset , offset );
 				mKeyInPos -= offset;
-				_this()->onTextChange();
+				_this()->onEditText();
 			}
 			return false;
 		case TVK_RIGHT: //VK_RIGHT
@@ -245,7 +245,7 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( char c , bool beDown )
 							mValue.insert( mValue.begin() + mKeyInPos , str , str + len );
 							mKeyInPos += len;
 
-							_this()->onTextChange();
+							_this()->onEditText();
 						}
 						::GlobalUnlock( hData );
 					}
@@ -265,7 +265,7 @@ bool TTextCtrlUI<Impl, CoreImpl>::onCharMsg( char c )
 	{
 		mValue.insert( mKeyInPos , 1 , c );
 		++mKeyInPos;
-		_this()->onTextChange();
+		_this()->onEditText();
 	}
 	return false;
 }

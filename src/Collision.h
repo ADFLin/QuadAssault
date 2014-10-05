@@ -17,11 +17,14 @@ struct ColInfo
 	};
 };
 
+typedef std::vector< ColBody* > ColBodyVec;
+
 class CollisionManager
 {
 public:
 	CollisionManager();
 
+	void  setTerrain( TileMap& terrain ){  mTerrain = &terrain; }
 	void  setup( float width , float height  , float cellLength );
 	void  addBody( LevelObject& obj , ColBody& body );
 	void  removeBody( ColBody& body );
@@ -30,7 +33,10 @@ public:
 	bool  testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned maskCheckReplace = 0 );
 	Tile* rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned colMask );
 	Tile* testTerrainCollision( Rect const& bBox , unsigned colMask );
-	void  setTerrain( TileMap& terrain ){  mTerrain = &terrain; }
+	
+	void  findBody( Rect const& bBox , unsigned colMask , ColBodyVec& out );
+	float getCellLength(){ return mCellLength; }
+
 
 private:
 
@@ -40,7 +46,7 @@ private:
 
 
 	Tile* rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned colMask );
-
+	
 	
 	typedef IntrList< ColBody , MemberHook< ColBody , &ColBody::cellHook > >    CellBodyList;
 	typedef IntrList< ColBody , MemberHook< ColBody , &ColBody::managerHook > > BodyList;

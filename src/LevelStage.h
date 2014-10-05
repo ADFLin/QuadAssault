@@ -12,6 +12,7 @@
 
 class SoundManager;
 class GUIManager;
+class IText;
 
 class LevelStageBase : public GameStage
 {
@@ -45,6 +46,7 @@ protected:
 		return Vec2i( Math::floor( wPos.x / BLOCK_SIZE ) , Math::floor( wPos.y  / BLOCK_SIZE ) );
 	}
 	
+	IText*      mDevMsg;
 	Texture*    mTexCursor;
 	RenderParam mRenderParam;
 	Object*     mCamera;

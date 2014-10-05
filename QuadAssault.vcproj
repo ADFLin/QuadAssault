@@ -235,15 +235,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Platform.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\PlayerSetting.h"
 				>
 			</File>
 			<File
 				RelativePath=".\src\RenderEngine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderSystem.h"
 				>
 			</File>
 			<File
@@ -268,6 +268,10 @@
 			</File>
 			<File
 				RelativePath=".\src\TextureManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\va_stdafx.h"
 				>
 			</File>
 		</Filter>
@@ -332,6 +336,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\RenderSystem.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\RenderUtility.cpp"
 				>
 			</File>
@@ -356,11 +364,11 @@
 			Name="Shader"
 			>
 			<File
-				RelativePath=".\out\shader\Light.fp"
+				RelativePath=".\out\shader\LightFS.glsl"
 				>
 			</File>
 			<File
-				RelativePath=".\out\shader\Light.vp"
+				RelativePath=".\out\shader\LightVS.glsl"
 				>
 			</File>
 			<File
@@ -372,19 +380,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\out\shader\RenderScene.fp"
+				RelativePath=".\out\shader\SceneFS.glsl"
 				>
 			</File>
 			<File
-				RelativePath=".\out\shader\RenderScene.vp"
+				RelativePath=".\out\shader\SceneGeometryFS.glsl"
 				>
 			</File>
 			<File
-				RelativePath=".\out\shader\RenderSceneGeometry.fp"
+				RelativePath=".\out\shader\SceneLightingFS.glsl"
 				>
 			</File>
 			<File
-				RelativePath=".\out\shader\RenderSceneLighting.fp"
+				RelativePath=".\out\shader\SceneVS.glsl"
 				>
 			</File>
 			<File
@@ -395,10 +403,22 @@
 				RelativePath=".\out\shader\SjenaVS.txt"
 				>
 			</File>
+			<File
+				RelativePath=".\out\shader\SpritePS.glsl"
+				>
+			</File>
+			<File
+				RelativePath=".\out\shader\SpriteVS.glsl"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="GameStage"
 			>
+			<File
+				RelativePath=".\src\DevStage.h"
+				>
+			</File>
 			<File
 				RelativePath=".\src\GameStage.cpp"
 				>
@@ -552,51 +572,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Bullet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Bullet.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\DebrisParticle.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\DebrisParticle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\DebrisPickup.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\DebrisPickup.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Explosion.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\Explosion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ItemPickup.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ItemPickup.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\KeyPickup.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\KeyPickup.h"
 				>
 			</File>
 			<File
@@ -624,14 +604,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\MinigunBullet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MinigunBullet.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\MinigunMob.cpp"
 				>
 			</File>
@@ -656,22 +628,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Particle.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Particle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PlasmaBullet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PlasmaBullet.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\PlasmaMob.cpp"
 				>
 			</File>
@@ -688,14 +644,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\SmokeParticle.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\SmokeParticle.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Trigger.cpp"
 				>
 			</File>
@@ -703,14 +651,98 @@
 				RelativePath=".\src\Trigger.h"
 				>
 			</File>
-			<File
-				RelativePath=".\src\WeaponPickup.cpp"
+			<Filter
+				Name="Bullet"
 				>
-			</File>
-			<File
-				RelativePath=".\src\WeaponPickup.h"
+				<File
+					RelativePath=".\src\Bullet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Bullet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MinigunBullet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MinigunBullet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PlasmaBullet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PlasmaBullet.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Particle"
 				>
-			</File>
+				<File
+					RelativePath=".\src\DebrisParticle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DebrisParticle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Particle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Particle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SmokeParticle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SmokeParticle.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ItemPickup"
+				>
+				<File
+					RelativePath=".\src\DebrisPickup.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DebrisPickup.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ItemPickup.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ItemPickup.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\KeyPickup.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\KeyPickup.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WeaponPickup.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WeaponPickup.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="GUI"
@@ -724,7 +756,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\PropFrame.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\PropFrame.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Platform"
+			>
+			<File
+				RelativePath=".\src\Platform.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PlatformBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PlatformWin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PlatformWin.h"
 				>
 			</File>
 		</Filter>

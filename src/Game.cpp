@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "SoundManager.h"
 #include "RenderEngine.h"
+#include "RenderSystem.h"
 
 #include "DataPath.h"
 #include "Platform.h"
@@ -50,20 +51,26 @@ bool Game::init(char* configFile)
 	mScreenSize.x = width;
 	mScreenSize.y = height;
 
-	mWindow.create(sf::VideoMode(width,height,32), tile, style);	
-	//mWindow.SetFramerateLimit(120);	
-	mWindow.setMouseCursorVisible(false);
+	mWindow = Platform::createWindow( tile , mScreenSize , 32 , false );
+	if ( !mWindow  )
+	{
+		std::cerr << "ERROR: Can't create window !" << endl;
+		return false;
+	}
+	mWindow->setSystemListener( *this );
+	mWindow->showCursor( false );
 
-	sf::Font* font = new sf::Font;
-	font->loadFromFile( DATA_DIR"DialogueFont.TTF");
+	mRenderSystem = new RenderSystem;
+	mRenderSystem->init( *mWindow );
+
+	IFont* font = IFont::loadFont( DATA_DIR"DialogueFont.TTF" );
 	mFonts.push_back( font );
 
 	cout << "Initilize glew..." << endl;
-	GLenum greska=glewInit();
-
-	if(greska!=GLEW_OK)
+	GLenum result = glewInit();
+	if(result != GLEW_OK )
 	{
-		std::cerr << "ERROR: Impossible to initialize Glew. Your graphics card probably does not support Shader Model 2.0.\n";
+		std::cerr << "ERROR: Impossible to initialize Glew. Your graphics card probably does not support Shader Model 2.0." << endl;
 		return false;
 	}
 
@@ -121,7 +128,11 @@ void Game::exit()
 	mRenderEngine->cleanup();
 	delete mRenderEngine;
 
-	mWindow.close();
+	delete mRenderSystem;
+
+	mWindow->close();
+	mWindow->release();
+
 
 	cout << "Game End !!" << endl;
 	cout << "*******************" << endl;	
@@ -137,12 +148,7 @@ void Game::run()
 	int64 timeFrame = Platform::getTickCount();
 	int frameCount = 0;
 
-	sf::Text text;
-	text.setFont( *mFonts[0] );		
-	text.setColor(sf::Color(255,255,25));
-	text.setCharacterSize(18);
-		
-	text.setPosition( getGame()->getScreenSize().x - 100 , 10 );	
+	IText* text = IText::create( mFonts[0] , 18 , Color(255,255,25) );
 
 	while( !mNeedEnd )
 	{
@@ -155,7 +161,8 @@ void Game::run()
 		mSoundMgr->update( deltaT );
 		mStageStack.back()->onUpdate( deltaT );
 
-		mRenderEngine->prevRender();
+		mRenderSystem->prevRender();
+
 		mStageStack.back()->onRender();
 
 		++frameCount;
@@ -170,13 +177,13 @@ void Game::run()
 
 		FixString< 256 > str;
 		str.format( "FPS = %f" , mFPS );
-		text.setString( str.c_str() );
-		mWindow.pushGLStates();
-		mWindow.draw( text );
-		mWindow.popGLStates();
+		text->setString( str.c_str() );
+
+		mRenderSystem->drawText( text , 
+			Vec2i( getGame()->getScreenSize().x - 100 , 10 ) , 
+			TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
 		
-		mRenderEngine->postRender();
-		mWindow.display();	
+		mRenderSystem->postRender();
 
 		if( mStageStack.back()->needStop() )
 		{
@@ -188,6 +195,8 @@ void Game::run()
 		if(mStageStack.size()==0)		
 			mNeedEnd=true;
 	}
+
+	text->release();
 }
 
 void Game::addStage( GameStage* stage, bool removePrev )
@@ -211,20 +220,19 @@ void Game::addStage( GameStage* stage, bool removePrev )
 	cout << "Stage Init !" << endl;
 }
 
-sf::RenderWindow* Game::getWindow()
-{
-	return &mWindow;
-}
-
 void Game::procWidgetEvent( int event , int id , GWidget* sender )
 {
 	mStageStack.back()->onWidgetEvent( event , id , sender );
 }
 
+
 void Game::procSystemEvent()
 {
+#if !USE_SFML_WIN
+	Platform::procSystemMsg();
+#else
 	sf::Event event;
-	while( getWindow()->pollEvent(event) )
+	while( mWindow->mImpl.pollEvent( event ) )
 	{
 		bool needSend = true;
 		switch( event.type )
@@ -233,14 +241,22 @@ void Game::procSystemEvent()
 			getGame()->stopPlay();
 			break;
 		case sf::Event::TextEntered:
-			{
-				
-			}
+			event.text.unicode;
 			break;
 		case sf::Event::KeyPressed:
+			{
+				if ( !GUISystem::getInstance().mManager.procKeyMsg( event.key.code , true ) )
+				{
+					needSend = false;
+				}
+			}
+			break;
 		case sf::Event::KeyReleased:
 			{
-				
+				if ( !GUISystem::getInstance().mManager.procKeyMsg( event.key.code , false ) )
+				{
+					needSend = false;
+				}
 			}
 			break;
 		case sf::Event::MouseButtonReleased:
@@ -285,5 +301,37 @@ void Game::procSystemEvent()
 		if ( needSend )
 			mStageStack.back()->onSystemEvent( event );
 	}
+#endif
+}
+
+bool Game::onMouse( MouseMsg const& msg )
+{
+	if ( msg.onMoving() )
+	{
+		mMousePos = msg.getPos();
+	}
+
+	if ( !GUISystem::getInstance().mManager.procMouseMsg( msg ) )
+	{
+		if ( !msg.onMoving() )
+			return true;
+	}
+	return true;
+}
+
+bool Game::onKey( char key , bool beDown )
+{
+	if ( !GUISystem::getInstance().mManager.procKeyMsg( key , beDown ) )
+		return true;
+
+	return true;
+}
+
+bool Game::onChar( char c )
+{
+	if ( !GUISystem::getInstance().mManager.procCharMsg( c ) )
+		return true;
+
+	return true;
 }
 

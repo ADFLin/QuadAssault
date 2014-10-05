@@ -6,10 +6,6 @@
 #include "Message.h"
 #include "Mob.h"
 
-#include "GlobalVariable.h"
-#include "DataPath.h"
-#include <fstream>
-
 TriggerBase::TriggerBase()
 {
 	mEnable = true;
@@ -110,7 +106,6 @@ void AreaTrigger::tick()
 			++iter;
 		}
 	}
-
 }
 
 
@@ -143,14 +138,4 @@ void MessageAct::fire( Level* level )
 void GoalAct::fire( Level* level )
 {
 	level->changeState( Level::eFINISH );
-	//SPREMANJE INFORMACIJA O OTKLJUCAVANJU				
-	if(gIdxCurLevel<MAX_LEVEL_NUM-1)
-		gLevelEnabled[gIdxCurLevel+1]=true;
-
-	std::ofstream of( LEVEL_DIR LEVEL_LOCK_FILE );	
-	for(int i=0; i<MAX_LEVEL_NUM; i++)
-	{
-		of << gLevelEnabled[i] << " ";	
-	}
-	of.close();
 }

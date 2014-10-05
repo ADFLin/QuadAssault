@@ -22,7 +22,7 @@ void SrceenFade::render()
 	}
 }
 
-void SrceenFade::updateRender( float dt )
+void SrceenFade::update( float dt )
 {
 	if ( mState == eNONE )
 		return;

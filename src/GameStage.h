@@ -30,7 +30,7 @@ public:
 	void fadeOut( Callback const& cb = NULL ){  mFunFisish = cb ; mState = eOUT; }
 	void setColor( float c ){ mColor == c; }
 	void render();
-	void updateRender( float dt );
+	void update( float dt );
 
 private:
 	enum State

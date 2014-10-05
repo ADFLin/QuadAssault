@@ -1,16 +1,22 @@
 #ifndef Game_h__
 #define Game_h__
 
+
 #include "GameInterface.h"
+
 #include "Base.h"
+#include "Platform.h"
 #include "Dependence.h"
 #include "GameStage.h"
 #include "IntegerType.h"
 
-
 #include <vector>
 
+class IFont;
+class RenderSystem;
+
 class Game : public IGame
+	       , public ISystemListener
 {
 public:
 	Game();
@@ -23,17 +29,21 @@ public:
 	virtual void  procWidgetEvent( int event , int id , GWidget* sender );
 	virtual void  procSystemEvent();
 
-	sf::RenderWindow* getWindow();
-	sf::Font*         getFont( int idx ){  return mFonts[idx]; }
+	IFont*        getFont( int idx ){  return mFonts[idx]; }
+
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual bool onKey( char key , bool beDown );
+	virtual bool onChar( char c );
 
 private:
 
 	float    mFPS;
 	unsigned mMouseState;
 	bool     mNeedEnd;
-	std::vector<GameStage*> mStageStack;
-	std::vector<sf::Font*>  mFonts;
-	sf::RenderWindow mWindow;
+	RenderSystem* mRenderSystem;
+	std::vector< GameStage* > mStageStack;
+	std::vector< IFont* >     mFonts;
+	GameWindow*               mWindow;
 
 };
 

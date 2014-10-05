@@ -47,8 +47,19 @@ struct RendererInitHelper
 IRenderer::IRenderer()
 {
 	static RendererInitHelper helper;
+	mRenderOrder = 0;
 	mLink = gLink;
 	gLink = this;
+}
+
+void IRenderer::renderGroup( RenderPass pass , LevelObject* object )
+{
+	do 
+	{
+		render( pass , object );
+		object = object->renderLink;
+	} 
+	while ( object );
 }
 
 void IRenderer::cleanup()

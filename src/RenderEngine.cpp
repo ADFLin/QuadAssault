@@ -17,10 +17,10 @@ bool RenderEngine::init( int width , int height )
 	if ( !setupFBO( width , height ) )
 		return false;
 
-	mShaderLighting = createShader( "Light.vp", "Light.fp" );
-	mShaderScene[ RM_ALL ] = createShader( "RenderScene.vp", "RenderScene.fp" );
-	mShaderScene[ RM_GEOMETRY  ] = createShader( "RenderScene.vp", "RenderSceneGeometry.fp" );
-	mShaderScene[ RM_LINGHTING ] = createShader( "RenderScene.vp", "RenderSceneLighting.fp" );
+	mShaderLighting = createShader( "LightVS.glsl", "LightFS.glsl" );
+	mShaderScene[ RM_ALL ]       = createShader( "SceneVS.glsl", "SceneFS.glsl" );
+	mShaderScene[ RM_GEOMETRY  ] = createShader( "SceneVS.glsl", "SceneGeometryFS.glsl" );
+	mShaderScene[ RM_LINGHTING ] = createShader( "SceneVS.glsl", "SceneLightingFS.glsl" );
 
 
 	return true;
@@ -83,16 +83,6 @@ bool RenderEngine::setupFBO( int width , int height )
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width , height );
 
 	return true;
-}
-
-void RenderEngine::prevRender()
-{
-
-}
-
-void RenderEngine::postRender()
-{
-	::glFlush();
 }
 
 void RenderEngine::renderScene( RenderParam& param )
@@ -286,7 +276,7 @@ void RenderEngine::renderGeometryFBO( RenderParam& param )
 	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
 
 	renderTerrain( param.level , param.terrainRange );
-	param.level->renderObjects(RP_DIFFUSE);	
+	renderObjects( RP_DIFFUSE , param.level );
 
 	glPopMatrix();
 
@@ -308,8 +298,9 @@ void RenderEngine::renderNormalFBO( RenderParam& param )
 	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
 
 	//Sprite(Vec2(0,0),Vec2(igra->DajRW()->getSize().x, igra->DajRW()->getSize().y),mt->DajTexturu(1)->id);
-	renderTerrainNormal( param.level , param.terrainRange );		
-	param.level->renderObjects( RP_NORMAL );
+	renderTerrainNormal( param.level , param.terrainRange );
+
+	renderObjects( RP_NORMAL , param.level );
 
 	glPopMatrix();
 	glBindFramebufferEXT(GL_FRAMEBUFFER ,0);
@@ -343,8 +334,10 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 	glPushMatrix();
 	glTranslatef(-camera->getPos().x, -camera->getPos().y, 0);
+
 	renderTerrainGlow( param.level , param.terrainRange );
-	param.level->renderObjects(RP_GLOW);
+	renderObjects( RP_GLOW , param.level );
+
 	glPopMatrix();
 
 	float w = param.renderWidth;
@@ -503,4 +496,39 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 			}
 		}
 	}
+}
+
+void RenderEngine::renderObjects( RenderPass pass , Level* level )
+{
+#if 1
+	level->renderObjects( pass );
+#else
+	for( RenderGroupVec::iterator iter = mRenderGroups.begin() , itEnd = mRenderGroups.end();
+		iter != itEnd ; ++iter )
+	{
+		RenderGroup* group = *iter;
+		group->renderer->renderGroup( pass , group->objectLists );
+	}
+#endif
+}
+
+void RenderEngine::updateRenderGroup( RenderParam& param )
+{
+	mRenderGroups.clear();
+
+	float len = param.level->getColManager().getCellLength();
+	Rect bBox;
+	bBox.min = param.camera->getPos() - Vec2f( len , len );
+	bBox.max = param.camera->getPos() + Vec2f( param.renderWidth + len , param.renderHeight + len );
+
+	ColBodyVec bodyList;
+	param.level->getColManager().findBody( bBox , COL_RENDER , bodyList );
+
+	for( ColBodyVec::iterator iter = bodyList.begin() , itEnd = bodyList.end();
+		 iter != itEnd ; ++iter )
+	{
+
+	}
+
+	std::sort( mRenderGroups.begin() , mRenderGroups.end() , GroupCompFun() );
 }

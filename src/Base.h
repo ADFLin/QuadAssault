@@ -44,6 +44,12 @@ struct Rect
 
 		return true;
 	}
+
+	bool hitTest( Vec2f const& p ) const
+	{
+		return min.x < p.x && p.x < max.x &&
+			   min.y < p.y && p.y < max.y ;
+	}
 };
 
 enum RenderPass
@@ -64,7 +70,8 @@ enum
 	COL_ITEM      = BIT(5) ,
 
 	COL_TERRAIN   = BIT(12) ,
-	COL_VIEW      = BIT(13) , //For terrain
+	COL_RENDER    = BIT(13) ,
+	COL_VIEW      = BIT(14) , //For terrain
 
 	COL_OBJECT    = COL_PLAYER | COL_SOILD | COL_FLY_SOILD | COL_TRIGGER | COL_BULLET | COL_ITEM ,
 	COL_ALL       = 0xffffffff ,

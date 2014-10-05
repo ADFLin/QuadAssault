@@ -33,7 +33,7 @@ void Mob::onSpawn()
 {
 	BaseClass::onSpawn();
 	mBody.setSize( getSize()- Vec2f(4,4) );
-	mBody.setMask( COL_SOILD );
+	mBody.setMask( COL_SOILD | COL_RENDER );
 	mBody.setMaskCheck( COL_BULLET | COL_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
 }

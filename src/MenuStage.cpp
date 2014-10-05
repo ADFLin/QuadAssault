@@ -2,18 +2,21 @@
 
 #include "GameInterface.h"
 #include "TextureManager.h"
-#include "LevelStage.h"
-
 #include "GUISystem.h"
+#include "RenderSystem.h"
 
 #include "GlobalVariable.h"
 #include "DataPath.h"
 #include "RenderUtility.h"
 
-#include <fstream>
-#include <sstream>
+#include "LevelStage.h"
+#include "DevStage.h"
 
 #include "Dependence.h"
+#include "FixString.h"
+
+#include <fstream>
+#include <sstream>
 
 MenuStage::MenuStage()
 {
@@ -26,7 +29,7 @@ bool MenuStage::onInit()
 	texBG     = getGame()->getTextureMgr()->getTexture("Menu1.tga");
 	texBG2    = getGame()->getTextureMgr()->getTexture("MenuLoading1.tga");		
 
-	sf::Font* font = getGame()->getFont( 0 );
+	IFont* font = getGame()->getFont( 0 );
 
 	GUISystem::getInstance().cleanupWidget();
 
@@ -36,32 +39,35 @@ bool MenuStage::onInit()
 
 	GTextButton* button;
 	button = new GTextButton( UI_START , Vec2i( poz.x , poz.y ) , Vec2i(128, 64) , NULL );
-	button->text.setFont( *font );
-	button->text.setString( "Start" );
+	button->text->setFont( font );
+	button->text->setString( "Start" );
 	button->show( false );
 	GUISystem::getInstance().addWidget( button );
 
 	button = new GTextButton( UI_ABOUT , Vec2i( poz.x +128+32 , poz.y ) , Vec2i(128, 64) , NULL );
-	button->text.setFont( *font );
-	button->text.setString( "About" );
+	button->text->setFont( font );
+	button->text->setString( "About" );
+	button->show( false );
+	GUISystem::getInstance().addWidget( button );
+
+	button = new GTextButton( UI_DEV_TEST , Vec2i( poz.x +128+32 , poz.y + 80 ) , Vec2i(128, 64) , NULL );
+	button->text->setFont( font );
+	button->text->setString( "Dev Test" );
 	button->show( false );
 	GUISystem::getInstance().addWidget( button );
 
 	button = new GTextButton( UI_EXIT , Vec2i( poz.x +256+64, poz.y ) , Vec2i(128, 64) , NULL );
-	button->text.setFont( *font );
-	button->text.setString( "Exit" );
+	button->text->setFont( font );
+	button->text->setString( "Exit" );
 	button->show( false );
 	GUISystem::getInstance().addWidget( button );
 
 	button = new GTextButton( UI_BACK , Vec2i( 32 , getGame()->getScreenSize().y-96 ) , Vec2i(128, 64) , NULL );
-	button->text.setFont( *font );
-	button->text.setString( "Back" );
+	button->text->setFont( font );
+	button->text->setString( "Back" );
 	button->show( false );
 	GUISystem::getInstance().addWidget( button );
 
-	mAboutText.setFont( *font );		
-	mAboutText.setColor(sf::Color(50,255,25));
-	mAboutText.setCharacterSize( 22 );
 	char const* text =
 		"QuadAssault v1.0\n"
 		"----------------\n"
@@ -83,10 +89,9 @@ bool MenuStage::onInit()
 		"The game uses a library of functions and classes OpenGL and SFML, and shaders is\n"
 		"koristen scripting language GLSL. Not used outside engine, but it was written\n"
 		"own, special to the game.\n";
-
-
-	mAboutText.setString(text);		
-	mAboutText.setPosition(32, 32);	
+	mTextAbout = IText::create( font , 22 , Color(50,255,25) );
+	mTextAbout->setString( text );
+	
 
 	std::ifstream file( LEVEL_DIR "LevelList.gdf" , std::ios::in );
 	string linija;
@@ -124,14 +129,13 @@ bool MenuStage::onInit()
 	in.close();
 	for(int i=0; i<mLevels.size(); i++)
 	{		
-		string text="Level ";
-		char brojString[16];
-		itoa(i+1,brojString,10);
-		text+=brojString;
+
+		FixString< 256 > str;
+		str.format( "Level %d" , i + 1 );
 
 		button = new GTextButton( UI_LEVEL , Vec2i( getGame()->getScreenSize().x/2-64, 64+i*96 ) , Vec2i(128, 64) , NULL );
-		button->text.setFont( *font );
-		button->text.setString( text );
+		button->text->setFont( font );
+		button->text->setString( str );
 		button->setUserData( &mLevels[i] );
 		button->show( false );
 		GUISystem::getInstance().addWidget( button );
@@ -158,13 +162,14 @@ bool MenuStage::onInit()
 
 void MenuStage::onExit()
 {	
+	mTextAbout->release();
 	mLevels.clear();	
 }
 
 void MenuStage::onUpdate(float deltaT)
 {
 	getGame()->procSystemEvent();
-	mScreenFade.updateRender( deltaT );
+	mScreenFade.update( deltaT );
 }
 
 void MenuStage::onSystemEvent( sf::Event const& event )
@@ -203,7 +208,6 @@ void MenuStage::onWidgetEvent( int event , int id , GWidget* sender )
 			gIdxCurLevel     = info->index;
 			getGame()->addStage(new LevelStage(), true);
 		}
-
 		break;
 	case UI_START:
 		changeState( MS_SELECT_LEVEL ); 
@@ -216,6 +220,11 @@ void MenuStage::onWidgetEvent( int event , int id , GWidget* sender )
 		break;
 	case UI_EXIT:
 		mScreenFade.fadeOut( std::tr1::bind( &GameStage::stop , this ) );
+		break;
+	case UI_DEV_TEST:
+		{
+			getGame()->addStage( new DevStage , true );
+		}
 		break;
 	}
 }
@@ -246,6 +255,7 @@ void MenuStage::showStateWidget( State state , bool beShow )
 		GUISystem::getInstance().findTopWidget( UI_START )->show( beShow );
 		GUISystem::getInstance().findTopWidget( UI_ABOUT )->show( beShow );
 		GUISystem::getInstance().findTopWidget( UI_EXIT  )->show( beShow );
+		GUISystem::getInstance().findTopWidget( UI_DEV_TEST )->show( beShow );
 		break;
 	}
 }
@@ -266,10 +276,7 @@ void MenuStage::onRender()
 		break;
 	case MS_ABOUT:
 		drawSprite(Vec2f(0.0, 0.0), Vec2f( getGame()->getScreenSize() ), texBG2);
-
-		getGame()->getWindow()->pushGLStates();	
-		getGame()->getWindow()->draw(mAboutText);
-		getGame()->getWindow()->popGLStates();
+		getRenderSystem()->drawText( mTextAbout , Vec2i( 32 , 32 ) , TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
 		break;
 	}
 
@@ -285,22 +292,18 @@ void MenuStage::onRender()
 
 void MenuStage::renderLoading()
 {
+	getRenderSystem()->prevRender();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glLoadIdentity();
 	drawSprite(Vec2f(0.0, 0.0), Vec2f(getGame()->getScreenSize().x, getGame()->getScreenSize().y), texBG2 );	
 
-	sf::Text t;
-	t.setFont( *getGame()->getFont(0) );	
-	t.setColor(sf::Color(50,255,50));
-	t.setCharacterSize(35);
-	t.setString("Loading Data...");
-	t.setPosition(getGame()->getScreenSize().x/2-t.getLocalBounds().width/2,getGame()->getScreenSize().y/2-t.getLocalBounds().height/2);
+	IText* t = IText::create( getGame()->getFont(0) , 35 , Color(50,255,50) );
+	t->setString( "Loading Data..." );
+	Vec2i pos = getGame()->getScreenSize() / 2;
+	getRenderSystem()->drawText( t , pos );
+	t->release();
 
-
-	getGame()->getWindow()->pushGLStates();
-	getGame()->getWindow()->draw(t);
-	getGame()->getWindow()->popGLStates();
-
-	getGame()->getWindow()->display();
+	getRenderSystem()->postRender();
 }

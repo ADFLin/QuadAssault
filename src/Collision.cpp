@@ -360,3 +360,37 @@ Tile* CollisionManager::testTerrainCollision( Rect const& bBox , unsigned colMas
 	}
 	return NULL;
 }
+
+void CollisionManager::findBody( Rect const& bBox , unsigned colMask , ColBodyVec& out )
+{
+	Vec2i cMin , cMax;
+	calcCellPos( bBox.min , cMin.x , cMin.y );
+	calcCellPos( bBox.max , cMax.x , cMax.y );
+
+	for( int i = cMin.x ; i <= cMax.x ; ++i )
+	{
+		for( int j = cMin.y ; j <= cMax.y ; ++j )
+		{
+			Cell& cell = mCellMap.getData( i , j );
+
+			for ( CellBodyList::iterator iter = cell.bodies.begin() , itEnd = cell.bodies.end();
+				iter != itEnd ; ++iter )
+			{
+				ColBody& bodyTest = *iter;
+
+				if ( ( colMask & bodyTest.colMask ) == 0 )
+					continue;
+	
+				if ( i == cMin.x || i == cMax.x || 
+					 i == cMin.x || i == cMax.x )
+				{
+					if ( !bBox.hitTest( bodyTest.cachePos ) )
+						continue;
+				}
+
+				out.push_back( &bodyTest );
+			}
+		}
+	}
+
+}

@@ -6,11 +6,13 @@
 
 class Level;
 class Sound;
+class IText;
 
 class Message
 {
 
 public:
+	~Message();
 	void init( string const& sender, string const& content, float durstion, string const& soundName );
 	void nodifyShow();
 	void tick();
@@ -21,8 +23,8 @@ public:
 	void render();
 	bool unisten;
 private:	
-	sf::Text p_text;
-	sf::Text text;
+	IText*  p_text;
+	IText*  text;
 	Vec2f   mPos;
 	float   mDurstion; //trajanje poruke u sekundama
 

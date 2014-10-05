@@ -107,7 +107,7 @@ void Level::tick()
 	}
 }
 
-void Level:: setupTerrain( int w , int h )
+void Level::setupTerrain( int w , int h )
 {
 	mColManager.setup( w * BLOCK_SIZE ,  h * BLOCK_SIZE ,  10 * BLOCK_SIZE );
 
@@ -279,6 +279,11 @@ void Level::changeState( State state )
 		return;
 
 	mState = state;
+
+	LevelEvent event;
+	event.id     = LevelEvent::eCHANGE_STATE;
+	event.intVal = state;
+	sendEvent( event );
 }
 
 Message* Level::addMessage( Message* msg )

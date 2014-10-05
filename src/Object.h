@@ -20,7 +20,14 @@ protected:
 };
 
 class Level;
-class PropEditor;
+class IPropEditor
+{
+public:
+	virtual void addProp( char const* name , float& value ) = 0;
+	virtual void addProp( char const* name , int& value ) = 0;
+	virtual void addProp( char const* name , string& value ) = 0;
+	virtual void addProp( char const* name , bool& value ) = 0;
+};
 
 enum ObjectType
 {
@@ -56,7 +63,7 @@ public:
 	virtual void updateRender( float dt ){}
 	
 	virtual void render( RenderPass pass ){}
-	virtual void enumProp( PropEditor& editor ){}
+	virtual void enumProp( IPropEditor& editor ){}
 
 	virtual void onTileCollision( ColBody& self , Tile& tile ){}
 	virtual void onBodyCollision( ColBody& self , ColBody& other ){}
@@ -83,15 +90,19 @@ public:
 	void         calcBoundBox( Rect& bBox );
 
 protected:
+	Vec2f    mSize;
+	Level*   mLevel;
+	bool     mNeedDestroy;
 
-	Vec2f mSize;
+private:
 	friend class Level;
-
 	HookNode baseHook;
 	HookNode typeHook;
 
-	Level*   mLevel;
-	bool     mNeedDestroy;
+private:
+	friend class RenderEngine;
+	friend class IRenderer;
+	LevelObject* renderLink;
 };
 
 class IRenderer
@@ -100,11 +111,19 @@ public:
 	IRenderer();
 	virtual void init() = 0;
 	virtual void render( RenderPass pass , LevelObject* object ) = 0;
+	virtual void renderGroup( RenderPass pass , LevelObject* object );
 	virtual void renderDev( LevelObject* object ){}
+
+	int    getOrder(){ return mRenderOrder; }
 
 	static void cleanup();
 	static void initialize();
 
+	
+
+protected:
+	int mRenderOrder;
+private:
 	IRenderer* mLink;
 };
 

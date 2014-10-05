@@ -3,6 +3,7 @@
 #include "GameInterface.h"
 #include "SoundManager.h"
 #include "GUISystem.h"
+#include "RenderSystem.h"
 #include "TextureManager.h"
 
 #include "MenuStage.h"
@@ -32,7 +33,8 @@
 #include "Minigun.h"
 
 #include "EasingFun.h"
-#include "LevelStage.h"
+#include "FixString.h"
+
 
 #include "GameInterface.h"
 #include "SoundManager.h"
@@ -46,12 +48,14 @@ bool LevelStageBase::onInit()
 	mPause    = false;
 	mTexCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
 
+	mDevMsg = IText::create( getGame()->getFont( 0 ) , 18 , Color(50,255,50) );
+
 	return true;
 }
 
 void LevelStageBase::onExit()
 {
-	
+	mDevMsg->release();
 }
 
 void LevelStageBase::onWidgetEvent( int event , int id , GWidget* sender )
@@ -114,28 +118,28 @@ bool LevelStage::onInit()
 
 		GUISystem::getInstance().addWidget( panel );
 
-		sf::Font* font = getGame()->getFont( 0 );
+		IFont* font = getGame()->getFont( 0 );
 
 		Vec2i pos;
 		pos.x = ( panelSize.x - buttonSize.x ) / 2;
 		pos.y = 10;
 		GTextButton* button;
 		button = new GTextButton( UI_BACK_GAME , pos , buttonSize , panel );
-		button->text.setFont( *font );
-		button->text.setCharacterSize( 24 );
-		button->text.setString( "Back" );
+		button->text->setFont( font );
+		button->text->setCharSize( 24 );
+		button->text->setString( "Back" );
 
 		pos.y += 40;
 		button = new GTextButton( UI_EXIT_GAME , pos , buttonSize , panel );
-		button->text.setFont( *font );
-		button->text.setCharacterSize( 24 );
-		button->text.setString( "Exit Game" );
+		button->text->setFont( font );
+		button->text->setCharSize( 24 );
+		button->text->setString( "Exit Game" );
 
 		pos.y += 40;
 		button = new GTextButton( UI_GO_MENU , pos , buttonSize , panel );
-		button->text.setFont( *font );
-		button->text.setCharacterSize( 24 );
-		button->text.setString( "Menu" );
+		button->text->setFont( font );
+		button->text->setCharSize( 24 );
+		button->text->setString( "Menu" );
 
 	}
 
@@ -220,7 +224,7 @@ void LevelStage::onUpdate(float deltaT)
 		getGame()->procSystemEvent();
 	}
 
-	mScreenFade.updateRender( deltaT );
+	mScreenFade.update( deltaT );
 }
 
 void LevelStage::changeMenuStage()
@@ -373,19 +377,10 @@ void LevelStage::onRender()
 	glDisable(GL_BLEND);
 
 
-	sf::Text t;
-	t.setFont( *getGame()->getFont( 0 ) );	
-	t.setColor(sf::Color(50,255,50));
-	t.setCharacterSize(18);
-	char buf[256];
-	::sprintf( buf ,"x = %f , y = %f " , player->getPos().x , player->getPos().y );
-	t.setString( buf );
-	t.setPosition( 10 , t.getLocalBounds().height/2);
-
-	getGame()->getWindow()->pushGLStates();
-	getGame()->getWindow()->draw(t);
-	getGame()->getWindow()->popGLStates();
-
+	FixString< 256 > str;
+	str.format( "x = %f , y = %f " , player->getPos().x , player->getPos().y );
+	mDevMsg->setString( str );
+	getRenderSystem()->drawText( mDevMsg , Vec2i( 10 , 10 ) , TEXT_SIDE_LEFT | TEXT_SIDE_RIGHT );
 }
 
 void LevelStage::onSystemEvent( sf::Event const& event )
@@ -445,6 +440,19 @@ void LevelStage::onLevelEvent( LevelEvent const& event )
 	case LevelEvent::ePLAYER_DEAD:
 		break;
 	case LevelEvent::eCHANGE_STATE:
+		if ( event.intVal == Level::eFINISH )
+		{
+			//SPREMANJE INFORMACIJA O OTKLJUCAVANJU				
+			if(gIdxCurLevel<MAX_LEVEL_NUM-1)
+				gLevelEnabled[gIdxCurLevel+1]=true;
+
+			std::ofstream of( LEVEL_DIR LEVEL_LOCK_FILE );	
+			for(int i=0; i<MAX_LEVEL_NUM; i++)
+			{
+				of << gLevelEnabled[i] << " ";	
+			}
+			of.close();
+		}
 		break;
 	}
 }

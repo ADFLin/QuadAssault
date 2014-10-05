@@ -7,6 +7,7 @@
 class Level;
 class Object;
 class Shader;
+class IRenderer;
 
 struct TileRange
 {
@@ -26,20 +27,7 @@ enum RenderMode
 	NUM_RENDER_MODE ,
 };
 
-class IFont
-{
-public:
-	static IFont* loadFont( char const* path );
-};
 
-class Text
-{
-
-
-
-
-
-};
 
 struct RenderParam
 {
@@ -51,21 +39,32 @@ struct RenderParam
 	TileRange  terrainRange;
 	float      renderWidth;
 	float      renderHeight;
+	bool       updateObjects;
 };
 
+
+struct RenderGroup
+{
+	int          order;
+	IRenderer*   renderer;
+	LevelObject* objectLists;
+};
 
 class RenderEngine
 {
 public:
-	bool        init( int width , int height );
-	void        cleanup();
-	Shader*     createShader( char const* vsName , char const* fsName );
-	void        renderScene( RenderParam& param );
+	bool         init( int width , int height );
+	void         cleanup();
+	Shader*      createShader( char const* vsName , char const* fsName );
+	void         renderScene( RenderParam& param );
 	Vec3f const& getAmbientLight() const { return mAmbientLight; }
-	void        setAmbientLight( Vec3f const& color ) { mAmbientLight = color; }
+	void         setAmbientLight( Vec3f const& color ) { mAmbientLight = color; }
 
-	void        prevRender();
-	void        postRender();
+	void         pushRenderState();
+	void         popRenderState();
+
+	void         prevRender();
+	void         postRender();
 private:
 
 	void   renderLightFBO( RenderParam& param );
@@ -82,7 +81,22 @@ private:
 	bool   setupFBO( int width , int height );
 	void   setupLightShaderParam( Shader* shader , Light* light );
 
+	struct GroupCompFun
+	{
+		bool operator()( RenderGroup* a , RenderGroup* b ) const 
+		{
+			return a->order > b->order;
+		}
+	};
+	void   updateRenderGroup( RenderParam& param );
+
+
+	void   renderObjects( RenderPass pass , Level* level );
+
 	std::vector<Shader*> mShaders;
+
+	typedef std::vector< RenderGroup* > RenderGroupVec;
+	RenderGroupVec mRenderGroups;
 
 	float   mFrameWidth;
 	float   mFrameHeight;

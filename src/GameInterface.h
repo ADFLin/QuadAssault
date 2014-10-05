@@ -8,12 +8,8 @@ class GameStage;
 class RenderEngine;
 class SoundManager;
 class TextureManager;
+class IFont;
 
-namespace sf
-{
-	class RenderWindow;
-	class Font;
-}
 class IGame
 {
 public:
@@ -34,9 +30,7 @@ public:
 	virtual void  procWidgetEvent( int event , int id , GWidget* sender ) = 0;
 	virtual void  procSystemEvent() = 0;
 
-	virtual sf::Font* getFont( int idx ) = 0;
-	virtual sf::RenderWindow* getWindow() = 0;
-
+	virtual IFont* getFont( int idx ) = 0;
 protected:
 	Vec2i           mScreenSize;
 	RenderEngine*   mRenderEngine;

@@ -214,18 +214,25 @@ public:
 		:CoreImpl(  pos , size , parent ){ mKeyInPos = 0; }
 
 	char const* getValue() const { return mValue.c_str(); }
-	void clearValue(){ mValue.clear(); mKeyInPos = 0; }
+	void clearValue()
+	{ 
+		mValue.clear(); 
+		mKeyInPos = 0; 
+		_this()->onModifyValue();
+	}
 	void setValue( char const* str )
 	{ 
 		mValue = str; 
 		if ( mKeyInPos > (int)mValue.size() )
 			mKeyInPos = (int)mValue.size();
+		_this()->onModifyValue();
 	}
 
 	///////// override function ////////
 public:
 	void onPressEnter(){}
-	void onTextChange(){}
+	void onEditText(){}
+	void onModifyValue(){}
 	/////////////////////////////////////
 
 protected:

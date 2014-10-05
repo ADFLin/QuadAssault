@@ -7,12 +7,13 @@
 #include "Singleton.h"
 
 class Texture;
+class IText;
 
 enum 
 {
 	UI_ANY = -1 ,
-
-	UI_STATE_ID = 100 ,
+	UI_STAGE_ID = 100 ,
+	UI_WIDGET_ID = 1000,
 };
 
 enum
@@ -55,6 +56,10 @@ public:
 	virtual void onFocus( bool beF ){}
 
 	virtual void  updateFrame( int frame ){}
+
+	//Use for Prop Edit
+	virtual void  inputData(){}
+	virtual void  outputData(){}
 
 	void onPrevRender(){}
 	void onPostRenderChildren(){}
@@ -108,11 +113,9 @@ class GTextButton : public GButtonBase
 	typedef GButtonBase BaseClass;
 public:
 	GTextButton( int id , Vec2i const& pos , Vec2i const& size  , GWidget* parent );
-
-
-	void  onRender();
-
-	sf::Text text;
+	~GTextButton();
+	void   onRender();
+	IText* text;
 };
 
 class GImageButton : public GButtonBase
@@ -151,18 +154,17 @@ class GTextCtrl : public GUI::TextCtrl< GTextCtrl >
 	typedef GUI::TextCtrl< GTextCtrl > BaseClass;
 public:
 	GTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
+	~GTextCtrl();
 
-	void setFontSize( unsigned size )
-	{
-		text.setCharacterSize( size );
-	}
+	void setFontSize( unsigned size );
 
-	sf::Text text;
-
-	void onTextChange(){ text.setString( getValue() );sendEvent( EVT_TEXTCTRL_CHANGE ); }
+	void onEditText();
+	void onModifyValue();
 	void onPressEnter(){ sendEvent( EVT_TEXTCTRL_ENTER ); }
 
 	void onRender();
+
+	IText* text;
 };
 
 

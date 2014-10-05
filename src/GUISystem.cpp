@@ -2,6 +2,8 @@
 
 #include "Dependence.h"
 #include "GameInterface.h"
+
+#include "RenderSystem.h"
 #include "RenderUtility.h"
 
 void GUISystem::sendMessage( int event , int id , GWidget* sender )
@@ -83,7 +85,12 @@ GWidget* GWidget::findChild( int id , GWidget* start )
 GTextButton::GTextButton( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
 	:BaseClass( id , pos , size , parent )
 {
+	text = IText::create();
+}
 
+GTextButton::~GTextButton()
+{
+	text->release();
 }
 
 void GTextButton::onRender()
@@ -135,18 +142,12 @@ void GTextButton::onRender()
 
 	glDisable(GL_BLEND);
 
-
-	text.setPosition( pos.x + size.x/2 - text.getLocalBounds().width/2  , 
-		              pos.y + size.y/2 - text.getLocalBounds().height/2 - 10 );	
 	if( isEnable() )
-		text.setColor(sf::Color(50,255,50));
+		text->setColor(Color(50,255,50));
 	else
-		text.setColor(sf::Color(150,150,150));
+		text->setColor(Color(150,150,150));
 
-
-	getGame()->getWindow()->pushGLStates();	
-	getGame()->getWindow()->draw( text );
-	getGame()->getWindow()->popGLStates();
+	getRenderSystem()->drawText( text , pos + size / 2  - Vec2i( 0 , 10 ) );
 
 }
 
@@ -272,7 +273,13 @@ GTextCtrl::GTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* p
 	:BaseClass( pos , size , parent )
 {
 	mId = id;
-	text.setCharacterSize( 16 );
+	text = IText::create();
+}
+
+
+GTextCtrl::~GTextCtrl()
+{
+	text->release();
 }
 
 void GTextCtrl::onRender()
@@ -280,16 +287,37 @@ void GTextCtrl::onRender()
 	Vec2i pos = getWorldPos();
 	Vec2i size = getSize();
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+	glColor3f( 0.1, 0.1 , 0.1 );
+	glBegin(GL_QUADS);
+	glVertex2f(pos.x, pos.y);
+	glVertex2f(pos.x + size.x, pos.y);
+	glVertex2f(pos.x + size.x, pos.y+size.y);
+	glVertex2f(pos.x, pos.y+size.y);
+	glEnd();
+	glDisable(GL_BLEND);
+
 	if( isEnable() )
-		text.setColor(sf::Color(50,255,50));
+		text->setColor(Color(50,255,50));
 	else
-		text.setColor(sf::Color(150,150,150));
+		text->setColor(Color(150,150,150));
 
-	text.setPosition( 
-		pos.x + size.x/2 - text.getLocalBounds().width/2  , 
-		pos.y + size.y/2 - text.getLocalBounds().height/2 - 10 );	
+	getRenderSystem()->drawText( text , pos + size / 2 );
+}
 
-	getGame()->getWindow()->pushGLStates();	
-	getGame()->getWindow()->draw( text );
-	getGame()->getWindow()->popGLStates();
+void GTextCtrl::setFontSize( unsigned size )
+{
+	text->setCharSize( size );
+}
+
+void GTextCtrl::onModifyValue()
+{
+	text->setString( getValue() );
+}
+
+void GTextCtrl::onEditText()
+{
+	text->setString( getValue() );
+	sendEvent( EVT_TEXTCTRL_CHANGE );
 }

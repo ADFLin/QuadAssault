@@ -207,7 +207,7 @@ void Player::init()
 	brzina=200;
 
 	mBody.setSize( getSize() - Vec2f(4,4) );
-	mBody.setMask( COL_SOILD | COL_PLAYER );
+	mBody.setMask( COL_SOILD | COL_PLAYER | COL_RENDER );
 	mBody.setMaskCheck( COL_TERRAIN | COL_OBJECT );
 }
 
@@ -373,7 +373,6 @@ void Player::shoot( Vec2f const& posTaget )
 	}
 
 }
-
 
 void Player::takeDamage(Bullet* p)
 {
