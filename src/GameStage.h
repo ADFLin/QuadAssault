@@ -28,7 +28,7 @@ public:
 
 	void fadeIn( Callback const& cb = NULL ) {  mFunFisish = cb ; mState = eIN;  }
 	void fadeOut( Callback const& cb = NULL ){  mFunFisish = cb ; mState = eOUT; }
-	void setColor( float c ){ mColor == c; }
+	void setColor( float c ){ mColor = c; }
 	void render();
 	void update( float dt );
 

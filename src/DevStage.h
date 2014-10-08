@@ -20,6 +20,12 @@ public:
 		frame->addProp( "a2" , val2 );
 		GUISystem::getInstance().addWidget( frame );
 
+		GTextButton* button;
+		button = new GTextButton( UI_ANY , Vec2i( 100 , 100 ) , Vec2i(128, 64) , NULL );
+		button->text->setFont( getGame()->getFont(0) );
+		button->text->setString( "Start" );
+		GUISystem::getInstance().addWidget( button );
+
 		frame->inputData();
 		return true;
 	}

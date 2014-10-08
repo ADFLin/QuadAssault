@@ -5,6 +5,12 @@
 #include "IntegerType.h"
 #include "SysMsg.h"
 
+
+struct  GLConfig
+{
+	int colorBits;
+
+};
 class ISystemListener
 {
 public:

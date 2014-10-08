@@ -85,7 +85,8 @@ GWidget* GWidget::findChild( int id , GWidget* start )
 GTextButton::GTextButton( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
 	:BaseClass( id , pos , size , parent )
 {
-	text = IText::create();
+	text = IText::create( getGame()->getFont(0) , 24 , Color( 255 , 255 , 0 ) );
+
 }
 
 GTextButton::~GTextButton()
@@ -290,20 +291,17 @@ void GTextCtrl::onRender()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glColor3f( 0.1, 0.1 , 0.1 );
-	glBegin(GL_QUADS);
-	glVertex2f(pos.x, pos.y);
-	glVertex2f(pos.x + size.x, pos.y);
-	glVertex2f(pos.x + size.x, pos.y+size.y);
-	glVertex2f(pos.x, pos.y+size.y);
-	glEnd();
+	drawRect( pos , size );
+	glColor3f( 1,1,1);
 	glDisable(GL_BLEND);
+
 
 	if( isEnable() )
 		text->setColor(Color(50,255,50));
 	else
 		text->setColor(Color(150,150,150));
 
-	getRenderSystem()->drawText( text , pos + size / 2 );
+	getRenderSystem()->drawText( text , pos + size / 2 , SIDE_LEFT );
 }
 
 void GTextCtrl::setFontSize( unsigned size )

@@ -8,13 +8,13 @@
 typedef TVector2< int > Vec2i;
 
 class GameWindowWin;
+class GLContext;
 
-#define USE_SFML_WIN 1
+#define USE_SFML_WINDOW  1
 
-#if USE_SFML_WIN
+#if USE_SFML_WINDOW
 #include "Dependence.h"
 #endif
-
 
 
 class PlatformWin
@@ -23,15 +23,17 @@ public:
 	static int64           getTickCount();
 	static GameWindowWin*  createWindow( char const* title , Vec2i const& size , int colorBit , bool bFullScreen );
 	static void            procSystemMsg();
+	static GLContext*      createGLContext( GameWindowWin& window , GLConfig& config );
 };
 
 class GameWindowWin
 {
-
 public:
-	void setSystemListener( ISystemListener& listener ){ mListener = &listener; }
+	~GameWindowWin();
 
-#if USE_SFML_WIN
+	void  release(){ delete this; }
+
+#if USE_SFML_WINDOW
 
 #else
 	Vec2i getSize(){ return mSize; }
@@ -41,20 +43,30 @@ public:
 	void  close();
 	void  display();
 	bool  setActive( bool bActive );
-	void  release(){ delete this; }
+	
+
+	void  setSystemListener( ISystemListener& listener ){ mListener = &listener; }
+#if USE_SFML_WINDOW
+
+#else
+	HWND  getSystemHandle(){ return mhWnd; }
+#endif
 
 private:
 
 	friend class PlatformWin;
 	GameWindowWin();
+	
 	bool create( char const* title , Vec2i const& size , int colorBit , bool bFullScreen );
 
 	ISystemListener* mListener;
 
-#if USE_SFML_WIN
+#if USE_SFML_WINDOW
 public:
 	sf::RenderWindow mImpl;
+
 #else
+
 
 	static LRESULT CALLBACK DefaultProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
@@ -62,14 +74,32 @@ public:
 	bool precMouseMsg( UINT message, WPARAM wParam, LPARAM lParam );
 
 	unsigned mMouseState;
-	HWND  mhWnd;
+	HWND     mhWnd;
+	Vec2i    mSize;
+
+
 	HDC   mhDC;
 	HGLRC mhRC;
-	Vec2i mSize;
-	int   mWidth;
-	int   mHeight;
 #endif
 
+};
+
+class GLContext
+{
+public:
+	bool init( GameWindowWin& window , GLConfig& config );
+	void release();
+	bool setCurrent();
+	void swapBuffers();
+
+
+#if USE_SFML_WINDOW
+public:
+	sf::RenderWindow* mWindow;
+#else
+	HDC   mhDC;
+	HGLRC mhRC;
+#endif
 };
 
 

@@ -9,12 +9,10 @@ typedef TVector2< float > Vec2f;
 struct Color
 {
 	Color(){}
-	Color( uint8 r , uint8 g , uint8 b )
-		:r(r),g(g),b(b){}
-	uint8 r , g , b;
+	Color( uint8 r , uint8 g , uint8 b , uint8 a = 255 )
+		:r(r),g(g),b(b),a(a){}
+	uint8 r , g , b , a;
 };
-
-class WindowRenderTarget;
 
 class IFont
 {
@@ -47,18 +45,20 @@ class RenderSystem
 {
 public:
 	RenderSystem();
-	void init( GameWindow& window );
 
-	void prevRender();
+	bool init( GameWindow& window );
+	void cleanup();
+	bool prevRender();
 	void postRender();
 	void drawText(  IText* text , Vec2f const& pos ,unsigned sideFlag = 0 );
 
 private:
-#if USE_SFML_WIN
-	sf::RenderWindow* mRenderTarget;
+#if USE_SFML_WINDOW
+	sf::RenderWindow* mRenderWindow;
 #else
-	WindowRenderTarget* mRenderTarget;
+	GameWindow* mRenderWindow;
 #endif
+	GLContext*  mContext;
 };
 
 RenderSystem* getRenderSystem();

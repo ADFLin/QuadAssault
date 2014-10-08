@@ -37,6 +37,7 @@ public:
 
 private:
 
+
 	float    mFPS;
 	unsigned mMouseState;
 	bool     mNeedEnd;

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="src;libCore;glew/include;SFML/include;"
+				AdditionalIncludeDirectories="src;libCore;Dependence/glew/include;Dependence/freetype2/include;Dependence/SFML/include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;DEBUG;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,8 +62,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib glew32.lib sfml-system-d.lib sfml-main-d.lib sfml-graphics-d.lib sfml-audio-d.lib sfml-window-d.lib"
-				AdditionalLibraryDirectories="glew/lib;SFML/lib"
+				AdditionalDependencies="opengl32.lib glu32.lib glew32.lib freetype.lib sfml-system-d.lib sfml-main-d.lib sfml-graphics-d.lib sfml-audio-d.lib sfml-window-d.lib"
+				AdditionalLibraryDirectories="Dependence/glew/lib;Dependence/SFML/lib;Dependence/freetype2/lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -116,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="src;libCore;glew/include;SFML/include;"
+				AdditionalIncludeDirectories="src;libCore;Dependence/glew/include;Dependence/freetype2/include;Dependence/SFML/include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -137,8 +137,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib glew32.lib sfml-system.lib sfml-main.lib sfml-graphics.lib sfml-audio.lib sfml-window.lib"
-				AdditionalLibraryDirectories="glew/lib;SFML/lib"
+				AdditionalDependencies="opengl32.lib glew32.lib freetype.lib sfml-system.lib sfml-main.lib sfml-graphics.lib sfml-audio.lib sfml-window.lib"
+				AdditionalLibraryDirectories="Dependence/glew/lib;Dependence/SFML/lib;Dependence/freetype2/lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\FontImpl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Game.h"
 				>
 			</File>
@@ -248,10 +252,6 @@
 			</File>
 			<File
 				RelativePath=".\src\RenderUtility.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\SFML.h"
 				>
 			</File>
 			<File
@@ -341,10 +341,6 @@
 			</File>
 			<File
 				RelativePath=".\src\RenderUtility.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\SFML.cpp"
 				>
 			</File>
 			<File

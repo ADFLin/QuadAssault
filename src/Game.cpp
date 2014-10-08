@@ -38,10 +38,6 @@ bool Game::init(char* configFile)
 	int height=600;
 	//width=1024;
 	//height=800;
-	char const* tile ="QuadAssault";
-	int style = sf::Style::Close;		
-	//int style = sf::Style::Fullscreen;
-	//***************************
 
 	cout << "----QuadAssault----" << endl;
 	cout << "*******************" << endl;		
@@ -51,6 +47,7 @@ bool Game::init(char* configFile)
 	mScreenSize.x = width;
 	mScreenSize.y = height;
 
+	char const* tile ="QuadAssault";
 	mWindow = Platform::createWindow( tile , mScreenSize , 32 , false );
 	if ( !mWindow  )
 	{
@@ -61,18 +58,14 @@ bool Game::init(char* configFile)
 	mWindow->showCursor( false );
 
 	mRenderSystem = new RenderSystem;
-	mRenderSystem->init( *mWindow );
-
-	IFont* font = IFont::loadFont( DATA_DIR"DialogueFont.TTF" );
-	mFonts.push_back( font );
-
-	cout << "Initilize glew..." << endl;
-	GLenum result = glewInit();
-	if(result != GLEW_OK )
+	if ( !mRenderSystem->init( *mWindow ) )
 	{
-		std::cerr << "ERROR: Impossible to initialize Glew. Your graphics card probably does not support Shader Model 2.0." << endl;
 		return false;
 	}
+
+	IFont* font = IFont::loadFont( DATA_DIR"DialogueFont.TTF" );
+	//IFont* font = NULL;
+	mFonts.push_back( font );
 
 	mSoundMgr     = new SoundManager;
 	mTextureMgr   = new TextureManager;
@@ -128,11 +121,10 @@ void Game::exit()
 	mRenderEngine->cleanup();
 	delete mRenderEngine;
 
+	mRenderSystem->cleanup();
 	delete mRenderSystem;
 
-	mWindow->close();
 	mWindow->release();
-
 
 	cout << "Game End !!" << endl;
 	cout << "*******************" << endl;	
@@ -150,6 +142,14 @@ void Game::run()
 
 	IText* text = IText::create( mFonts[0] , 18 , Color(255,255,25) );
 
+
+	
+	static const int NUM_FPS_SAMPLES = 32;
+	float fpsSamples[NUM_FPS_SAMPLES];
+	int   NumFrameSample = 10;
+	std::fill_n( fpsSamples , NUM_FPS_SAMPLES , 30.0f );
+	int  idxSample = 0;
+
 	while( !mNeedEnd )
 	{
 		int64 curTime = Platform::getTickCount();
@@ -161,29 +161,42 @@ void Game::run()
 		mSoundMgr->update( deltaT );
 		mStageStack.back()->onUpdate( deltaT );
 
-		mRenderSystem->prevRender();
-
-		mStageStack.back()->onRender();
-
-		++frameCount;
-
-		if ( frameCount > 50 )
+		if ( mRenderSystem->prevRender() )
 		{
-			int64 temp = Platform::getTickCount();
-			mFPS = 1000.0f * ( frameCount ) / (  temp - timeFrame );
-			timeFrame = temp;
-			frameCount = 0;
+			mStageStack.back()->onRender();
+
+			++frameCount;
+
+			if ( frameCount > NumFrameSample )
+			{
+				int64 temp = Platform::getTickCount();
+				fpsSamples[idxSample] = 1000.0f * ( frameCount ) / (  temp - timeFrame );
+				timeFrame = temp;
+				frameCount = 0;
+
+				++idxSample;
+				if ( idxSample == NUM_FPS_SAMPLES )
+					idxSample = 0;
+
+				mFPS = 0;
+				for (int i = 0; i < NUM_FPS_SAMPLES; i++)
+					mFPS += fpsSamples[i];
+
+				mFPS /= NUM_FPS_SAMPLES;
+
+				std::cout << "FPS =" << mFPS << std::endl;
+			}
+
+			FixString< 256 > str;
+			str.format( "FPS = %f" , mFPS );
+			text->setString( str.c_str() );
+
+			mRenderSystem->drawText( text , 
+				Vec2i( getGame()->getScreenSize().x - 100 , 10 ) , 
+				TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
+
+			mRenderSystem->postRender();
 		}
-
-		FixString< 256 > str;
-		str.format( "FPS = %f" , mFPS );
-		text->setString( str.c_str() );
-
-		mRenderSystem->drawText( text , 
-			Vec2i( getGame()->getScreenSize().x - 100 , 10 ) , 
-			TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
-		
-		mRenderSystem->postRender();
 
 		if( mStageStack.back()->needStop() )
 		{
@@ -228,7 +241,7 @@ void Game::procWidgetEvent( int event , int id , GWidget* sender )
 
 void Game::procSystemEvent()
 {
-#if !USE_SFML_WIN
+#if !USE_SFML_WINDOW
 	Platform::procSystemMsg();
 #else
 	sf::Event event;

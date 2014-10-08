@@ -30,22 +30,37 @@ GameWindowWin* PlatformWin::createWindow( char const* title , Vec2i const& size 
 	return win;
 }
 
+GLContext* PlatformWin::createGLContext( GameWindowWin& window , GLConfig& config )
+{
+	GLContext* context = new GLContext;
+	if ( !context->init( window , config ) )
+	{
+		delete context;
+		return NULL;
+	}
+	return context;
+}
+
 GameWindowWin::GameWindowWin()
 {
-#ifdef USE_SFML_WIN
+
+	mListener = NULL;
+
+#ifdef USE_SFML_WINDOW
+
 
 #else
+	mMouseState = 0;
 	mSize = Vec2i::Zero();
 	mhWnd = NULL;
+
 	mhDC  = NULL;
 	mhRC  = NULL;
 
-	mListener = NULL;
-	mMouseState = 0;
 #endif
 }
 
-#if !USE_SFML_WIN
+#if !USE_SFML_WINDOW
 LRESULT CALLBACK GameWindowWin::DefaultProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	HDC hDC;
@@ -148,7 +163,7 @@ case WM_MOUSEWHEEL:
 
 bool GameWindowWin::create( char const* title , Vec2i const& size , int colorBit , bool bFullScreen )
 {
-#if USE_SFML_WIN
+#if USE_SFML_WINDOW
 	int style = sf::Style::Close;		
 	mImpl.create(sf::VideoMode( size.x , size.y , colorBit), title, style);
 	return mImpl.isOpen();
@@ -226,13 +241,74 @@ bool GameWindowWin::create( char const* title , Vec2i const& size , int colorBit
 	if ( !mhWnd )
 		return false;
 
-	mhDC = GetDC( mhWnd );
-
 	mSize = size;
-
 
 	ShowWindow( mhWnd , SW_SHOWDEFAULT );
 	UpdateWindow( mhWnd );
+
+	return true;
+#endif
+}
+
+void GameWindowWin::close()
+{
+#if USE_SFML_WINDOW
+	mImpl.close();
+#else
+	if ( mhWnd )
+		::DestroyWindow( mhWnd );
+
+	mhWnd = NULL;
+	
+#endif
+
+}
+
+
+
+void GameWindowWin::showCursor( bool bShow )
+{
+#if USE_SFML_WINDOW
+	mImpl.setMouseCursorVisible( bShow );
+#else
+	::ShowCursor( bShow );
+#endif
+}
+
+
+GameWindowWin::~GameWindowWin()
+{
+	close();
+}
+
+void GLContext::swapBuffers()
+{
+#if USE_SFML_WINDOW
+	mWindow->display();
+#else
+	::SwapBuffers( mhDC );
+#endif
+}
+
+bool GLContext::setCurrent()
+{
+#if USE_SFML_WINDOW
+	return mWindow->setActive( true );
+#else
+	if ( !::wglMakeCurrent( mhDC , mhRC ) )
+		return false;
+	return true;
+#endif
+}
+
+bool GLContext::init( GameWindowWin& window , GLConfig& config )
+{
+
+#if USE_SFML_WINDOW
+	mWindow = &window.mImpl;
+
+#else
+	mhDC = ::GetDC( window.getSystemHandle() );
 
 	PIXELFORMATDESCRIPTOR pfd;
 	::ZeroMemory( &pfd , sizeof( pfd ) );
@@ -243,10 +319,11 @@ bool GameWindowWin::create( char const* title , Vec2i const& size , int colorBit
 	pfd.dwFlags    = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_DRAW_TO_WINDOW;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-
-	pfd.cColorBits   = colorBit;
-	pfd.cDepthBits   = 32;
-	pfd.cStencilBits = 0;
+	pfd.cColorBits   = config.colorBits;
+	pfd.cDepthBits   = 24;
+	pfd.cStencilBits = 8;
+	//pfd.cAlphaBits   = ( colorBit == 32 ) ? 8 : 0;
+	pfd.cAlphaBits   = 0;
 
 	int pixelFmt = ::ChoosePixelFormat( mhDC , &pfd );
 
@@ -260,63 +337,23 @@ bool GameWindowWin::create( char const* title , Vec2i const& size , int colorBit
 
 	if ( !::wglMakeCurrent( mhDC , mhRC )  )
 		return false;
+#endif
 
 
 	return true;
-#endif
 }
 
-void GameWindowWin::close()
+void GLContext::release()
 {
-#if USE_SFML_WIN
-	mImpl.close();
+#if USE_SFML_WINDOW
+
 #else
 	if ( mhRC )
 		::wglDeleteContext( mhRC );
 
-	if ( mhDC )
-		::ReleaseDC( mhWnd , mhDC );
-
-	if ( mhWnd )
-		::DestroyWindow( mhWnd );
-
 	mhDC  = NULL;
-	mhWnd = NULL;
 	mhRC  = NULL;
 #endif
 
-}
-
-void GameWindowWin::display()
-{
-#if USE_SFML_WIN
-	mImpl.display();
-#else
-	::SwapBuffers( mhDC );
-#endif
-}
-
-void GameWindowWin::showCursor( bool bShow )
-{
-#if USE_SFML_WIN
-	mImpl.setMouseCursorVisible( bShow );
-#else
-	::ShowCursor( bShow );
-#endif
-}
-
-bool GameWindowWin::setActive( bool bActive )
-{
-
-#if USE_SFML_WIN
-	return mImpl.setActive( bActive );
-#else
-	if ( bActive )
-	{
-		if ( !::wglMakeCurrent( mhDC , mhRC ) )
-			return false;
-	}
-	return true;
-#endif
-
+	delete this;
 }
