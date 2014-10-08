@@ -2,6 +2,9 @@
 #define DevStage_h__
 
 #include "PropFrame.h"
+
+#include "FixString.h"
+
 class DevStage : public GameStage
 {
 public:
@@ -10,6 +13,9 @@ public:
 	{
 
 		mTexCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
+
+		mDevMsg = IText::create( getGame()->getFont( 0 ) , 18 , Color(50,255,50) );
+
 
 		GUISystem::getInstance().cleanupWidget();
 		PropFrame* frame = new PropFrame( UI_ANY , Vec2i( 10 , 10 ) , NULL );
@@ -51,11 +57,19 @@ public:
 		glBlendFunc(GL_ONE, GL_ONE);
 		drawSprite( Vec2f( getGame()->getMousePos() ) - Vec2f(16,16) ,Vec2f(32,32), mTexCursor );
 		glDisable(GL_BLEND);
+
+		FixString< 128 > str;
+		str.format( "v1 = %d , v2 = %f" , val , val2 );
+		mDevMsg->setString( str );
+
+
+		getRenderSystem()->drawText( mDevMsg , Vec2f( 5 ,5 ) , TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
 	}
 
 	int val;
 	float val2;
-	Texture*    mTexCursor;
+	Texture*  mTexCursor;
+	IText*    mDevMsg;
 };
 
 #endif // DevStage_h__

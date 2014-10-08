@@ -43,11 +43,8 @@ public:
 		UI_PROP_TEXTCTRL = UI_WIDGET_ID ,
 	};
 
-	Vec2i getWidgetSize(){ return Vec2i( 100 , 20 ); }
-	Vec2i calcWidgetPos()
-	{
-		return Vec2i( 100 , 10 ) + Vec2i( 0 , mPorps.size() * ( getWidgetSize().y + 5 ) );
-	}
+	Vec2i getWidgetSize(){ return Vec2i( 130 , 20 ); }
+	Vec2i calcWidgetPos();
 
 	virtual void addProp( char const* name , float& value );
 	virtual void addProp( char const* name , int& value );

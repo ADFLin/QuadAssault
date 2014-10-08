@@ -63,7 +63,7 @@ public:
 	virtual void updateRender( float dt ){}
 	
 	virtual void render( RenderPass pass ){}
-	virtual void enumProp( IPropEditor& editor ){}
+	virtual void enumProp( IPropEditor& editor );
 
 	virtual void onTileCollision( ColBody& self , Tile& tile ){}
 	virtual void onBodyCollision( ColBody& self , ColBody& other ){}

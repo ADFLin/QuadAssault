@@ -4,6 +4,7 @@
 #include "PlatformWin.h"
 typedef PlatformWin   Platform;
 typedef GameWindowWin GameWindow;
+typedef WGLContext    GLContext;
 
 
 #endif // Platform_h__

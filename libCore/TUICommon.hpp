@@ -96,9 +96,9 @@ void TItemOwnerUI<Impl, CoreImpl>::tryMoveSelect( bool beNext )
 }
 
 template < class Impl, class CoreImpl >
-bool TItemOwnerUI<Impl, CoreImpl>::onKeyMsg( char key , bool beDown )
+bool TItemOwnerUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 {
-	if ( !beDown )
+	if ( !isDown )
 		return true;
 
 	switch( key )
@@ -196,11 +196,11 @@ bool TTextCtrlUI<Impl, CoreImpl>::isDoubleChar( int pos )
 }
 
 template < class Impl , class CoreImpl >
-bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( char c , bool beDown )
+bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 {
-	if ( beDown )
+	if ( isDown )
 	{
-		switch( c )
+		switch( key )
 		{
 		case 0x08: //(<-)
 			if ( mKeyInPos > 0 && mValue.size() > 0 )
@@ -223,6 +223,7 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( char c , bool beDown )
 			break;
 		case TVK_ENTER: //VK_ENTER
 			_this()->onPressEnter();
+			getManager()->setFocusUI( NULL );
 			break;
 		case 'V':
 			if ( ::GetKeyState( VK_CONTROL ) < 0 )
@@ -259,11 +260,11 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( char c , bool beDown )
 }
 
 template < class Impl , class CoreImpl >
-bool TTextCtrlUI<Impl, CoreImpl>::onCharMsg( char c )
+bool TTextCtrlUI<Impl, CoreImpl>::onCharMsg( unsigned code )
 {
-	if ( c < 0 || isprint( c ) )
+	if ( ( code & 0x80 ) || isprint( code ) )
 	{
-		mValue.insert( mKeyInPos , 1 , c );
+		mValue.insert( mKeyInPos , 1 , char( code ) );
 		++mKeyInPos;
 		_this()->onEditText();
 	}

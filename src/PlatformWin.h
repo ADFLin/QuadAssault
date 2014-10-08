@@ -8,7 +8,7 @@
 typedef TVector2< int > Vec2i;
 
 class GameWindowWin;
-class GLContext;
+class WGLContext;
 
 #define USE_SFML_WINDOW  1
 
@@ -22,8 +22,8 @@ class PlatformWin
 public:
 	static int64           getTickCount();
 	static GameWindowWin*  createWindow( char const* title , Vec2i const& size , int colorBit , bool bFullScreen );
-	static void            procSystemMsg();
-	static GLContext*      createGLContext( GameWindowWin& window , GLConfig& config );
+	static void            procSystemMessage();
+	static WGLContext*     createGLContext( GameWindowWin& window , GLConfig& config );
 };
 
 class GameWindowWin
@@ -46,6 +46,7 @@ public:
 	
 
 	void  setSystemListener( ISystemListener& listener ){ mListener = &listener; }
+	void  procSystemMessage();
 #if USE_SFML_WINDOW
 
 #else
@@ -61,6 +62,7 @@ private:
 
 	ISystemListener* mListener;
 
+	unsigned mMouseState;
 #if USE_SFML_WINDOW
 public:
 	sf::RenderWindow mImpl;
@@ -73,7 +75,7 @@ public:
 	bool procMsg( UINT message, WPARAM wParam, LPARAM lParam );
 	bool precMouseMsg( UINT message, WPARAM wParam, LPARAM lParam );
 
-	unsigned mMouseState;
+	
 	HWND     mhWnd;
 	Vec2i    mSize;
 
@@ -84,7 +86,7 @@ public:
 
 };
 
-class GLContext
+class WGLContext
 {
 public:
 	bool init( GameWindowWin& window , GLConfig& config );

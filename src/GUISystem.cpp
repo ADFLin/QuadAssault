@@ -113,12 +113,7 @@ void GTextButton::onRender()
 		glColor3f(0.05, 0.05, 0.05);
 	}
 
-	glBegin(GL_QUADS);
-	glVertex2f(pos.x         , pos.y       );
-	glVertex2f(pos.x + size.x, pos.y       );
-	glVertex2f(pos.x + size.x, pos.y+size.y);
-	glVertex2f(pos.x         , pos.y+size.y);
-	glEnd();
+	drawRect( pos , size );
 
 	if( isEnable() )
 	{
@@ -148,11 +143,11 @@ void GTextButton::onRender()
 	else
 		text->setColor(Color(150,150,150));
 
-	getRenderSystem()->drawText( text , pos + size / 2  - Vec2i( 0 , 10 ) );
+	getRenderSystem()->drawText( text , pos  + size / 2  );
 
 }
 
-int const FrameTileHeight = 16;
+int const TopSideHeight = 16;
 bool GFrame::onMouseMsg( MouseMsg const& msg )
 {
 	BaseClass::onMouseMsg( msg );
@@ -162,7 +157,7 @@ bool GFrame::onMouseMsg( MouseMsg const& msg )
 	if ( msg.onLeftDown() )
 	{
 		if ( msg.getPos().y > getWorldPos().y &&
-			 msg.getPos().y < getWorldPos().y + FrameTileHeight )
+			 msg.getPos().y < getWorldPos().y + TopSideHeight )
 		{
 			x = msg.x();
 			y = msg.y();
@@ -211,8 +206,8 @@ void GFrame::onRender()
 	glBegin(GL_QUADS);
 	glColor3f(0.0, 1.0, 0.0); glVertex2f(pos.x, pos.y);
 	glColor3f(0.0, 1.0, 0.0); glVertex2f(pos.x+size.x, pos.y);
-	glColor3f(0.0, 0.0, 0.0); glVertex2f(pos.x+size.x, pos.y+FrameTileHeight);
-	glColor3f(0.0, 0.0, 0.0); glVertex2f(pos.x, pos.y+FrameTileHeight);
+	glColor3f(0.0, 0.0, 0.0); glVertex2f(pos.x+size.x, pos.y+TopSideHeight);
+	glColor3f(0.0, 0.0, 0.0); glVertex2f(pos.x, pos.y+TopSideHeight);
 	glEnd();
 	glColor3f(1.0, 1.0, 1.0);
 }
@@ -296,12 +291,12 @@ void GTextCtrl::onRender()
 	glDisable(GL_BLEND);
 
 
-	if( isEnable() )
+	if( isFocus() )
 		text->setColor(Color(50,255,50));
 	else
 		text->setColor(Color(150,150,150));
 
-	getRenderSystem()->drawText( text , pos + size / 2 , SIDE_LEFT );
+	getRenderSystem()->drawText( text , pos + Vec2f( size.x - 3 , size.y / 2 ) , TEXT_SIDE_RIGHT );
 }
 
 void GTextCtrl::setFontSize( unsigned size )

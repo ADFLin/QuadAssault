@@ -23,6 +23,12 @@ public:
 			rotation += 2 * PI;	
 	}
 
+	virtual void enumProp( IPropEditor& editor )
+	{
+		BaseClass::enumProp( editor );
+		editor.addProp( "Rotation" , rotation );
+	}
+
 protected:
 
 	float rotation;	

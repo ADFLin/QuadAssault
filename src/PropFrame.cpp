@@ -118,8 +118,8 @@ void PropFrame::onRender()
 		PropData& data = *iter;
 
 		getRenderSystem()->drawText( data.name , 
-			pos + Vec2i( 5 , 10 + i * ( getWidgetSize().y + 5 ) ) , 
-			TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
+			pos + Vec2i( 5 , TopSideHeight + 5 + i * ( getWidgetSize().y + 5 ) + getWidgetSize().y / 2 ) , 
+			TEXT_SIDE_LEFT );
 
 		++i;
 	}
@@ -143,4 +143,11 @@ void PropFrame::outputData()
 		PropData& data = *iter;
 		data.widget->outputData();
 	}
+}
+
+Vec2i PropFrame::calcWidgetPos()
+{
+	int x = getSize().x - ( getWidgetSize().x + 5 );
+	int y = TopSideHeight + 5 + mPorps.size() * ( getWidgetSize().y + 5 );
+	return Vec2i( x , y );
 }

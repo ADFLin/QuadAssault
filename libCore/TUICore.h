@@ -7,7 +7,7 @@
 
 #include "SysMsg.h"
 //#include "ProfileSystem.h"
-#define PROFILE_ENTRY(...)
+#define  PROFILE_ENTRY(...)
 
 
 #ifndef BIT
@@ -173,8 +173,8 @@ protected:
 public:
 
 	virtual void  deleteThis(){ delete this; }
-	virtual bool  onKeyMsg( char key , bool beDown ){ (void)key; (void)beDown; return true; }
-	virtual bool  onCharMsg( char c ){ (void)c; return true; }
+	virtual bool  onKeyMsg( unsigned key , bool isDown ){ (void)key; (void)isDown; return true; }
+	virtual bool  onCharMsg( unsigned code ){ (void)code; return true; }
 	virtual bool  onMouseMsg( MouseMsg const& msg){ (void)msg; return false; }
 
 private:
@@ -211,7 +211,7 @@ protected:
 
 	virtual void  mouseOverlap( bool beOverlap ){  _this()->onMouse( beOverlap ); }
 	virtual void  render(){  _this()->onRender();  }
-	virtual void  focus( bool beF ){ _this()->onFocus( beF); }
+	virtual void  focus( bool beF ){ _this()->onFocus( beF ); }
 	void    update()    {  _this()->onUpdateUI();   }
 
 private:
@@ -270,9 +270,9 @@ public:
 	void      startModal( TUICore<T>* ui );
 	void      endModal( TUICore<T>* ui );
 
-	bool      procCharMsg( char c );
 	bool      procMouseMsg( MouseMsg const& msg );
-	bool      procKeyMsg( char key , bool beDown );
+	bool      procKeyMsg( unsigned key , bool isDown );
+	bool      procCharMsg( unsigned code );
 
 	void      setFocusUI( TUICore<T>* ui );
 

@@ -61,7 +61,7 @@ TUICore<T>* TUICore<T>::hitTestChildren( Vec2i const& testPos )
 	{
 		bool testFail = true;
 		if ( !ui->checkFlag( UF_DISABLE | UF_BE_HIDDEN ) )
-	    //if ( ui->isEnable() && ui->isShow() )
+			// ui->isEnable() && ui->isShow()
 		{
 			if ( ui->checkFlag( UF_HITTEST_CHILDREN ) )
 			{
@@ -507,36 +507,36 @@ bool TUIManager<T>::procMouseMsg( MouseMsg const& msg )
 }
 
 template< class T >
-bool TUIManager<T>::procCharMsg( char c )
+bool TUIManager<T>::procCharMsg( unsigned code )
 {
 	bool result = true;
 	mProcessingMsg = true;
 
 	if ( mUIFocus )
 	{
-		result = mUIFocus->isEnable() ? mUIFocus->onCharMsg( c ) : true;
+		result = mUIFocus->isEnable() ? mUIFocus->onCharMsg( code ) : true;
 	}
 	else if ( mUIModal )
 	{
-		result = mUIModal->isEnable() ? mUIModal->onCharMsg( c ) : true;
+		result = mUIModal->isEnable() ? mUIModal->onCharMsg( code ) : true;
 	}
 	mProcessingMsg = false;
 	return result;
 }
 
 template< class T >
-bool TUIManager<T>::procKeyMsg( char key , bool beDown )
+bool TUIManager<T>::procKeyMsg( unsigned key , bool isDown )
 {
 	bool result = true;
 	mProcessingMsg = true;
 
 	if ( mUIFocus )
 	{
-		result = mUIFocus->isEnable() ? mUIFocus->onKeyMsg( key , beDown ) : true;
+		result = mUIFocus->isEnable() ? mUIFocus->onKeyMsg( key , isDown ) : true;
 	}
 	else if ( mUIModal )
 	{
-		result = mUIModal->isEnable() ? mUIModal->onKeyMsg( key , beDown ) : true;
+		result = mUIModal->isEnable() ? mUIModal->onKeyMsg( key , isDown ) : true;
 	}
 
 	mProcessingMsg = false;
@@ -736,8 +736,8 @@ void TUIManager<T>::setFocusUI( TUICore<T>* ui )
 		mUIFocus->focus( false );
 
 	mUIFocus = ui;
-	ui->focus( true );
-	
+	if ( mUIFocus )
+		mUIFocus->focus( true );
 }
 
 #endif // TUICore_hpp__

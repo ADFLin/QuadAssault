@@ -223,8 +223,7 @@ public:
 	void setValue( char const* str )
 	{ 
 		mValue = str; 
-		if ( mKeyInPos > (int)mValue.size() )
-			mKeyInPos = (int)mValue.size();
+		mKeyInPos = (int)mValue.size();
 		_this()->onModifyValue();
 	}
 
@@ -240,9 +239,9 @@ protected:
 	bool isDoubleChar( int pos );
 
 	//virtual 
-	bool onKeyMsg( char c , bool beDown );
+	bool onKeyMsg( unsigned key , bool isDown );
 	//virtual 
-	bool onCharMsg( char c );
+	bool onCharMsg( unsigned code );
 
 	int mKeyInPos;
 	std::string mValue;
@@ -344,7 +343,7 @@ protected:
 	void onItemSelect( unsigned select ){}
 protected:
 	void tryMoveSelect( bool beNext );
-	bool onKeyMsg( char key , bool beDown );
+	bool onKeyMsg( unsigned key , bool isDown );
 
 	struct Item
 	{

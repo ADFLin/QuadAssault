@@ -588,6 +588,7 @@ void RenderSystem::drawText( IText* text , Vec2f const& pos , unsigned sideFlag 
 			rPos.x -= textImpl.getLocalBounds().width / 2 ;
 	}
 
+	rPos.y -= textImpl.getLocalBounds().top;
 	if ( ( sideFlag & TEXT_SIDE_TOP ) == 0 )
 	{
 		if ( sideFlag & TEXT_SIDE_BOTTOM )

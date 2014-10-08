@@ -1,7 +1,6 @@
 #ifndef PlatformBase_h__
 #define PlatformBase_h__
 
-
 #include "IntegerType.h"
 #include "SysMsg.h"
 
@@ -9,15 +8,25 @@
 struct  GLConfig
 {
 	int colorBits;
-
 };
+
+enum SystemEvent
+{
+	SYS_WINDOW_CLOSE ,
+	SYS_QUIT ,
+};
+
 class ISystemListener
 {
 public:
-	virtual bool onMouse( MouseMsg const& mouse ){ return true; }
-	virtual bool onKey( char key , bool beDown ){ return true; }
-	virtual bool onChar( char key ){ return true; }
+	virtual bool onSystemEvent( SystemEvent event ){ return true; }
+	virtual bool onMouse( MouseMsg const& msg ){ return true; }
+	virtual bool onKey( unsigned key , bool beDown ){ return true; }
+	virtual bool onChar( unsigned code ){ return true; }
 };
+
+
+
 
 
 #endif // PlatformBase_h__

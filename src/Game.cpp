@@ -142,12 +142,10 @@ void Game::run()
 
 	IText* text = IText::create( mFonts[0] , 18 , Color(255,255,25) );
 
-
-	
-	static const int NUM_FPS_SAMPLES = 32;
+	static int const NUM_FPS_SAMPLES = 24;
 	float fpsSamples[NUM_FPS_SAMPLES];
-	int   NumFrameSample = 10;
-	std::fill_n( fpsSamples , NUM_FPS_SAMPLES , 30.0f );
+	int   NumFrameSample = 4;
+	std::fill_n( fpsSamples , NUM_FPS_SAMPLES , 60.0f );
 	int  idxSample = 0;
 
 	while( !mNeedEnd )
@@ -166,7 +164,6 @@ void Game::run()
 			mStageStack.back()->onRender();
 
 			++frameCount;
-
 			if ( frameCount > NumFrameSample )
 			{
 				int64 temp = Platform::getTickCount();
@@ -238,91 +235,14 @@ void Game::procWidgetEvent( int event , int id , GWidget* sender )
 	mStageStack.back()->onWidgetEvent( event , id , sender );
 }
 
-
 void Game::procSystemEvent()
 {
-#if !USE_SFML_WINDOW
-	Platform::procSystemMsg();
-#else
-	sf::Event event;
-	while( mWindow->mImpl.pollEvent( event ) )
-	{
-		bool needSend = true;
-		switch( event.type )
-		{
-		case sf::Event::Closed:
-			getGame()->stopPlay();
-			break;
-		case sf::Event::TextEntered:
-			event.text.unicode;
-			break;
-		case sf::Event::KeyPressed:
-			{
-				if ( !GUISystem::getInstance().mManager.procKeyMsg( event.key.code , true ) )
-				{
-					needSend = false;
-				}
-			}
-			break;
-		case sf::Event::KeyReleased:
-			{
-				if ( !GUISystem::getInstance().mManager.procKeyMsg( event.key.code , false ) )
-				{
-					needSend = false;
-				}
-			}
-			break;
-		case sf::Event::MouseButtonReleased:
-		case sf::Event::MouseButtonPressed:
-			{
-				unsigned msg = 0;
-
-				switch( event.mouseButton.button )
-				{
-				case sf::Mouse::Button::Left:   msg |= MBS_LEFT; break;
-				case sf::Mouse::Button::Right:  msg |= MBS_RIGHT; break;
-				case sf::Mouse::Button::Middle: msg |= MBS_MIDDLE; break;
-				}
-
-				if ( event.type == sf::Event::MouseButtonPressed )
-				{
-					mMouseState |= msg;
-					msg |= MBS_DOWN;
-				}
-				else
-				{
-					mMouseState &= ~msg;
-				}
-
-				if ( !GUISystem::getInstance().mManager.procMouseMsg( 
-					 MouseMsg( event.mouseButton.x , event.mouseButton.y , msg , mMouseState ) ) )
-				{
-					needSend = false;
-				}
-			}
-			break;
-		case sf::Event::MouseMoved:
-			{
-				mMousePos.x=event.mouseMove.x;
-				mMousePos.y=event.mouseMove.y;
-
-				GUISystem::getInstance().mManager.procMouseMsg( 
-					MouseMsg( event.mouseMove.x , event.mouseMove.y , MBS_MOVING , mMouseState ) );
-			}
-			break;
-		}
-		if ( needSend )
-			mStageStack.back()->onSystemEvent( event );
-	}
-#endif
+	mWindow->procSystemMessage();
 }
 
 bool Game::onMouse( MouseMsg const& msg )
 {
-	if ( msg.onMoving() )
-	{
-		mMousePos = msg.getPos();
-	}
+	mMousePos = msg.getPos();
 
 	if ( !GUISystem::getInstance().mManager.procMouseMsg( msg ) )
 	{
@@ -332,7 +252,7 @@ bool Game::onMouse( MouseMsg const& msg )
 	return true;
 }
 
-bool Game::onKey( char key , bool beDown )
+bool Game::onKey( unsigned key , bool beDown )
 {
 	if ( !GUISystem::getInstance().mManager.procKeyMsg( key , beDown ) )
 		return true;
@@ -340,11 +260,24 @@ bool Game::onKey( char key , bool beDown )
 	return true;
 }
 
-bool Game::onChar( char c )
+bool Game::onChar( unsigned code )
 {
-	if ( !GUISystem::getInstance().mManager.procCharMsg( c ) )
+	if ( !GUISystem::getInstance().mManager.procCharMsg( code ) )
 		return true;
 
 	return true;
+}
+
+bool Game::onSystemEvent( SystemEvent event )
+{
+	switch( event )
+	{
+	case SYS_WINDOW_CLOSE:
+		getGame()->stopPlay();
+		return false;
+	}
+
+	return true;
+
 }
 

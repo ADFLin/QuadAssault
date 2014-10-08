@@ -51,8 +51,8 @@ public:
 	virtual void onMouse( bool beIn ){  /*sendEvent( ( beIn ) ? EVT_ENTER_UI : EVT_EXIT_UI );*/  }
 	virtual void onRender(){}
 	virtual void onUpdateUI(){}
-	virtual bool onKeyMsg( char key , bool beDown ){ return true; }
-	virtual void onHotkey( char key ){}
+	virtual bool onKeyMsg( unsigned key , bool beDown ){ return true; }
+	virtual void onHotkey( unsigned key ){}
 	virtual void onFocus( bool beF ){}
 
 	virtual void  updateFrame( int frame ){}
@@ -143,6 +143,7 @@ class  GFrame : public GUI::Panel< GFrame >
 	typedef GUI::Panel< GFrame > BaseClass;
 public:
 	GFrame( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
+	static int const TopSideHeight = 20;
 protected:
 	bool onMouseMsg( MouseMsg const& msg );
 	void onRender();
