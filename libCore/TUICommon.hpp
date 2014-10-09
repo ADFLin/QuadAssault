@@ -202,7 +202,7 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 	{
 		switch( key )
 		{
-		case 0x08: //(<-)
+		case Keyboard::eBACK:
 			if ( mKeyInPos > 0 && mValue.size() > 0 )
 			{
 				int offset = isDoubleChar( mKeyInPos - 1 ) ? 2 : 1;
@@ -210,22 +210,22 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 				mKeyInPos -= offset;
 				_this()->onEditText();
 			}
-			return false;
-		case TVK_RIGHT: //VK_RIGHT
+			break;
+		case Keyboard::eRIGHT:
 			mKeyInPos += isDoubleChar( mKeyInPos ) ? 2 : 1;
 			if ( mKeyInPos > int( mValue.size() ) )
 				mKeyInPos = int( mValue.size() );
 			break;
-		case TVK_LEFT: //VK_LEFT
+		case Keyboard::eLEFT:
 			mKeyInPos -= isDoubleChar( mKeyInPos - 1 ) ? 2 : 1;
 			if ( mKeyInPos < 0 )
 				mKeyInPos = 0;
 			break;
-		case TVK_ENTER: //VK_ENTER
+		case Keyboard::eRETURN:
 			_this()->onPressEnter();
 			getManager()->setFocusUI( NULL );
 			break;
-		case 'V':
+		case Keyboard::eV:
 			if ( ::GetKeyState( VK_CONTROL ) < 0 )
 			{
 				if ( ::OpenClipboard( NULL ) )

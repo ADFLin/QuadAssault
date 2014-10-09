@@ -20,7 +20,9 @@ public:
 	virtual bool onInit();
 	virtual void onExit();
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
-	virtual void onSystemEvent( sf::Event const& event );
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual bool onKey( unsigned key , bool isDown );
+
 protected:
 
 	enum
@@ -45,7 +47,10 @@ protected:
 		Vec2f wPos = convertToWorldPos( sPos );
 		return Vec2i( Math::floor( wPos.x / BLOCK_SIZE ) , Math::floor( wPos.y  / BLOCK_SIZE ) );
 	}
-	
+
+
+
+
 	IText*      mDevMsg;
 	Texture*    mTexCursor;
 	RenderParam mRenderParam;
@@ -70,8 +75,9 @@ public:
 	virtual void onRender();
 
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
-	virtual void onSystemEvent( sf::Event const& event );
 	virtual void onLevelEvent( LevelEvent const& event );
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual bool onKey( unsigned key , bool isDown );
 
 	void tick();
 	void updateRender( float dt );
@@ -82,6 +88,9 @@ public:
 private:
 
 	void changeMenuStage();
+
+
+
 	sf::Music  mMusic;
 	
 	typedef Tween::GroupTweener< float > CTweener;

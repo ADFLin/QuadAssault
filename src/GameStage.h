@@ -11,6 +11,7 @@ namespace sf
 
 class Game;
 class GWidget;
+class MouseMsg;
 
 enum StateTransition
 {
@@ -55,6 +56,8 @@ public:
 	virtual void onRender() = 0;
 
 	virtual void onSystemEvent( sf::Event const& event ){}
+	virtual bool onMouse( MouseMsg const& msg ){ return true; }
+	virtual bool onKey( unsigned key , bool isDown ){ return true; }
 	virtual void onWidgetEvent( int event , int id , GWidget* sender ){}
 
 	void  stop(){ mNeedStop = true; }

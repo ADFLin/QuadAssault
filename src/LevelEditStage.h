@@ -23,11 +23,15 @@ public:
 
 	virtual void onUpdate( float deltaT );
 	virtual void onRender();
-	virtual void onSystemEvent( sf::Event const& event );
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual bool onKey( unsigned key , bool isDown );
 
 	bool   saveLevel( char const* path );
 	void   generateEmptyLevel();
+
+
+
 protected:
 
 	friend class LevelStage;

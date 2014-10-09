@@ -172,28 +172,6 @@ void MenuStage::onUpdate(float deltaT)
 	mScreenFade.update( deltaT );
 }
 
-void MenuStage::onSystemEvent( sf::Event const& event )
-{
-	switch( event.type )
-	{
-	case sf::Event::KeyPressed:
-		{
-			if(event.key.code==sf::Keyboard::Key::Escape)
-			{
-				if( mState ==MS_SELECT_MENU )
-					stop();
-				else
-					changeState( MS_SELECT_MENU );
-			}
-		}
-		break;
-	case sf::Event::MouseButtonReleased:
-		{
-
-		}
-		break;
-	}
-}
 
 void MenuStage::onWidgetEvent( int event , int id , GWidget* sender )
 {
@@ -306,4 +284,25 @@ void MenuStage::renderLoading()
 	t->release();
 
 	getRenderSystem()->postRender();
+}
+
+bool MenuStage::onKey( unsigned key , bool isDown )
+{
+	if ( !isDown )
+		return true;
+	switch( key )
+	{
+	case Keyboard::eESCAPE:
+		if( mState == MS_SELECT_MENU )
+			stop();
+		else
+			changeState( MS_SELECT_MENU );
+		break;
+	}
+	return false;
+}
+
+bool MenuStage::onMouse( MouseMsg const& msg )
+{
+	return true;
 }

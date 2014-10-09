@@ -29,6 +29,25 @@ WGLContext* PlatformWin::createGLContext( GameWindowWin& window , GLConfig& conf
 	return context;
 }
 
+bool PlatformWin::isKeyPressed( unsigned key )
+{
+	return ( GetAsyncKeyState(key) & 0x8000) != 0;
+}
+
+bool PlatformWin::isButtonPressed( unsigned button )
+{
+	int key = 0;
+	switch (button)
+	{
+	case Mouse::eLBUTTON:  key = GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON; break;
+	case Mouse::eRBUTTON:  key = GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON; break;
+	case Mouse::eMBUTTON:  key = VK_MBUTTON;  break;
+	case Mouse::eXBUTTON1: key = VK_XBUTTON1; break;
+	case Mouse::eXBUTTON2: key = VK_XBUTTON2; break;
+	}
+	return (GetAsyncKeyState(key) & 0x8000) != 0;
+}
+
 GameWindowWin::GameWindowWin()
 {
 
@@ -277,9 +296,9 @@ int convertSFKey( sf::Keyboard::Key key )
 	if ( key == sf::Keyboard::Unknown )
 		return -1;
 	if ( key <= sf::Keyboard::Z )
-		return int('A') + ( key - sf::Keyboard::A );
+		return Keyboard::eA + ( key - sf::Keyboard::A );
 	if ( key <= sf::Keyboard::Num9 )
-		return int('9') + ( key - sf::Keyboard::Num9 );
+		return Keyboard::eNUM0 + ( key - sf::Keyboard::Num9 );
 
 	switch( key )
 	{
@@ -295,9 +314,9 @@ int convertSFKey( sf::Keyboard::Key key )
 	if ( key <  sf::Keyboard::Numpad0 )
 		return -1;
 	if ( key <= sf::Keyboard::Numpad9 )
-		return int(VK_NUMPAD0) + ( key - sf::Keyboard::Numpad0 );
+		return Keyboard::eNUMPAD0 + ( key - sf::Keyboard::Numpad0 );
 	if ( key <= sf::Keyboard::F15 )
-		return int(VK_F1) + ( key - sf::Keyboard::F1 );
+		return Keyboard::eF1 + ( key - sf::Keyboard::F1 );
 
 	return -1;
 }

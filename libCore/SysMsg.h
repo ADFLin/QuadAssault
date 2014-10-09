@@ -16,14 +16,113 @@ enum MsgType
 	MSG_TYPE_KEY   ,
 };
 
+struct Keyboard 
+{
+	enum Enum
+	{
+		eLBUTTON        = 0x01 ,
+		eRBUTTON        = 0x02 ,
+		eCANCEL         = 0x03 ,
+		eMBUTTON        = 0x04 ,
 
-class TMessage
+		eBACK           = 0x08 ,
+		eTAB            = 0x09 ,
+		eCLEAR          = 0x0C ,
+		eRETURN         = 0x0D ,
+
+		eSHIFT          = 0x10 ,
+		eCONTROL        = 0x11 ,
+		eMENU           = 0x12 ,
+		ePAUSE          = 0x13 ,
+		eCAPITAL        = 0x14 ,
+
+		eKANA           = 0x15 ,
+		eJUNJA          = 0x17 , 
+		eFINAL          = 0x18 ,
+		eHANJA          = 0x19 ,
+		eKANJI          = 0x19 ,
+
+		eESCAPE         = 0x1B ,
+
+		eCONVERT        = 0x1C ,
+		eNONCONVERT     = 0x1D ,
+		eACCEPT         = 0x1E ,
+		eMODECHANGE     = 0x1F ,
+
+		eSPACE          = 0x20 ,
+		ePRIOR          = 0x21 ,
+		eNEXT           = 0x22 ,
+		eEND            = 0x23 ,
+		eHOME           = 0x24 ,
+		eLEFT           = 0x25 ,
+		eUP             = 0x26 ,
+		eRIGHT          = 0x27 ,
+		eDOWN           = 0x28 ,
+		eSELECT         = 0x29 ,
+		ePRINT          = 0x2A ,
+		eEXECUTE        = 0x2B ,
+		eSNAPSHOT       = 0x2C ,
+		eINSERT         = 0x2D ,
+		eDELETE         = 0x2E ,
+		eHELP           = 0x2F ,
+
+		eNUM0           = '0' ,
+		eNUM1 , eNUM2 , eNUM3 , eNUM4 , eNUM5 ,
+		eNUM6 , eNUM7 , eNUM8 , eNUM9 ,
+		eA              = 'A',
+		eB , eC , eD , eE , eF ,
+		eG , eH , eI , eJ , eK ,
+		eL , eM , eN , eO , eP ,
+		eQ , eR , eS , eT , eU ,
+		eV , eW , eX , eY , eZ ,
+
+		eSLEEP          = 0x5F ,
+
+		eNUMPAD0        = 0x60 ,
+		eNUMPAD1 , eNUMPAD2 , eNUMPAD3 , eNUMPAD4 , eNUMPAD5 ,
+		eNUMPAD6 , eNUMPAD7 , eNUMPAD8 , eNUMPAD9 ,
+		eMULTIPLY       = 0x6A ,
+		eADD            = 0x6B ,
+		eSEPARATOR      = 0x6C ,
+		eSUBTRACT       = 0x6D ,
+		eDECIMAL        = 0x6E ,
+		eDIVIDE         = 0x6F ,
+
+		eF1             = 0x70 ,
+		eF2 , eF3 , eF4 , eF5 , eF6 , 
+		eF7 , eF8 , eF9 , eF10 , eF11 , 
+		eF12 , eF13 , eF14 , eF15 ,
+
+		eNUMLOCK        = 0x90 ,
+		eSCROLL         = 0x91 ,
+
+		eLSHIFT         = 0xA0 ,
+		eRSHIFT         = 0xA1 ,
+		eLCONTROL       = 0xA2 ,
+		eRCONTROL       = 0xA3 ,
+		eLMENU          = 0xA4 ,
+		eRMENU          = 0xA5 ,
+	};
+};
+class SysMessage
 {
 public:
-	TMessage( MsgType type) : m_type( type ){}
+	SysMessage( MsgType type) : m_type( type ){}
 	MsgType getType(){ return m_type; }
 private:
 	MsgType m_type;
+};
+
+struct Mouse
+{
+	enum Enum
+	{
+		eLBUTTON = 0,
+		eMBUTTON  ,
+		eRBUTTON  ,
+		eXBUTTON1 ,
+		eXBUTTON2 ,
+	};
 };
 
 enum MouseState
@@ -41,23 +140,25 @@ enum MouseState
 	MBS_ACTION_MASK  = MBS_BUTTON_ACTION_MASK | MBS_WHEEL | MBS_MOVING ,
 };
 
-class MouseMsg : public TMessage
+
+
+class MouseMsg : public SysMessage
 {
 public:
 	typedef unsigned short uint16;
 	MouseMsg()
-		: TMessage( MSG_TYPE_MOUSE )
+		: SysMessage( MSG_TYPE_MOUSE )
 		, msg(0),state(0)
 	{
 
 	}
 	MouseMsg( Vec2i const& pos , uint16 m , uint16 s )
-		: TMessage( MSG_TYPE_MOUSE )
+		: SysMessage( MSG_TYPE_MOUSE )
 		, pos( pos ), msg( m ), state(s )
 	{
 	}
 	MouseMsg( int x , int y , uint16 m , uint16 s )
-		: TMessage( MSG_TYPE_MOUSE )
+		: SysMessage( MSG_TYPE_MOUSE )
 		,pos(x,y),msg( m ) ,state(s)
 	{
 	}

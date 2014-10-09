@@ -15,13 +15,13 @@ class MenuStage : public GameStage
 {
 public:
 	MenuStage();
-	bool onInit();
-	void onUpdate(float deltaT);	
-	void onRender();
-	void onExit();
-
-	void onSystemEvent( sf::Event const& event );
-	void onWidgetEvent( int event , int id , GWidget* sender );
+	virtual bool onInit();
+	virtual void onUpdate(float deltaT);	
+	virtual void onRender();
+	virtual void onExit();
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual bool onKey( unsigned key , bool isDown );
+	virtual void onWidgetEvent( int event , int id , GWidget* sender );
 
 	void renderLoading();
 

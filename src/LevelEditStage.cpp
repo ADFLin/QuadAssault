@@ -62,36 +62,36 @@ void LevelEditStage::onUpdate( float deltaT )
 {	
 	float speed=250;
 
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
+	if( Platform::isKeyPressed( Keyboard::eLSHIFT ) )
 		speed=750;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+	if( Platform::isKeyPressed( Keyboard::eLEFT ) || Platform::isKeyPressed( Keyboard::eA ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(-speed*deltaT,0));
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+	if( Platform::isKeyPressed( Keyboard::eRIGHT ) || Platform::isKeyPressed( Keyboard::eD) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(speed*deltaT,0));
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+	if( Platform::isKeyPressed( Keyboard::eUP ) || Platform::isKeyPressed( Keyboard::eW ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(0, -speed*deltaT));
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+	if( Platform::isKeyPressed( Keyboard::eDOWN ) || Platform::isKeyPressed( Keyboard::eS ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(0, speed*deltaT));
 
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad7))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD7))
 		sr+=0.5*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad4))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD4))
 		sr-=0.5*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad8))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD8))
 		sg+=0.5*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad5))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD5))
 		sg-=0.5*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad9))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD9))
 		sb+=0.5*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad6))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD6))
 		sb-=0.5*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad2))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD2))
 		si+=50*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Numpad1))
+	if(Platform::isKeyPressed(Keyboard::eNUMPAD1))
 		si-=50*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::I))
+	if(Platform::isKeyPressed(Keyboard::eI))
 		srad+=50*deltaT;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K))
+	if(Platform::isKeyPressed(Keyboard::eK))
 		srad-=50*deltaT;
 	if(sr<0.0)
 		sr=0.0;
@@ -167,126 +167,118 @@ void LevelEditStage::onRender()
 
 }
 
-
-void LevelEditStage::onSystemEvent( sf::Event const& event )
+bool LevelEditStage::onMouse( MouseMsg const& msg )
 {
-	switch( event.type )
+	if( msg.onLeftDown() )
 	{
-	case sf::Event::MouseButtonPressed:
+		Vec2f wPos = convertToWorldPos( msg.getPos() );
+		if(postavljaLight==true)
 		{
-			if(event.mouseButton.button==sf::Mouse::Button::Left)
+			postavljaLight=false;
+		}
+
+		switch( mStepEdit )
+		{
+		case 1:
+			t1= wPos;
+			mStepEdit=2;
+			break;
+		case 2:
+			t2 = wPos;
+			mStepEdit=3;
+			break;
+		case 3:
+			t3 = wPos;
+			mEditTrigger->init(t1,t2);
+			mLevel->addOjectInternal( mEditTrigger );
+			mEditTrigger = NULL;
+			mStepEdit=0;
+			break;
+
+		}
+
+	}			
+	else if( msg.onRightDown() )
+	{				
+		TileMap& terrain = mLevel->getTerrain();
+
+		Vec2i tPos = convertToTilePos( getGame()->getMousePos() );
+
+		if ( terrain.checkRange( tPos.x , tPos.y ) )
+		{
+			Tile& tile = terrain.getData( tPos.x , tPos.y );
+			tile.type = mEditTileType;
+			tile.meta = mEditTileMeta;
+		}
+	}
+	return false;
+}
+
+bool LevelEditStage::onKey( unsigned key , bool isDown )
+{
+	if ( !isDown )
+	{
+		switch( key )
+		{
+		case Keyboard::eF1:
+			GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
+			stop();
+			break;
+		case Keyboard::eF4:
+			{
+				RenderEngine* renderEngine = getGame()->getRenderEenine();
+				if( renderEngine->getAmbientLight().x==0.1f)
+					renderEngine->setAmbientLight( Vec3f(0.8f, 0.8f, 0.8f) );
+				else
+					renderEngine->setAmbientLight( Vec3f(0.1f, 0.1f, 0.1f) );
+			}
+			break;
+		case Keyboard::eF6:
+			{
+				string path = LEVEL_DIR;
+				path += gMapFileName;
+				saveLevel( path.c_str() );				
+			}
+			break;
+		case Keyboard::eG:
 			{
 				Vec2f wPos = convertToWorldPos( getGame()->getMousePos() );
-				if(postavljaLight==true)
-				{
-					postavljaLight=false;
-				}
-
-				switch( mStepEdit )
-				{
-				case 1:
-					t1= wPos;
-					mStepEdit=2;
-					break;
-				case 2:
-					t2 = wPos;
-					mStepEdit=3;
-					break;
-				case 3:
-					t3 = wPos;
-					mEditTrigger->init(t1,t2);
-					mLevel->addOjectInternal( mEditTrigger );
-					mEditTrigger = NULL;
-					mStepEdit=0;
-					break;
-
-				}
-
-			}			
-			else if(event.mouseButton.button==sf::Mouse::Button::Right)
-			{				
-				TileMap& terrain = mLevel->getTerrain();
-
-				Vec2i tPos = convertToTilePos( getGame()->getMousePos() );
-
-				if ( terrain.checkRange( tPos.x , tPos.y ) )
-				{
-					Tile& tile = terrain.getData( tPos.x , tPos.y );
-					tile.type = mEditTileType;
-					tile.meta = mEditTileMeta;
-				}
+				cout << "X: " << wPos.x << endl;
+				cout << "Y: " << wPos.y << endl;
 			}
-		}
-		break;
-	case sf::Event::MouseButtonReleased:
-		{
+			break;
 
+		case Keyboard::eNUM1:
+			mEditTileType = TID_FLAT;
+			mEditTileMeta = 0;
+			break;
+		case Keyboard::eNUM2:		
+			mEditTileType = TID_WALL;
+			mEditTileMeta = 0;
+			break;
+		case Keyboard::eNUM3:			
+			mEditTileType = TID_GAP;
+			mEditTileMeta = 0;
+			break;
+		case Keyboard::eNUM4:
+			mEditTileType = TID_DOOR;
+			mEditTileMeta = DOOR_RED;
+			break;
+		case Keyboard::eNUM5:	
+			mEditTileType = TID_DOOR;
+			mEditTileMeta = DOOR_GREEN;
+			break;
+		case Keyboard::eNUM6:	
+			mEditTileType = TID_DOOR;
+			mEditTileMeta = DOOR_BLUE;
+			break;
+		case Keyboard::eNUM7:
+			mEditTileType = TID_ROCK;
+			mEditTileMeta = 2000;
+			break;
 		}
-		break;
-	case sf::Event::KeyPressed:
-		{		
-			switch( event.key.code )
-			{
-			case sf::Keyboard::Key::F1:
-				GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
-				stop();
-				break;
-			case sf::Keyboard::Key::F4:
-				{
-					RenderEngine* renderEngine = getGame()->getRenderEenine();
-					if( renderEngine->getAmbientLight().x==0.1f)
-						renderEngine->setAmbientLight( Vec3f(0.8f, 0.8f, 0.8f) );
-					else
-						renderEngine->setAmbientLight( Vec3f(0.1f, 0.1f, 0.1f) );
-				}
-				break;
-			case sf::Keyboard::Key::F6:
-				{
-					string path = LEVEL_DIR;
-					path += gMapFileName;
-					saveLevel( path.c_str() );				
-				}
-				break;
-			case sf::Keyboard::Key::G:
-				{
-					Vec2f wPos = convertToWorldPos( getGame()->getMousePos() );
-					cout << "X: " << wPos.x << endl;
-					cout << "Y: " << wPos.y << endl;
-				}
-				break;
-
-			case sf::Keyboard::Key::Num1:
-				mEditTileType = TID_FLAT;
-				mEditTileMeta = 0;
-				break;
-			case sf::Keyboard::Key::Num2:		
-				mEditTileType = TID_WALL;
-				mEditTileMeta = 0;
-				break;
-			case sf::Keyboard::Key::Num3:			
-				mEditTileType = TID_GAP;
-				mEditTileMeta = 0;
-				break;
-			case sf::Keyboard::Key::Num4:
-				mEditTileType = TID_DOOR;
-				mEditTileMeta = DOOR_RED;
-				break;
-			case sf::Keyboard::Key::Num5:	
-				mEditTileType = TID_DOOR;
-				mEditTileMeta = DOOR_GREEN;
-				break;
-			case sf::Keyboard::Key::Num6:	
-				mEditTileType = TID_DOOR;
-				mEditTileMeta = DOOR_BLUE;
-				break;
-			case sf::Keyboard::Key::Num7:
-				mEditTileType = TID_ROCK;
-				mEditTileMeta = 2000;
-				break;
-			}
-		}
-		break;
 	}
+	return BaseClass::onKey( key , isDown );
 }
 
 void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )

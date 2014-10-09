@@ -14,13 +14,17 @@ public:
 
 	void init( Vec2f poz, float radius );
 
-	ObjectType getType(){ return OT_LIGHT; }
+	virtual ObjectType getType(){ return OT_LIGHT; }
+	virtual void enumProp( IPropEditor& editor );
 	void tick();
 
 	void setColorParam( Vec3f const& color , float intensity );
 	void SetExplozija(bool explozija);
 	void PostavkeKuta(Vec2f const& dir, float angle);
+
 	
+
+
 
 	float  radius;
 	float  intensity;

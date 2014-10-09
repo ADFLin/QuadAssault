@@ -72,26 +72,27 @@ void LevelStageBase::onWidgetEvent( int event , int id , GWidget* sender )
 	}
 }
 
-void LevelStageBase::onSystemEvent( sf::Event const& event )
+
+bool LevelStageBase::onMouse( MouseMsg const& msg )
 {
-	switch( event.type )
+	return true;
+}
+
+bool LevelStageBase::onKey( unsigned key , bool isDown )
+{
+	if ( !isDown )
+		return false;
+
+	switch( key )
 	{
-	case sf::Event::MouseButtonPressed:
+	case Keyboard::eF2:
 		break;
-	case sf::Event::MouseButtonReleased:
-		break;
-	case sf::Event::KeyPressed:	
-		switch( event.key.code )
-		{
-		case sf::Keyboard::Key::F2:
-			break;
-		case sf::Keyboard::Key::Escape:
-			GUISystem::getInstance().findTopWidget( UI_MENU_PANEL )->show( true );
-			mPause = true;
-			break;
-		}
+	case Keyboard::eESCAPE:
+		GUISystem::getInstance().findTopWidget( UI_MENU_PANEL )->show( true );
+		mPause = true;
 		break;
 	}
+	return false;
 }
 
 bool LevelStage::onInit()
@@ -247,15 +248,15 @@ void LevelStage::tick()
 
 	float rotateSpeed = Math::toRad( 150 );
 	float moveAcc = 1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+	if(Platform::isKeyPressed(Keyboard::eLEFT) || Platform::isKeyPressed(Keyboard::eA))
 		player->rotate(-rotateSpeed*TICK_TIME);
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+	if(Platform::isKeyPressed(Keyboard::eRIGHT) || Platform::isKeyPressed(Keyboard::eD))
 		player->rotate( rotateSpeed*TICK_TIME);
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+	if(Platform::isKeyPressed(Keyboard::eUP) || Platform::isKeyPressed(Keyboard::eW))
 		player->addMoment( moveAcc);
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+	if(Platform::isKeyPressed(Keyboard::eDOWN) || Platform::isKeyPressed(Keyboard::eS))
 		player->addMoment(-moveAcc);
-	if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	if(Platform::isButtonPressed( Mouse::eLBUTTON ) )
 		player->shoot( wPosMouse );
 
 	player->update( wPosMouse );
@@ -383,43 +384,40 @@ void LevelStage::onRender()
 	getRenderSystem()->drawText( mDevMsg , Vec2i( 10 , 10 ) , TEXT_SIDE_LEFT | TEXT_SIDE_RIGHT );
 }
 
-void LevelStage::onSystemEvent( sf::Event const& event )
+bool LevelStage::onMouse( MouseMsg const& msg )
 {
-	
-	switch( event.type )
+	return true;
+}
+
+bool LevelStage::onKey( unsigned key , bool isDown )
+{
+	if ( isDown )
+		return false;
+
+	switch( key )
 	{
-	case sf::Event::MouseButtonPressed:
-		break;
-	case sf::Event::MouseButtonReleased:
-		break;
-	case sf::Event::KeyPressed:	
-		switch( event.key.code )
+	case Keyboard::eF1:
 		{
-		case sf::Keyboard::Key::F1:
-			{
-				LevelEditStage* stage = new LevelEditStage;
-				stage->mLevel  = mLevel;
-				stage->mCamera = mCamera;
-				stage->mWorldScaleFactor = mWorldScaleFactor;
-				getGame()->addStage( stage , false );
-			}
-			break;
-		case sf::Keyboard::Key::F2:
-			break;
-			//if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
-			//	tranzicija=ST_FADEOUT;
-		case sf::Keyboard::Key::Q:
-			mTweener.tweenValue< Easing::OQuad >( mWorldScaleFactor , mWorldScaleFactor , std::max( mWorldScaleFactor + 0.25f , 0.25f ) , 1.0f );
-			break;
-		case sf::Keyboard::Key::E:
-			mTweener.tweenValue< Easing::OQuad >( mWorldScaleFactor , mWorldScaleFactor , mWorldScaleFactor - 0.25f , 1.0f );
-			break;
+			LevelEditStage* stage = new LevelEditStage;
+			stage->mLevel  = mLevel;
+			stage->mCamera = mCamera;
+			stage->mWorldScaleFactor = mWorldScaleFactor;
+			getGame()->addStage( stage , false );
 		}
+		break;
+	case Keyboard::eF2:
+		break;
+	case Keyboard::eQ:
+		mTweener.tweenValue< Easing::OQuad >( mWorldScaleFactor , mWorldScaleFactor , std::max( mWorldScaleFactor + 0.25f , 0.25f ) , 1.0f );
+		break;
+	case Keyboard::eE:
+		mTweener.tweenValue< Easing::OQuad >( mWorldScaleFactor , mWorldScaleFactor , mWorldScaleFactor - 0.25f , 1.0f );
 		break;
 	}
 
-	BaseClass::onSystemEvent( event );
+	return BaseClass::onKey( key , isDown );
 }
+
 
 void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 {
@@ -689,4 +687,3 @@ void LevelStage::loadLevel()
 	levelFS.close();
 
 }
-

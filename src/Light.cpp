@@ -45,3 +45,8 @@ void Light::tick()
 
 }
 
+void Light::enumProp( IPropEditor& editor )
+{
+	BaseClass::enumProp( editor );
+}
+

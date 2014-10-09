@@ -21,8 +21,10 @@ class PlatformWin
 {
 public:
 	static int64           getTickCount();
+	static bool            isKeyPressed( unsigned key );
+	static bool            isButtonPressed( unsigned button );
+
 	static GameWindowWin*  createWindow( char const* title , Vec2i const& size , int colorBit , bool bFullScreen );
-	static void            procSystemMessage();
 	static WGLContext*     createGLContext( GameWindowWin& window , GLConfig& config );
 };
 
@@ -41,8 +43,6 @@ public:
 	
 	void  showCursor( bool bShow );
 	void  close();
-	void  display();
-	bool  setActive( bool bActive );
 	
 
 	void  setSystemListener( ISystemListener& listener ){ mListener = &listener; }
@@ -94,7 +94,7 @@ public:
 	bool setCurrent();
 	void swapBuffers();
 
-
+private:
 #if USE_SFML_WINDOW
 public:
 	sf::RenderWindow* mWindow;
