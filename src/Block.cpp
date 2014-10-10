@@ -24,11 +24,11 @@ static void createBlockClass();
 
 static BlockInfo const gInfo[] = 
 {
-	{ TID_FLAT , 0 , 0 , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
-	{ TID_WALL , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
-	{ TID_GAP  , COL_SOILD | COL_TRIGGER | COL_VIEW , 0 , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
-	{ TID_DOOR , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
-	{ TID_ROCK , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
+	{ BID_FLAT , 0 , 0 , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
+	{ BID_WALL , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
+	{ BID_GAP  , COL_SOILD | COL_TRIGGER | COL_VIEW , 0 , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
+	{ BID_DOOR , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
+	{ BID_ROCK , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
 };
 
 void Block::init( BlockType type )
@@ -121,7 +121,7 @@ void RockBlock::onCollision( Tile& tile , Bullet* bullet )
 	tile.meta -= 100 * bullet->getDamage();
 	if ( tile.meta < 0 )
 	{
-		tile.type = TID_FLAT;
+		tile.type = BID_FLAT;
 		tile.meta = 0;
 
 		Explosion* e = bullet->getLevel()->createExplosion( tile.pos + 0.5 * gSimpleBlockSize , 128 );
@@ -156,10 +156,10 @@ void DoorBlock::renderGlow( Tile const& tile )
 
 static void createBlockClass()
 {
-	gBlockMap[ TID_FLAT ] = new Block;
-	gBlockMap[ TID_WALL ] = new Block;
-	gBlockMap[ TID_GAP  ] = new Block;
-	gBlockMap[ TID_DOOR ] = new DoorBlock;
-	gBlockMap[ TID_ROCK ] = new RockBlock;
+	gBlockMap[ BID_FLAT ] = new Block;
+	gBlockMap[ BID_WALL ] = new Block;
+	gBlockMap[ BID_GAP  ] = new Block;
+	gBlockMap[ BID_DOOR ] = new DoorBlock;
+	gBlockMap[ BID_ROCK ] = new RockBlock;
 }
 

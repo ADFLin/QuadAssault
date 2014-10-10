@@ -34,27 +34,51 @@ bool LevelEditStage::onInit()
 	sr=1.0; sg=10; sb=1.0; si=8.0; srad=128.0;
 
 	{
-		GFrame* frame = new GFrame( UI_MAP_TOOL , Vec2i(32,32), Vec2i(320, 240) , NULL );
+		GFrame* frame = new GFrame( UI_MAP_TOOL , Vec2i(32,32), Vec2i(220, 140) , NULL );
 		//"Tools"
 		GUISystem::getInstance().addWidget( frame );
 
-		GImageButton* button;
+		{
+			Vec2i pos = Vec2i( 4 , GFrame::TopSideHeight + 4 );
+			Vec2i size = Vec2i( 32 , 32 );
+			int offset = size.x + 4;
 
-		button = new GImageButton( UI_CREATE_LIGHT , Vec2i(16,32),Vec2i(32,32) , frame );
-		button->setHelpText( "Create Light" );
-		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+			GImageButton* button;
+			button = new GImageButton( UI_CREATE_LIGHT , pos , size , frame );
+			button->setHelpText( "Create Light" );
+			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+			pos.x += offset;
 
-		button = new GImageButton( UI_CREATE_TRIGGER ,Vec2i(64,32),Vec2i(32,32) , frame );
-		button->setHelpText( "Create Trigger" );
-		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+			button = new GImageButton( UI_CREATE_TRIGGER , pos , size  , frame );
+			button->setHelpText( "Create Trigger" );
+			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+			pos.x += offset;
 
-		button = new GImageButton( UI_EMPTY_MAP  ,Vec2i(16,72),Vec2i(32,32) , frame );
-		button->setHelpText( "New Map" );
-		button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
+			button = new GImageButton( UI_EMPTY_MAP  , pos , size  , frame );
+			button->setHelpText( "New Map" );
+			button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
+			pos.x += offset;
 
-		button = new GImageButton( UI_SAVE_MAP ,Vec2i(64,72),Vec2i(32,32) , frame );
-		button->setHelpText( "Save Map" );
-		button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
+			button = new GImageButton( UI_SAVE_MAP , pos , size  , frame );
+			button->setHelpText( "Save Map" );
+			button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
+			pos.x += offset;
+		}
+
+		{
+
+			Vec2i pos = Vec2i( 4 , GFrame::TopSideHeight + 4 + 32 + 4 );
+			GTextButton* button;
+			button = new GTextButton( UI_TILE_EDIT_BUTTON , pos , Vec2i( 64 , 32 ) , frame );
+			button->text->setFont( getGame()->getFont(0) );
+			button->text->setCharSize( 20 );
+			button->text->setString( "Tile" );
+			pos.x += 64 + 4;
+			button = new GTextButton( UI_TILE_EDIT_BUTTON , pos , Vec2i( 64 , 32 ) , frame );
+			button->text->setFont( getGame()->getFont(0) );
+			button->text->setCharSize( 20 );
+			button->text->setString( "Object" );
+		}
 	}
 
 
@@ -143,8 +167,6 @@ void LevelEditStage::onRender()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	//mWorldScaleFactor = 0.5f;
 
 	mRenderParam.camera      = mCamera;
 	mRenderParam.level       = mLevel;
@@ -295,6 +317,12 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 			mEditLight->setColorParam(Vec3f(1.0, 1.0, 1.0), 8);
 		}
 		break;
+	case UI_OBJECT_EDIT_BUTTON:
+		changeMode( ObjectEditMode::getInstance() );
+		break;
+	case UI_TILE_EDIT_BUTTON:
+		changeMode( TileEditMode::getInstance() );
+		break;
 	}
 }
 
@@ -313,7 +341,7 @@ bool LevelEditStage::saveLevel( char const* path )
 	for(int j=0; j< terrain.getSizeY(); j++)
 	{
 		Tile& tile = terrain.getData( i , j );
-		if ( tile.type == TID_FLAT && tile.meta == 0 )
+		if ( tile.type == BID_FLAT && tile.meta == 0 )
 			continue;
 
 		of << "block" << " "  
@@ -355,10 +383,10 @@ void LevelEditStage::generateEmptyLevel()
 		for(int j=0; j< terrain.getSizeY(); j++)
 		{		
 			Tile& tile = terrain.getData( i , j );
-			tile.type = TID_FLAT;
+			tile.type = BID_FLAT;
 			tile.meta = 0;
 			if(i==0 || j==0 || i== terrain.getSizeX()-1 || j== terrain.getSizeY() -1 )
-				tile.type = TID_WALL;
+				tile.type = BID_WALL;
 		}	
 	}
 
@@ -382,6 +410,9 @@ void LevelEditStage::generateEmptyLevel()
 
 void LevelEditStage::changeMode( EditMode& mode )
 {
+	if ( mMode == &mode )
+		return;
+
 	if ( mMode )
 		mMode->onDisable();
 
@@ -394,7 +425,7 @@ TileEditMode::TileEditMode()
 {
 	mFrame = NULL;
 	mEditTileMeta = 0;
-	mEditTileType = TID_FLAT;
+	mEditTileType = BID_FLAT;
 }
 
 bool TileEditMode::onKey( unsigned key , bool isDown )
@@ -405,31 +436,31 @@ bool TileEditMode::onKey( unsigned key , bool isDown )
 	switch( key )
 	{
 	case Keyboard::eNUM1:
-		mEditTileType = TID_FLAT;
+		mEditTileType = BID_FLAT;
 		mEditTileMeta = 0;
 		return false;
 	case Keyboard::eNUM2:		
-		mEditTileType = TID_WALL;
+		mEditTileType = BID_WALL;
 		mEditTileMeta = 0;
 		return false;
 	case Keyboard::eNUM3:			
-		mEditTileType = TID_GAP;
+		mEditTileType = BID_GAP;
 		mEditTileMeta = 0;
 		return false;
 	case Keyboard::eNUM4:
-		mEditTileType = TID_DOOR;
+		mEditTileType = BID_DOOR;
 		mEditTileMeta = DOOR_RED;
 		return false;
 	case Keyboard::eNUM5:	
-		mEditTileType = TID_DOOR;
+		mEditTileType = BID_DOOR;
 		mEditTileMeta = DOOR_GREEN;
 		return false;
 	case Keyboard::eNUM6:	
-		mEditTileType = TID_DOOR;
+		mEditTileType = BID_DOOR;
 		mEditTileMeta = DOOR_BLUE;
 		return false;
 	case Keyboard::eNUM7:
-		mEditTileType = TID_ROCK;
+		mEditTileType = BID_ROCK;
 		mEditTileMeta = 2000;
 		return false;
 	}
@@ -487,4 +518,20 @@ void TileEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 		mEditTileType = id;
 		break;
 	}
+}
+
+void TileEdit::enumProp( IPropEditor& editor )
+{
+	int tileValue[] = 
+	{ 
+#define BLOCK_INFO( ID , NAME ) ID ,
+#include "BlockType.h"
+	};
+	char const* tileStr[] = 
+	{
+#define BLOCK_INFO( ID , NAME ) NAME ,
+#include "BlockType.h"
+	};
+	editor.addEnumProp( "Block Type" , mTile->type , ARRAY_SIZE( tileValue ) , tileValue , tileStr );
+	editor.addProp( "Meta" , mTile->meta );
 }

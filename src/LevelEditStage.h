@@ -37,9 +37,10 @@ enum EditState
 	EDIT_DESTROY ,	
 };
 
-class ObjectEdit   : public EditMode
+class ObjectEditMode  : public EditMode
+	                  , public SingletonT< ObjectEditMode >
 {
-
+public:
 
 
 
@@ -55,19 +56,7 @@ class TileEdit : public IEditable
 public:
 	Tile* getTile(){ return mTile; }
 
-	virtual void enumProp( IPropEditor& editor )
-	{
-		int tileValue[] = 
-		{ 
-			TID_FLAT , TID_WALL , TID_GAP  ,TID_DOOR ,TID_ROCK ,
-		};
-		char const* tileStr[] = 
-		{
-			"TID_FLAT" , "TID_WALL" , "TID_GAP"  , "TID_DOOR" , "TID_ROCK" ,
-		};
-		editor.addEnumProp( "Block Type" , mTile->type , 5 , tileValue , tileStr );
-		editor.addProp( "Meta" , mTile->meta );
-	}
+	virtual void enumProp( IPropEditor& editor );
 	virtual void updateEdit()
 	{
 

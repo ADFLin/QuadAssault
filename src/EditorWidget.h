@@ -17,6 +17,9 @@ enum
 	UI_TILE_BUTTON ,
 	UI_PROP_FRAME,
 
+	UI_OBJECT_EDIT_BUTTON ,
+	UI_TILE_EDIT_BUTTON ,
+
 };
 
 class IPropCtrl

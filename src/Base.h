@@ -8,7 +8,9 @@
 #define BIT( n ) ( 1 << ( n ) )
 #endif
 
-typedef TVector2< int > Vec2i; 
+typedef TVector2< int > Vec2i;
+
+#define ARRAY_SIZE( ARRAY ) ( sizeof(ARRAY) / sizeof( ARRAY[0] ) )
 
 float const TICK_TIME = 60 / 1000.0f;
 int const BLOCK_SIZE = 64;

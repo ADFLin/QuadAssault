@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\BlockType.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ColBody.h"
 				>
 			</File>

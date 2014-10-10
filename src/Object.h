@@ -20,14 +20,6 @@ protected:
 		
 };
 
-class ObjectClass
-{
-
-
-
-
-
-};
 
 class Level;
 
@@ -45,10 +37,17 @@ enum ObjectType
 	OT_TRIGGER ,
 };
 
-
 class IRenderer;
 struct Tile;
 class ColBody;
+
+class ObjectClass
+{
+	char const*  name;
+	ObjectType   type;
+	ObjectClass* parent;
+	IRenderer*   renderer;
+};
 
 class LevelObject : public Object
 {

@@ -118,10 +118,10 @@ void Level::setupTerrain( int w , int h )
 		{		
 			Tile& tile = mTerrain.getData( i , j );
 			tile.pos  = Vec2f( BLOCK_SIZE * i , BLOCK_SIZE * j );
-			tile.type = TID_FLAT;
+			tile.type = BID_FLAT;
 			tile.meta = 0;
 			if(i==0 || j==0 || i== w-1 || j== h-1)
-				tile.type = TID_WALL;
+				tile.type = BID_WALL;
 		}	
 	}
 	addOjectInternal( mPlayer );

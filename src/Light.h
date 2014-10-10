@@ -3,28 +3,16 @@
 
 #include "Object.h"
 
-
-class Light : public LevelObject
+enum LightingModel
 {
-	typedef LevelObject BaseClass;
+
+
+
+
+};
+class LightBase
+{
 public:
-
-	Light();
-	~Light();
-
-	void init( Vec2f poz, float radius );
-
-	virtual ObjectType getType(){ return OT_LIGHT; }
-	virtual void enumProp( IPropEditor& editor );
-	void tick();
-
-	void setColorParam( Vec3f const& color , float intensity );
-	void SetExplozija(bool explozija);
-	void PostavkeKuta(Vec2f const& dir, float angle);
-
-	
-
-
 
 	float  radius;
 	float  intensity;
@@ -36,9 +24,32 @@ public:
 	bool  isExplosion;
 	bool  drawShadow;
 
-	friend class RenderEngine;
+	Vec2f   offset;
+	Object* host;
 
-	
+	friend class RenderEngine;	
+};
+
+class Light : public LevelObject
+	        , public LightBase
+{
+	typedef LevelObject BaseClass;
+public:
+
+	Light();
+	~Light();
+
+	void init( Vec2f poz, float radius );
+
+	virtual ObjectType getType(){ return OT_LIGHT; }
+	virtual void enumProp( IPropEditor& editor );
+
+	void tick();
+	void setColorParam( Vec3f const& color , float intensity );
+	void SetExplozija(bool explozija);
+	void PostavkeKuta(Vec2f const& dir, float angle);
+
+	friend class RenderEngine;	
 };
 
 #endif // Light_h__

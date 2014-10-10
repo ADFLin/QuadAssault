@@ -3,19 +3,11 @@
 
 #include "Base.h"
 #include "TGrid2D.h"
+#include "BlockType.h"
 
 Vec2f const gSimpleBlockSize = Vec2f( BLOCK_SIZE , BLOCK_SIZE );
 
-enum BlockTypeEnum
-{
-	TID_FLAT , 
-	TID_WALL , 
-	TID_GAP  ,
-	TID_DOOR ,
-	TID_ROCK ,
 
-	NUM_BLOCK_TYPE ,
-};
 
 enum DoorType
 {
