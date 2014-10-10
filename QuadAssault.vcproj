@@ -20,7 +20,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="2"
+			CharacterSet="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -204,6 +204,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Game.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libCore\GameEdit.h"
 				>
 			</File>
 			<File
@@ -512,6 +516,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libCore\PlatformConfig.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libCore\Singleton.h"
 				>
 			</File>
@@ -744,19 +752,19 @@
 			Name="GUI"
 			>
 			<File
+				RelativePath=".\src\EditorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\EditorWidget.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\GUISystem.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\GUISystem.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PropFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PropFrame.h"
 				>
 			</File>
 		</Filter>
@@ -769,6 +777,14 @@
 			</File>
 			<File
 				RelativePath=".\src\PlatformBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PlatformSF.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PlatformSF.h"
 				>
 			</File>
 			<File

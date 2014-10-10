@@ -5,14 +5,39 @@
 #include "Level.h"
 
 #include "Object.h"
+#include "ObjectFactory.h"
 #include "Dependence.h"
 #include "RenderEngine.h"
 #include "Tween.h"
 #include <vector>
 
+
 class SoundManager;
 class GUIManager;
 class IText;
+
+class WorldData
+{
+public:
+
+	Vec2f  convertToWorldPos( Vec2i const& sPos )
+	{
+		return mCamera->getPos() + mWorldScaleFactor * Vec2f( sPos.x  , sPos.y  );
+	}
+
+	Vec2i convertToTilePos( Vec2i const& sPos )
+	{
+		Vec2f wPos = convertToWorldPos( sPos );
+		return Vec2i( Math::floor( wPos.x / BLOCK_SIZE ) , Math::floor( wPos.y  / BLOCK_SIZE ) );
+	}
+
+	Level*  getLevel(){ return mLevel; }
+	Object* getCamera(){ return mCamera; }
+protected:
+	Object*        mCamera;
+	float          mWorldScaleFactor;
+	Level*         mLevel;
+};
 
 class LevelStageBase : public GameStage
 {
@@ -34,29 +59,14 @@ protected:
 		UI_EXIT_GAME ,
 		UI_GO_MENU   ,
 
-		UI_EDIT_ID  = 400 ,
 	};
-
-	Vec2f  convertToWorldPos( Vec2i const& sPos )
-	{
-		return mCamera->getPos() + mWorldScaleFactor * Vec2f( sPos.x  , sPos.y  );
-	}
-
-	Vec2i convertToTilePos( Vec2i const& sPos )
-	{
-		Vec2f wPos = convertToWorldPos( sPos );
-		return Vec2i( Math::floor( wPos.x / BLOCK_SIZE ) , Math::floor( wPos.y  / BLOCK_SIZE ) );
-	}
-
 
 
 
 	IText*      mDevMsg;
 	Texture*    mTexCursor;
 	RenderParam mRenderParam;
-	Object*     mCamera;
-	float       mWorldScaleFactor;
-	Level*      mLevel;
+
 	bool        mPause;
 };
 
@@ -65,6 +75,7 @@ protected:
 
 class LevelStage : public LevelStageBase
 	             , public Level::EventListener
+				 , public WorldData
 {
 	typedef LevelStageBase BaseClass;
 

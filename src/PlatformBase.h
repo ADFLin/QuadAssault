@@ -4,6 +4,8 @@
 #include "IntegerType.h"
 #include "SysMsg.h"
 
+#include "TVector2.h"
+typedef TVector2< int > Vec2i;
 
 struct  GLConfig
 {

@@ -60,16 +60,7 @@ void LevelStageBase::onExit()
 
 void LevelStageBase::onWidgetEvent( int event , int id , GWidget* sender )
 {
-	switch( id )
-	{
-	case UI_BACK_GAME:
-		GUISystem::getInstance().findTopWidget( UI_MENU_PANEL )->show( false );
-		mPause = false;
-		break;
-	case UI_GO_MENU:
-		getGame()->addStage( new MenuStage , true );
-		break;
-	}
+
 }
 
 
@@ -150,8 +141,6 @@ bool LevelStage::onInit()
 	mLevel = new Level;
 	mLevel->init();
 	mLevel->addListerner( *this );
-
-	
 
 	mCamera = new Object();
 	mCamera->setPos(Vec2f(0,0));
@@ -391,7 +380,7 @@ bool LevelStage::onMouse( MouseMsg const& msg )
 
 bool LevelStage::onKey( unsigned key , bool isDown )
 {
-	if ( isDown )
+	if ( !isDown )
 		return false;
 
 	switch( key )
@@ -423,6 +412,13 @@ void LevelStage::onWidgetEvent( int event , int id , GWidget* sender )
 {
 	switch( id )
 	{
+	case UI_BACK_GAME:
+		GUISystem::getInstance().findTopWidget( UI_MENU_PANEL )->show( false );
+		mPause = false;
+		break;
+	case UI_GO_MENU:
+		getGame()->addStage( new MenuStage , true );
+		break;
 	case UI_EXIT_GAME:
 		mScreenFade.fadeOut( std::tr1::bind( &IGame::stopPlay , getGame() ) );
 		break;

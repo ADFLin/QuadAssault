@@ -1,12 +1,15 @@
 #include "LevelEditStage.h"
 
-#include "GUISystem.h"
 #include "GameInterface.h"
 #include "RenderSystem.h"
 #include "TextureManager.h"
 
+#include "GUISystem.h"
+#include "EditorWidget.h"
+
 #include "Level.h"
 #include "Light.h"
+#include "Player.h"
 #include "Trigger.h"
 
 #include "GlobalVariable.h"
@@ -16,14 +19,15 @@
 #include "FixString.h"
 #include <fstream>
 
+
+EditWorldData* EditMode::mWorldData = NULL;
+
 bool LevelEditStage::onInit()
 {
 	if( !BaseClass::onInit() )
 		return false;
 
-
-	mEditTileMeta = 0;
-	mEditTileType = TID_FLAT;
+	EditMode::mWorldData = this;
 
 	postavljaLight = false;
 	mStepEdit=0;
@@ -37,24 +41,36 @@ bool LevelEditStage::onInit()
 		GImageButton* button;
 
 		button = new GImageButton( UI_CREATE_LIGHT , Vec2i(16,32),Vec2i(32,32) , frame );
+		button->setHelpText( "Create Light" );
 		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
 
 		button = new GImageButton( UI_CREATE_TRIGGER ,Vec2i(64,32),Vec2i(32,32) , frame );
+		button->setHelpText( "Create Trigger" );
 		button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
 
 		button = new GImageButton( UI_EMPTY_MAP  ,Vec2i(16,72),Vec2i(32,32) , frame );
+		button->setHelpText( "New Map" );
 		button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
 
 		button = new GImageButton( UI_SAVE_MAP ,Vec2i(64,72),Vec2i(32,32) , frame );
+		button->setHelpText( "Save Map" );
 		button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
 	}
 
 
+	mPropFrame = new PropFrame( UI_PROP_FRAME , Vec2i( 0 , 0 ) , NULL );
+	GUISystem::getInstance().addWidget( mPropFrame );
+
+	mPropFrame->setupEdit( *mLevel->getPlayer() );
+
+	changeMode( TileEditMode::getInstance() );
 	return true;
 }
 
 void LevelEditStage::onExit()
 {
+	GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
+	GUISystem::getInstance().findTopWidget( UI_PROP_FRAME )->destroy();
 	BaseClass::onExit();
 }
 
@@ -169,6 +185,9 @@ void LevelEditStage::onRender()
 
 bool LevelEditStage::onMouse( MouseMsg const& msg )
 {
+	if ( !mMode->onMouse( msg ) )
+		return false;
+
 	if( msg.onLeftDown() )
 	{
 		Vec2f wPos = convertToWorldPos( msg.getPos() );
@@ -198,30 +217,20 @@ bool LevelEditStage::onMouse( MouseMsg const& msg )
 		}
 
 	}			
-	else if( msg.onRightDown() )
-	{				
-		TileMap& terrain = mLevel->getTerrain();
 
-		Vec2i tPos = convertToTilePos( getGame()->getMousePos() );
-
-		if ( terrain.checkRange( tPos.x , tPos.y ) )
-		{
-			Tile& tile = terrain.getData( tPos.x , tPos.y );
-			tile.type = mEditTileType;
-			tile.meta = mEditTileMeta;
-		}
-	}
 	return false;
 }
 
 bool LevelEditStage::onKey( unsigned key , bool isDown )
 {
-	if ( !isDown )
+	if ( !mMode->onKey( key , isDown ) )
+		return false;
+
+	if ( isDown )
 	{
 		switch( key )
 		{
 		case Keyboard::eF1:
-			GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
 			stop();
 			break;
 		case Keyboard::eF4:
@@ -247,35 +256,6 @@ bool LevelEditStage::onKey( unsigned key , bool isDown )
 				cout << "Y: " << wPos.y << endl;
 			}
 			break;
-
-		case Keyboard::eNUM1:
-			mEditTileType = TID_FLAT;
-			mEditTileMeta = 0;
-			break;
-		case Keyboard::eNUM2:		
-			mEditTileType = TID_WALL;
-			mEditTileMeta = 0;
-			break;
-		case Keyboard::eNUM3:			
-			mEditTileType = TID_GAP;
-			mEditTileMeta = 0;
-			break;
-		case Keyboard::eNUM4:
-			mEditTileType = TID_DOOR;
-			mEditTileMeta = DOOR_RED;
-			break;
-		case Keyboard::eNUM5:	
-			mEditTileType = TID_DOOR;
-			mEditTileMeta = DOOR_GREEN;
-			break;
-		case Keyboard::eNUM6:	
-			mEditTileType = TID_DOOR;
-			mEditTileMeta = DOOR_BLUE;
-			break;
-		case Keyboard::eNUM7:
-			mEditTileType = TID_ROCK;
-			mEditTileMeta = 2000;
-			break;
 		}
 	}
 	return BaseClass::onKey( key , isDown );
@@ -283,6 +263,9 @@ bool LevelEditStage::onKey( unsigned key , bool isDown )
 
 void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 {
+	if ( id >= UI_EDIT_ID )
+		mMode->onWidgetEvent( event , id , sender );
+
 	switch( id )
 	{
 	case UI_SAVE_MAP:
@@ -394,5 +377,114 @@ void LevelEditStage::generateEmptyLevel()
 		{
 			++iter;
 		}
+	}
+}
+
+void LevelEditStage::changeMode( EditMode& mode )
+{
+	if ( mMode )
+		mMode->onDisable();
+
+	mMode = &mode;
+	mMode->onEnable();
+}
+
+
+TileEditMode::TileEditMode()
+{
+	mFrame = NULL;
+	mEditTileMeta = 0;
+	mEditTileType = TID_FLAT;
+}
+
+bool TileEditMode::onKey( unsigned key , bool isDown )
+{
+	if ( !isDown )
+		return true;
+
+	switch( key )
+	{
+	case Keyboard::eNUM1:
+		mEditTileType = TID_FLAT;
+		mEditTileMeta = 0;
+		return false;
+	case Keyboard::eNUM2:		
+		mEditTileType = TID_WALL;
+		mEditTileMeta = 0;
+		return false;
+	case Keyboard::eNUM3:			
+		mEditTileType = TID_GAP;
+		mEditTileMeta = 0;
+		return false;
+	case Keyboard::eNUM4:
+		mEditTileType = TID_DOOR;
+		mEditTileMeta = DOOR_RED;
+		return false;
+	case Keyboard::eNUM5:	
+		mEditTileType = TID_DOOR;
+		mEditTileMeta = DOOR_GREEN;
+		return false;
+	case Keyboard::eNUM6:	
+		mEditTileType = TID_DOOR;
+		mEditTileMeta = DOOR_BLUE;
+		return false;
+	case Keyboard::eNUM7:
+		mEditTileType = TID_ROCK;
+		mEditTileMeta = 2000;
+		return false;
+	}
+	return true;
+}
+
+bool TileEditMode::onMouse( MouseMsg const& msg )
+{
+	Vec2f wPos = getWorld().convertToWorldPos( msg.getPos() );
+	Tile* tile = getWorld().getLevel()->getTile( wPos );
+
+	if ( msg.onLeftDown() )
+	{
+		if ( tile )
+		{
+			mEdit.mTile = tile;
+			getWorld().mPropFrame->setupEdit( mEdit );
+			return false;
+		}
+	}
+	else if( msg.onRightDown() )
+	{				
+		if ( tile )
+		{
+			tile->type = mEditTileType;
+			tile->meta = mEditTileMeta;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void TileEditMode::onEnable()
+{
+	if ( mFrame == NULL )
+	{
+		mFrame = new TileEditFrame( UI_ANY , Vec2i( 10 , 10 ) , NULL );
+		GUISystem::getInstance().addWidget( mFrame );
+	}
+	mFrame->show( true );
+}
+
+void TileEditMode::onDisable()
+{
+	mFrame->show( false );
+}
+
+void TileEditMode::onWidgetEvent( int event , int id , GWidget* sender )
+{
+	switch( id )
+	{
+	case UI_TILE_BUTTON:
+		int id = (int)sender->getUserData();
+		mEditTileType = id;
+		break;
 	}
 }

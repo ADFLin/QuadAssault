@@ -39,6 +39,11 @@ public:
 	}
 	sf::Text mImpl;
 
+	Vec2f getBoundSize() const
+	{
+		sf::FloatRect rect = mImpl.getLocalBounds();
+		return Vec2f( rect.width , rect.height );
+	}
 	virtual void setString( char const* str )
 	{
 		mImpl.setString( str );
@@ -336,6 +341,11 @@ public:
 	typedef std::vector< char > Line;
 	typedef std::vector< Line > LineVec;
 
+	virtual Vec2f getBoundSize() const
+	{
+		sf::FloatRect rect = mImpl.getLocalBounds();
+		return Vec2f( 0 , 0 );
+	}
 	virtual void setString( char const* str )
 	{
 		mStr = str;

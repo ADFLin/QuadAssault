@@ -13,6 +13,7 @@
 #include <vector>
 
 class LevelObject;
+class ObjectCreator;
 class Mob;
 class Light;
 class ItemPickup;
@@ -98,6 +99,8 @@ public:
 
 	int               random(int i1, int i2);
 
+	Tile*             getTile( Vec2f const& pos );
+
 	
 public:
 
@@ -124,6 +127,7 @@ protected:
 
 	typedef std::vector< Message* > MessageVec;
 
+	ObjectCreator*   mObjectCreator;
 	MessageVec       mMsgQueue;
 	Message*         mTopMessage;
 	State            mState;

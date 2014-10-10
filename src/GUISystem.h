@@ -12,8 +12,9 @@ class IText;
 enum 
 {
 	UI_ANY = -1 ,
-	UI_STAGE_ID = 100 ,
-	UI_WIDGET_ID = 1000,
+	UI_STAGE_ID  = 100  ,
+	UI_EDIT_ID   = 1000 ,
+	UI_WIDGET_ID = 2000,
 };
 
 enum
@@ -96,6 +97,15 @@ public:
 };
 
 
+class  GPanel : public GUI::Panel< GPanel >
+{
+	typedef GUI::Panel< GPanel > BaseClass;
+public:
+	GPanel( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
+protected:
+	void onRender();
+};
+
 class  GButtonBase : public GUI::Button< GButtonBase >
 {
 	typedef GUI::Button< GButtonBase > BaseClass;
@@ -106,6 +116,14 @@ public:
 		mId = id;
 	}
 	virtual void onClick(){  sendEvent( EVT_BUTTON_CLICK );  }
+};
+
+class HelpTextPanel : public GPanel
+{
+
+
+
+
 };
 
 class GTextButton : public GButtonBase
@@ -123,20 +141,17 @@ class GImageButton : public GButtonBase
 	typedef GButtonBase BaseClass;
 public:
 	GImageButton( int id , Vec2i const& pos , Vec2i const& size  , GWidget* parent );
+	~GImageButton();
 
 	void onRender();
+	void setHelpText( char const* str );
 
 	Texture* texImag;
+	IText*   mHelpText;
 };
 
-class  GPanel : public GUI::Panel< GPanel >
-{
-	typedef GUI::Panel< GPanel > BaseClass;
-public:
-	GPanel( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
-protected:
-	void onRender();
-};
+
+
 
 class  GFrame : public GUI::Panel< GFrame >
 {
@@ -166,6 +181,22 @@ public:
 	void onRender();
 
 	IText* text;
+};
+
+class GChoice : public GUI::Choice< GChoice >
+{
+public:
+
+	struct MyData 
+	{
+		IText* text;
+	};
+
+	typedef MyData ExtraData;
+
+	void onAddItem( unsigned pos , Item& item );
+	void onRemoveItem( unsigned pos , Item& item );
+	void doRenderItem( Vec2i const& pos , Item& item , bool beLight );
 };
 
 

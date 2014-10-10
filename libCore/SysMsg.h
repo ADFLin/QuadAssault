@@ -20,11 +20,7 @@ struct Keyboard
 {
 	enum Enum
 	{
-		eLBUTTON        = 0x01 ,
-		eRBUTTON        = 0x02 ,
 		eCANCEL         = 0x03 ,
-		eMBUTTON        = 0x04 ,
-
 		eBACK           = 0x08 ,
 		eTAB            = 0x09 ,
 		eCLEAR          = 0x0C ,
@@ -40,7 +36,6 @@ struct Keyboard
 		eJUNJA          = 0x17 , 
 		eFINAL          = 0x18 ,
 		eHANJA          = 0x19 ,
-		eKANJI          = 0x19 ,
 
 		eESCAPE         = 0x1B ,
 

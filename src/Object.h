@@ -3,8 +3,9 @@
 
 #include "Base.h"
 #include "IntrList.h"
+#include "GameEdit.h"
 
-class Object
+class Object : public IEditable
 {
 public:
 	Object();
@@ -19,15 +20,17 @@ protected:
 		
 };
 
-class Level;
-class IPropEditor
+class ObjectClass
 {
-public:
-	virtual void addProp( char const* name , float& value ) = 0;
-	virtual void addProp( char const* name , int& value ) = 0;
-	virtual void addProp( char const* name , string& value ) = 0;
-	virtual void addProp( char const* name , bool& value ) = 0;
+
+
+
+
+
 };
+
+class Level;
+
 
 enum ObjectType
 {

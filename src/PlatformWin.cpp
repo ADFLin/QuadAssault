@@ -1,15 +1,13 @@
 #include "PlatformWin.h"
 
-
-
 int64 PlatformWin::getTickCount()
 {
 	return  ::GetTickCount();
 }
 
-GameWindowWin* PlatformWin::createWindow( char const* title , Vec2i const& size , int colorBit , bool bFullScreen )
+GameWindow* PlatformWin::createWindow( char const* title , Vec2i const& size , int colorBit , bool bFullScreen )
 {
-	GameWindowWin* win = new GameWindowWin;
+	GameWindow* win = new GameWindow;
 	if ( !win->create( title , size , colorBit , bFullScreen ) )
 	{
 		delete win;
@@ -18,9 +16,9 @@ GameWindowWin* PlatformWin::createWindow( char const* title , Vec2i const& size 
 	return win;
 }
 
-WGLContext* PlatformWin::createGLContext( GameWindowWin& window , GLConfig& config )
+GLContext* PlatformWin::createGLContext( GameWindow& window , GLConfig& config )
 {
-	WGLContext* context = new WGLContext;
+	GLContext* context = new GLContext;
 	if ( !context->init( window , config ) )
 	{
 		delete context;
@@ -50,28 +48,15 @@ bool PlatformWin::isButtonPressed( unsigned button )
 
 GameWindowWin::GameWindowWin()
 {
-
 	mListener = NULL;
 	mMouseState = 0;
 
-#ifdef USE_SFML_WINDOW
-
-
-#else
-	
 	mSize = Vec2i::Zero();
 	mhWnd = NULL;
-
-	mhDC  = NULL;
-	mhRC  = NULL;
-
-#endif
 }
 
-#if !USE_SFML_WINDOW
 LRESULT CALLBACK GameWindowWin::DefaultProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	HDC hDC;
 	switch (message)                  /* handle the messages */
 	{
 	case WM_CREATE:
@@ -167,16 +152,9 @@ case WM_MOUSEWHEEL:
 
 	return mListener->onMouse( MouseMsg( x , y , button , mMouseState ) );
 }
-#endif
 
 bool GameWindowWin::create( char const* title , Vec2i const& size , int colorBit , bool bFullScreen )
 {
-#if USE_SFML_WINDOW
-	int style = sf::Style::Close;		
-	mImpl.create(sf::VideoMode( size.x , size.y , colorBit), title, style);
-	return mImpl.isOpen();
-
-#else
 	TCHAR const* FRAME_CLASS_NAME = TEXT("GameWindow");
 	WNDCLASSEX  wc;
 
@@ -255,32 +233,20 @@ bool GameWindowWin::create( char const* title , Vec2i const& size , int colorBit
 	UpdateWindow( mhWnd );
 
 	return true;
-#endif
 }
 
 void GameWindowWin::close()
 {
-#if USE_SFML_WINDOW
-	mImpl.close();
-#else
 	if ( mhWnd )
 		::DestroyWindow( mhWnd );
-
 	mhWnd = NULL;
-	
-#endif
-
 }
 
 
 
 void GameWindowWin::showCursor( bool bShow )
 {
-#if USE_SFML_WINDOW
-	mImpl.setMouseCursorVisible( bShow );
-#else
 	::ShowCursor( bShow );
-#endif
 }
 
 
@@ -289,106 +255,8 @@ GameWindowWin::~GameWindowWin()
 	close();
 }
 
-#if USE_SFML_WINDOW
-
-int convertSFKey( sf::Keyboard::Key key )
-{
-	if ( key == sf::Keyboard::Unknown )
-		return -1;
-	if ( key <= sf::Keyboard::Z )
-		return Keyboard::eA + ( key - sf::Keyboard::A );
-	if ( key <= sf::Keyboard::Num9 )
-		return Keyboard::eNUM0 + ( key - sf::Keyboard::Num9 );
-
-	switch( key )
-	{
-	case sf::Keyboard::Escape: return VK_ESCAPE;
-	case sf::Keyboard::Return: return VK_RETURN;
-	case sf::Keyboard::BackSpace: return VK_BACK;
-	case sf::Keyboard::Left:  return VK_LEFT;
-	case sf::Keyboard::Right: return VK_RIGHT;
-	case sf::Keyboard::Up:    return VK_UP;
-	case sf::Keyboard::Down:  return VK_DOWN;
-	case sf::Keyboard::Pause: return VK_PAUSE;
-	}
-	if ( key <  sf::Keyboard::Numpad0 )
-		return -1;
-	if ( key <= sf::Keyboard::Numpad9 )
-		return Keyboard::eNUMPAD0 + ( key - sf::Keyboard::Numpad0 );
-	if ( key <= sf::Keyboard::F15 )
-		return Keyboard::eF1 + ( key - sf::Keyboard::F1 );
-
-	return -1;
-}
-
-#endif
-
 void GameWindowWin::procSystemMessage()
 {
-#if USE_SFML_WINDOW
-	sf::Event event;
-	while( mImpl.pollEvent( event ) )
-	{
-		bool needSend = true;
-		switch( event.type )
-		{
-		case sf::Event::Closed:
-			mListener->onSystemEvent( SYS_WINDOW_CLOSE );
-			break;
-		case sf::Event::TextEntered:
-			{
-				uint16 out[2];
-				uint16* end = sf::Utf32::toUtf16( &event.text.unicode , &event.text.unicode + 1 , out);
-				for( uint16* it = out ; it != end ; ++it )
-				{
-					uint16 c = *it;
-					if ( c & 0xff00 )
-						mListener->onChar( c >> 8 );
-					mListener->onChar( c & 0xff );
-				}
-			}
-			break;
-		case sf::Event::KeyPressed:
-		case sf::Event::KeyReleased:
-			{
-				int key = convertSFKey( event.key.code );
-				if ( key != -1 )
-					mListener->onKey( key , event.type == sf::Event::KeyPressed );
-			}
-			break;
-		case sf::Event::MouseButtonReleased:
-		case sf::Event::MouseButtonPressed:
-			{
-				unsigned msg = 0;
-
-				switch( event.mouseButton.button )
-				{
-				case sf::Mouse::Button::Left:   msg |= MBS_LEFT; break;
-				case sf::Mouse::Button::Right:  msg |= MBS_RIGHT; break;
-				case sf::Mouse::Button::Middle: msg |= MBS_MIDDLE; break;
-				}
-
-				if ( event.type == sf::Event::MouseButtonPressed )
-				{
-					mMouseState |= msg;
-					msg |= MBS_DOWN;
-				}
-				else
-				{
-					mMouseState &= ~msg;
-				}
-
-				mListener->onMouse( MouseMsg( event.mouseButton.x , event.mouseButton.y , msg , mMouseState ) );
-			}
-			break;
-		case sf::Event::MouseMoved:
-			{
-				mListener->onMouse( MouseMsg( event.mouseMove.x , event.mouseMove.y , MBS_MOVING , mMouseState ) );
-			}
-			break;
-		}
-	}
-#else
 	MSG msg;
 	while ( PeekMessage(&msg, NULL, 0, 0, PM_REMOVE ) )
 	{
@@ -399,37 +267,27 @@ void GameWindowWin::procSystemMessage()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-#endif
-
 }
 
-void WGLContext::swapBuffers()
+WGLContext::WGLContext()
 {
-#if USE_SFML_WINDOW
-	mWindow->display();
-#else
-	::SwapBuffers( mhDC );
-#endif
+	mhDC  = NULL;
+	mhRC  = NULL;
 }
 
-bool WGLContext::setCurrent()
+WGLContext::~WGLContext()
 {
-#if USE_SFML_WINDOW
-	return mWindow->setActive( true );
-#else
-	if ( !::wglMakeCurrent( mhDC , mhRC ) )
-		return false;
-	return true;
-#endif
+	if ( mhRC )
+		::wglDeleteContext( mhRC );
+
+	mhDC  = NULL;
+	mhRC  = NULL;
 }
 
 bool WGLContext::init( GameWindowWin& window , GLConfig& config )
 {
 
-#if USE_SFML_WINDOW
-	mWindow = &window.mImpl;
 
-#else
 	mhDC = ::GetDC( window.getSystemHandle() );
 
 	PIXELFORMATDESCRIPTOR pfd;
@@ -459,23 +317,23 @@ bool WGLContext::init( GameWindowWin& window , GLConfig& config )
 
 	if ( !::wglMakeCurrent( mhDC , mhRC )  )
 		return false;
-#endif
-
 
 	return true;
 }
 
 void WGLContext::release()
 {
-#if USE_SFML_WINDOW
-
-#else
-	if ( mhRC )
-		::wglDeleteContext( mhRC );
-
-	mhDC  = NULL;
-	mhRC  = NULL;
-#endif
-
 	delete this;
+}
+
+void WGLContext::swapBuffers()
+{
+	::SwapBuffers( mhDC );
+}
+
+bool WGLContext::setCurrent()
+{
+	if ( !::wglMakeCurrent( mhDC , mhRC ) )
+		return false;
+	return true;
 }

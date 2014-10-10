@@ -1,7 +1,7 @@
 #ifndef DevStage_h__
 #define DevStage_h__
 
-#include "PropFrame.h"
+#include "EditorWidget.h"
 
 #include "FixString.h"
 
@@ -31,6 +31,10 @@ public:
 		button->text->setFont( getGame()->getFont(0) );
 		button->text->setString( "Start" );
 		GUISystem::getInstance().addWidget( button );
+
+		GChoice* chioce = new GChoice( UI_ANY , Vec2i( 200 , 200 ) , Vec2i( 200 , 30 ) , NULL );
+
+
 
 		frame->inputData();
 		return true;

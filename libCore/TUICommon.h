@@ -13,12 +13,6 @@ enum ButtonState
 	BS_NUM_STATE ,
 };
 
-#define TVK_LEFT  0x25
-#define TVK_UP    0x26
-#define TVK_RIGHT 0x27
-#define TVK_DOWN  0x28
-#define TVK_ENTER 0x0d
-#define TVK_CTRL  0x11
 
 template < class Impl , class CoreImpl >
 class TButtonUI : public CoreImpl
@@ -255,30 +249,19 @@ class TItemOwnerUI : public CoreImpl
 private:
 	Impl* _this(){ return static_cast< Impl*>(this); }
 
+	struct EmptyData {};
+	typedef EmptyData ExtraData;
 public:
+
 	TItemOwnerUI( Vec2i const& pos , Vec2i const& size, CoreImpl* parent )
 		:CoreImpl( pos , size , parent )
 	{
 		mCurSelect   = -1;
 	}
 
-	unsigned appendItem( char const* str )
-	{ 
-		mItemList.push_back( Item( str ) );
-		return unsigned( mItemList.size() - 1 ); 
-	}
+	unsigned appendItem( char const* str );
 	void     removeItem( char const* str );
-	void     removeItem( unsigned pos )
-	{
-		if ( pos >= mItemList.size() )
-			return;
-
-		mItemList.erase( mItemList.begin() + pos );
-		if ( mCurSelect == (int)pos )
-			mCurSelect = -1;
-		else if ( mCurSelect > (int)pos )
-			--mCurSelect;
-	}
+	void     removeItem( unsigned pos );
 	void     removeAllItem()
 	{
 		mItemList.clear();
@@ -323,6 +306,7 @@ public:
 	void    insertValue( unsigned pos , char const* str )
 	{
 		mItemList.insert( mItemList.begin() + pos , Item(str) );
+		_this()->onAddItem( pos , mItemList[pos] );
 	}
 
 	char const* getSelectValue()
@@ -339,19 +323,24 @@ public:
 	}
 
 protected:
-	///////// override function ////////
-	void onItemSelect( unsigned select ){}
-protected:
-	void tryMoveSelect( bool beNext );
-	bool onKeyMsg( unsigned key , bool isDown );
 
-	struct Item
+	struct Item : public Impl::ExtraData
 	{
 		Item( char const* val )
 			:value( val ),userData( NULL ){}
 		std::string value;
 		void*       userData;
 	};
+
+	///////// override function ////////
+	void onItemSelect( unsigned select ){}
+	void onAddItem( unsigned pos , Item& item ){}
+	void onRemoveItem( unsigned pos , Item& item ){}
+protected:
+	void tryMoveSelect( bool beNext );
+	bool onKeyMsg( unsigned key , bool isDown );
+
+
 	typedef std::vector< Item > ItemVec;
 	ItemVec    mItemList;
 	int        mCurSelect;
@@ -399,7 +388,7 @@ public:
 
 	///////// override function ////////
 	void onItemSelect( unsigned select ){}
-	void doRenderText( Vec2i const& pos , char const* str , bool beLight ){}
+	void doRenderItem( Vec2i const& pos , Item& item , bool beLight ){}
 	void doRenderMenuBG( Menu* menu ){}
 	int  getMenuItemHeight(){ return 15; }
 	/////////////////////////////////////////////////////////////////
@@ -438,7 +427,7 @@ public:
 	///////// override function ////////
 	void onItemSelect( unsigned pos ){}
 	void onItemLDClick( unsigned pos ){}
-	void doRenderText( Vec2i const& pos , char const* str , bool beSelected ){}
+	void doRenderItem( Vec2i const& pos , Item& item , bool beSelected ){}
 	void doRenderBackground( Vec2i const& pos , Vec2i const& size ){}
 	int  getItemHeight(){ return 15; }
 	/////////////////////////////////////

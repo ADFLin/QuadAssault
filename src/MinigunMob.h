@@ -8,9 +8,9 @@ class MinigunMob : public Mob
 	typedef Mob BaseClass;
 public:
 	void init(Vec2f const& poz);
-	void tick();
-	void takeDamage(Bullet* p);
-	IRenderer* getRenderer();
+	virtual void tick();
+	virtual void takeDamage(Bullet* p);
+	virtual IRenderer* getRenderer();
 	void onSpawn();
 	void onDestroy();
 	void shoot( IBulletFactory const& creator );

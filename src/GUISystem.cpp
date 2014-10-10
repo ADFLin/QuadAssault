@@ -156,13 +156,14 @@ bool GFrame::onMouseMsg( MouseMsg const& msg )
 	static bool needMove = false;
 	if ( msg.onLeftDown() )
 	{
+		setTop();
+
 		if ( msg.getPos().y > getWorldPos().y &&
 			 msg.getPos().y < getWorldPos().y + TopSideHeight )
 		{
 			x = msg.x();
 			y = msg.y();
 
-			setTop();
 			getManager()->captureMouse( this );
 
 			needMove = true;
@@ -192,8 +193,8 @@ void GFrame::onRender()
 	Vec2i size = getSize();
 	//TIJELO PROZORA
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-	glColor3f(0.0, 0.25, 0.0);
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glColor4f(0.0, 0.25, 0.0 , 0.4 );
 	glBegin(GL_QUADS);
 	glVertex2f(pos.x, pos.y);
 	glVertex2f(pos.x + size.x, pos.y);
@@ -244,7 +245,13 @@ GPanel::GPanel( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent 
 GImageButton::GImageButton( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
 	:BaseClass( id , pos , size , parent )
 {
+	mHelpText = NULL;
+}
 
+GImageButton::~GImageButton()
+{
+	if ( mHelpText )
+		mHelpText->release();
 }
 
 void GImageButton::onRender()
@@ -263,6 +270,28 @@ void GImageButton::onRender()
 
 	drawSprite( pos , size ,texImag );
 	glColor3f(1.0, 1.0, 1.0);
+
+	if( getButtonState() == BS_HIGHLIGHT && mHelpText )
+	{
+		Vec2f sizeHelp = mHelpText->getBoundSize() + 2 * Vec2f( 4 , 4 );
+		Vec2f posHelp = getGame()->getMousePos();
+
+		glEnable(GL_BLEND);
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glColor4f(0.0, 0.25, 0.0 , 0.4 );
+		drawRect( posHelp , sizeHelp );
+		glDisable(GL_BLEND);
+		getRenderSystem()->drawText( mHelpText , posHelp + sizeHelp / 2 );
+	}
+}
+
+void GImageButton::setHelpText( char const* str )
+{
+	if ( !mHelpText )
+	{
+		mHelpText = IText::create( getGame()->getFont(0) , 24 , Color( 255 , 255 , 255 ) );
+	}
+	mHelpText->setString( str );
 }
 
 GTextCtrl::GTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
@@ -284,8 +313,8 @@ void GTextCtrl::onRender()
 	Vec2i size = getSize();
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-	glColor3f( 0.1, 0.1 , 0.1 );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glColor4f( 0.1, 0.1 , 0.1 , 0.8f );
 	drawRect( pos , size );
 	glColor3f( 1,1,1);
 	glDisable(GL_BLEND);
@@ -313,4 +342,20 @@ void GTextCtrl::onEditText()
 {
 	text->setString( getValue() );
 	sendEvent( EVT_TEXTCTRL_CHANGE );
+}
+
+void GChoice::onAddItem( unsigned pos , Item& item )
+{
+	item.text = IText::create( getGame()->getFont( 0 ) , 16 , Color( 255 , 255 , 255 ) );
+}
+
+void GChoice::onRemoveItem( unsigned pos , Item& item )
+{
+	item.text->release();
+}
+
+void GChoice::doRenderItem( Vec2i const& pos , Item& item , bool beLight )
+{
+	Vec2i size( getSize().x , getMenuItemHeight() );
+	getRenderSystem()->drawText( item.text , pos + size );
 }

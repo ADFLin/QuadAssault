@@ -18,17 +18,20 @@ class IFont
 {
 public:
 	virtual void release() = 0;
+public:
 	static IFont* loadFont( char const* path );
 };
 
 class IText
 {
 public:
-	virtual void setString( char const* str ) = 0;
-	virtual void setColor( Color const& color ) = 0;
-	virtual void setFont( IFont* font ) = 0;
-	virtual void setCharSize( int size ) = 0;
-	virtual void release() = 0;
+	virtual Vec2f getBoundSize() const = 0;
+	virtual void  setString( char const* str ) = 0;
+	virtual void  setColor( Color const& color ) = 0;
+	virtual void  setFont( IFont* font ) = 0;
+	virtual void  setCharSize( int size ) = 0;
+	virtual void  release() = 0;
+public:
 	static IText* create( IFont* font , int size , Color const& color );
 	static IText* create();
 };

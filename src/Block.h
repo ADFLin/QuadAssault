@@ -68,6 +68,8 @@ public:
 	virtual bool  testIntersect( Tile const& tile , Rect const& bBox ){ return false; }
 
 
+	Texture* getTexture( int idx ){ return mTex[ idx ]; }
+
 	static void   initialize();
 	static void   cleanup();
 	static Block* FromType( BlockType type );

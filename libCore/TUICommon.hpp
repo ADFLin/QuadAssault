@@ -46,6 +46,31 @@ void TButtonUI< Impl , CoreImpl >::setButtonState( ButtonState state )
 }
 
 template < class Impl, class CoreImpl >
+unsigned TItemOwnerUI<Impl, CoreImpl>::appendItem( char const* str )
+{ 
+	mItemList.push_back( Item( str ) );
+	unsigned pos = unsigned( mItemList.size() - 1 );
+	_this()->onAddItem( pos , mItemList.back() );
+	return pos; 
+}
+
+template < class Impl, class CoreImpl >
+void  TItemOwnerUI<Impl, CoreImpl>::removeItem( unsigned pos )
+{
+	if ( pos >= mItemList.size() )
+		return;
+
+	ItemVec::iterator iter = mItemList.begin() + pos;
+
+	_this()->onRemoveItem( pos , *iter );
+	mItemList.erase( iter );
+	if ( mCurSelect == (int)pos )
+		mCurSelect = -1;
+	else if ( mCurSelect > (int)pos )
+		--mCurSelect;
+}
+
+template < class Impl, class CoreImpl >
 void TItemOwnerUI<Impl, CoreImpl>::removeItem( char const* str )
 {
 	struct FindValue
@@ -63,6 +88,7 @@ void TItemOwnerUI<Impl, CoreImpl>::removeItem( char const* str )
 	{
 		if ( mCurSelect != -1 && iter == mItemList.begin() + mCurSelect )
 			mCurSelect = -1;
+		_this()->onRemoveItem( *iter );
 		mItemList.erase( iter );
 	}
 }
@@ -103,10 +129,10 @@ bool TItemOwnerUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 
 	switch( key )
 	{
-	case TVK_UP: 
+	case Keyboard::eUP: 
 		tryMoveSelect( false );
 		return false;
-	case TVK_DOWN:
+	case Keyboard::eDOWN:
 		tryMoveSelect( true );
 		return false;
 	}
@@ -171,7 +197,7 @@ void TChoiceUI<Impl, CoreImpl>::_onRenderMenu( Menu* menu )
 	Vec2i pos = menu->getWorldPos();
 	for( int i = 0 ; i < (int)mItemList.size() ; ++i )
 	{
-		_this()->doRenderText( pos , mItemList[i].value.c_str() , mLightSelect == i );
+		_this()->doRenderItem( pos , mItemList[i] , mLightSelect == i );
 		pos.y += _this()->getMenuItemHeight();
 	}
 }
@@ -302,7 +328,7 @@ template < class Impl , class CoreImpl >
 void TSliderUI<Impl, CoreImpl>::updateValue()
 {
 	Vec2i const& pos = m_tipUI->getPos();
-	Vec2i  const& size = m_tipUI->getSize();
+	Vec2i const& size = m_tipUI->getSize();
 
 	if ( m_beHorizontal )
 		m_curValue =  m_minRange + ( m_maxRange - m_minRange) * pos.x / ( this->getSize().x - size.x ) ;
@@ -431,7 +457,7 @@ void TListCtrlUI< Impl , CoreImpl >::onRender()
 		int posItem = i + mIndexShowStart;
 		if ( posItem >= (int)mItemList.size() )
 			break;
-		_this()->doRenderText( pos , mItemList[posItem].value.c_str() , i == mCurSelect );
+		_this()->doRenderItem( pos , mItemList[posItem] , i == mCurSelect );
 		pos.y += _this()->getItemHeight();
 	}
 }

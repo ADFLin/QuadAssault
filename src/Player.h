@@ -21,6 +21,8 @@ public:
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
 	virtual IRenderer* getRenderer();
 
+	virtual void updateEdit();
+
 	void  init();
 	void  update( Vec2f const& aimPos );
 
@@ -43,6 +45,8 @@ private:
 	bool testCollision( Vec2f const& offset );
 
 	void updateHeadlight();
+
+	
 
 	ColBody mBody;
 

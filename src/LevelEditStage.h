@@ -3,21 +3,105 @@
 
 #include "LevelStage.h"
 
+#include "Singleton.h"
+
 class IText;
+class PropFrame;
+
+
+class EditWorldData : public WorldData
+{
+public:
+	PropFrame* mPropFrame;
+
+
+};
+
+class EditMode
+{
+public:
+	virtual void onEnable(){}
+	virtual void onDisable(){}
+	virtual bool onKey( unsigned key , bool isDown ){ return true; }
+	virtual bool onMouse( MouseMsg const& msg ){ return true; }
+	virtual void onWidgetEvent( int event , int id , GWidget* sender ){}
+
+	EditWorldData& getWorld(){ return *mWorldData; }
+	static EditWorldData* mWorldData;
+};
+
+enum EditState
+{
+	EDIT_CREATE ,
+	EDIT_CHIOCE ,
+	EDIT_DESTROY ,	
+};
+
+class ObjectEdit   : public EditMode
+{
+
+
+
+
+
+
+	LevelObject* mObject;
+};
+
+
+
+class TileEdit : public IEditable
+{
+public:
+	Tile* getTile(){ return mTile; }
+
+	virtual void enumProp( IPropEditor& editor )
+	{
+		editor.addProp( "Type" , mTile->type );
+		editor.addProp( "Meta" , mTile->meta );
+	}
+	virtual void updateEdit()
+	{
+
+	}
+
+	Tile* mTile;
+};
+
+
+class TileEditMode : public EditMode
+	               , public SingletonT< TileEditMode >
+{
+public:
+	TileEditMode();
+
+	TileEdit mEdit;
+	int      mEditTileType; //vrsta bloka koji se postavlja
+	int      mEditTileMeta;
+
+	class TileEditFrame* mFrame;
+
+	virtual void onEnable();
+	virtual void onDisable();
+	virtual bool onKey( unsigned key , bool isDown );
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual void onWidgetEvent( int event , int id , GWidget* sender );
+
+
+};
 
 class LevelEditStage : public LevelStageBase
+	                 , public EditWorldData
+	                 
 {
 	typedef LevelStageBase BaseClass;
 public:
-	enum
+
+
+	LevelEditStage()
 	{
-		UI_CREATE_LIGHT  = UI_EDIT_ID ,
-		UI_CREATE_TRIGGER ,
-		UI_EMPTY_MAP ,
-		UI_SAVE_MAP  ,
-
-	};
-
+		mMode = NULL;
+	}
 	virtual bool onInit();
 	virtual void onExit();
 
@@ -31,19 +115,23 @@ public:
 	void   generateEmptyLevel();
 
 
+	void changeMode( EditMode& mode );
+
 
 protected:
 
 	friend class LevelStage;
 
-	Light*   mEditLight;
-	float    sr,sg,sb, si, srad; //boja postavljenog svjetla
 
-	int      mEditTileType; //vrsta bloka koji se postavlja
-	int      mEditTileMeta;
-	bool     postavljaLight;
-	int      mStepEdit;
+	Light*     mEditLight;
+	float      sr,sg,sb, si, srad; //boja postavljenog svjetla
+
+
+	bool       postavljaLight;
+	int        mStepEdit;
 	AreaTrigger* mEditTrigger;
+
+	EditMode*  mMode;
 
 	Vec2f t1, t2, t3; //pocetak, kraj i spawnpoint triggera
 };

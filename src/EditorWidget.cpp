@@ -1,22 +1,42 @@
-#include "PropFrame.h"
+#include "EditorWidget.h"
 
 #include "GameInterface.h"
 #include "RenderSystem.h"
+#include "Block.h"
 
 #include "FixString.h"
 
+
+PorpTextCtrl::PorpTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
+	:GTextCtrl( id , pos , size , parent )
+{
+	text->setCharSize( 24 );
+	text->setFont( getGame()->getFont(0) );
+	text->setColor( Color( 255 , 255 , 0 ) );
+
+	mTypeData = PROP_NONE;
+}
+
+PorpTextCtrl::~PorpTextCtrl()
+{
+	if ( mTypeData == PROP_CTRL )
+		delete static_cast< IPropCtrl* >( mData );
+}
 
 void PorpTextCtrl::inputData()
 {
 	FixString< 256 > str;
 	switch( mTypeData )
 	{
-	case PROP_FLOAT: str.format( "%f" , *((float*)mData) ); break;
-	case PROP_INT:   str.format( "%d" , *((int*)mData) ); break;
-	case PROP_BOOL:  str = *((bool*)mData) ? "true" : "false"; break;
+	
+	case PROP_INT:   str.format( "%d" , *((int*)mData) ); setValue( str );break;
+	case PROP_UCHAR: str.format( "%u" , *((unsigned char*)mData) ); setValue( str ); break;
+	case PROP_BOOL:  str = *((bool*)mData) ? "true" : "false"; setValue( str ); break;
+	case PROP_FLOAT: str.format( "%f" , *((float*)mData) ); setValue( str );break;
 	case PROP_STRING:str = *((string*)mData); break;
+	case PROP_CTRL:  setValue( static_cast< IPropCtrl* >( mData )->input().c_str() ); break;
 	}
-	setValue( str );
+	
 }
 
 void PorpTextCtrl::outputData()
@@ -25,51 +45,17 @@ void PorpTextCtrl::outputData()
 	{
 	case PROP_FLOAT: *((float*)mData) = ::atof( getValue() );break;
 	case PROP_INT:   *((int*)mData) = ::atoi( getValue() );break;
+	case PROP_UCHAR: *((unsigned char*)mData) = ::atoi( getValue() );break;
 	case PROP_BOOL:  *((bool*)mData) = strcmp( getValue() , "true" ) ? true : false; break;
 	case PROP_STRING:*((string*)mData) = getValue();break;
+	case PROP_CTRL:  static_cast< IPropCtrl* >( mData )->output( getValue() );
 	}
-}
-
-PorpTextCtrl::PorpTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
-	:GTextCtrl( id , pos , size , parent )
-{
-	text->setCharSize( 24 );
-	text->setFont( getGame()->getFont(0) );
-	text->setColor( Color( 255 , 255 , 0 ) );
 }
 
 PropFrame::PropFrame( int id , Vec2i const& pos , GWidget* parent ) 
 	:BaseClass( id , pos , Vec2f( 300 , 400 ) , parent )
 {
 
-}
-
-void PropFrame::addProp( char const* name , float& value )
-{
-	PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );
-	textCtrl->setData( value );
-	addPorpWidget( name , textCtrl );
-}
-
-void PropFrame::addProp( char const* name , int& value )
-{
-	PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );
-	textCtrl->setData( value );
-	addPorpWidget( name , textCtrl );
-}
-
-void PropFrame::addProp( char const* name , string& value )
-{
-	PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );
-	textCtrl->setData( value );
-	addPorpWidget( name , textCtrl );
-}
-
-void PropFrame::addProp( char const* name , bool& value )
-{
-	PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );
-	textCtrl->setData( value );
-	addPorpWidget( name , textCtrl );
 }
 
 void PropFrame::addPorpWidget( char const* name , GWidget* widget )
@@ -88,7 +74,10 @@ bool PropFrame::onChildEvent( int event , int id , GWidget* ui )
 	{
 	case UI_PROP_TEXTCTRL:
 		if ( event == EVT_TEXTCTRL_ENTER )
+		{
 			ui->outputData();
+			mEditObj->updateEdit();
+		}
 		break;
 	}
 	return false;
@@ -150,4 +139,16 @@ Vec2i PropFrame::calcWidgetPos()
 	int x = getSize().x - ( getWidgetSize().x + 5 );
 	int y = TopSideHeight + 5 + mPorps.size() * ( getWidgetSize().y + 5 );
 	return Vec2i( x , y );
+}
+
+TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent ) 
+	:GFrame( id , pos , Vec2f( 4 + NUM_BLOCK_TYPE * ( 32 + 2 ) , 4 + 32 + TopSideHeight ) , parent )
+{
+	for( int i = 0; i < NUM_BLOCK_TYPE ; ++i )
+	{
+		GImageButton* button = new GImageButton( UI_TILE_BUTTON , Vec2i(  i * ( 32 + 2 ) , 2 + TopSideHeight ) , Vec2i( 32 , 32 ) , this );
+		button->texImag = Block::FromType( i )->getTexture( 0 );
+		button->setHelpText( "block" );
+		button->setUserData( (void*)i );
+	}
 }

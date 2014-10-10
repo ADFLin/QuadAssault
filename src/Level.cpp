@@ -305,3 +305,15 @@ void Level::addListerner( EventListener& listener )
 {
 	mListeners.push_back( &listener );
 }
+
+Tile* Level::getTile( Vec2f const& pos )
+{
+	int tx = int( pos.x / BLOCK_SIZE );
+	int ty = int( pos.y / BLOCK_SIZE );
+
+	if ( !mTerrain.checkRange( tx , ty ) )
+		return NULL;
+	return &mTerrain.getData( tx , ty );
+}
+
+
