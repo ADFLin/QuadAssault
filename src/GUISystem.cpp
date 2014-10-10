@@ -325,7 +325,7 @@ void GTextCtrl::onRender()
 	else
 		text->setColor(Color(150,150,150));
 
-	getRenderSystem()->drawText( text , pos + Vec2f( size.x - 3 , size.y / 2 ) , TEXT_SIDE_RIGHT );
+	getRenderSystem()->drawText( text , pos + size / 2 );
 }
 
 void GTextCtrl::setFontSize( unsigned size )
@@ -344,12 +344,13 @@ void GTextCtrl::onEditText()
 	sendEvent( EVT_TEXTCTRL_CHANGE );
 }
 
-void GChoice::onAddItem( unsigned pos , Item& item )
+void GChoice::onAddItem( Item& item )
 {
-	item.text = IText::create( getGame()->getFont( 0 ) , 16 , Color( 255 , 255 , 255 ) );
+	item.text = IText::create( getGame()->getFont( 0 ) , 20 , Color( 255 , 255 , 255 ) );
+	item.text->setString( item.value.c_str() );
 }
 
-void GChoice::onRemoveItem( unsigned pos , Item& item )
+void GChoice::onRemoveItem( Item& item )
 {
 	item.text->release();
 }
@@ -357,5 +358,48 @@ void GChoice::onRemoveItem( unsigned pos , Item& item )
 void GChoice::doRenderItem( Vec2i const& pos , Item& item , bool beLight )
 {
 	Vec2i size( getSize().x , getMenuItemHeight() );
-	getRenderSystem()->drawText( item.text , pos + size );
+	if ( beLight )
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glColor4f( 0.1, 0.1 , 0.1 , 0.8f );
+		drawRect( pos + Vec2i( 2 , 2 ) , size - Vec2i( 4 , 4 ) );
+		glColor3f( 1,1,1);
+		glDisable(GL_BLEND);
+
+	}
+	getRenderSystem()->drawText( item.text , pos + size / 2 );
+}
+
+void GChoice::onRender()
+{
+	Vec2i pos = getWorldPos();
+	Vec2i size = getSize();
+
+	glEnable(GL_BLEND);
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glColor4f( 0.1, 0.1 , 0.1 , 0.8f );
+	drawRect( pos , size );
+	glColor3f( 1,1,1);
+	glDisable(GL_BLEND);
+
+	if ( mCurSelect != -1 )
+	{
+		Item& item = mItemList[ mCurSelect ];
+		getRenderSystem()->drawText( item.text , pos + size / 2 );
+	}
+}
+
+void GChoice::doRenderMenuBG( Menu* menu )
+{
+
+	Vec2i pos =  menu->getWorldPos();
+	Vec2i size = menu->getSize();
+
+	glEnable(GL_BLEND);
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glColor4f( 0.5, 0.5 , 0.5 , 0.8f );
+	drawRect( pos , size );
+	glColor3f( 1,1,1);
+	glDisable(GL_BLEND);
 }

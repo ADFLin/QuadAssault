@@ -55,7 +55,7 @@ void PorpTextCtrl::outputData()
 PropFrame::PropFrame( int id , Vec2i const& pos , GWidget* parent ) 
 	:BaseClass( id , pos , Vec2f( 300 , 400 ) , parent )
 {
-
+	mEditObj = NULL;
 }
 
 void PropFrame::addPorpWidget( char const* name , GWidget* widget )
@@ -72,11 +72,20 @@ bool PropFrame::onChildEvent( int event , int id , GWidget* ui )
 {
 	switch( id )
 	{
+	case UI_INT_PROP_CHIOCE:
+		if ( event == EVT_CHOICE_SELECT )
+		{
+			ui->outputData();
+			if ( mEditObj )
+				mEditObj->updateEdit();
+		}
+		break;
 	case UI_PROP_TEXTCTRL:
 		if ( event == EVT_TEXTCTRL_ENTER )
 		{
 			ui->outputData();
-			mEditObj->updateEdit();
+			if ( mEditObj )
+				mEditObj->updateEdit();
 		}
 		break;
 	}
@@ -141,6 +150,14 @@ Vec2i PropFrame::calcWidgetPos()
 	return Vec2i( x , y );
 }
 
+void PropFrame::addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] )
+{
+	IntPropChioce* chioce = new IntPropChioce( UI_INT_PROP_CHIOCE , calcWidgetPos() , getWidgetSize() , this );
+	chioce->init( numSet , valueSet , strSet );
+	chioce->setData( value , sizeValue );
+	addPorpWidget( name , chioce );
+}
+
 TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent ) 
 	:GFrame( id , pos , Vec2f( 4 + NUM_BLOCK_TYPE * ( 32 + 2 ) , 4 + 32 + TopSideHeight ) , parent )
 {
@@ -150,5 +167,54 @@ TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent )
 		button->texImag = Block::FromType( i )->getTexture( 0 );
 		button->setHelpText( "block" );
 		button->setUserData( (void*)i );
+	}
+}
+
+IntPropChioce::IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
+	:BaseClass( id , pos , size , parent )
+{
+
+}
+
+void IntPropChioce::inputData()
+{
+	int value;
+	switch( mDataSize )
+	{
+	case 1: value = *((char*)mData);  break;
+	case 2: value = *((short*)mData); break;
+	case 4: value = *((int*)mData);   break;
+	}
+	for( int i = 0 ; i < getItemNum() ; ++i )
+	{
+		if ( value == (int)getItemData( i ) )
+		{
+			setSelection( i );
+			break;
+		}
+	}
+}
+
+void IntPropChioce::outputData()
+{
+	int pos = getSelection();
+	if ( pos == -1 )
+		return;
+
+	int  value = (int)getItemData( pos );
+	switch( mDataSize )
+	{
+	case 1: *((char*)mData)  = value; break;
+	case 2: *((short*)mData) = value; break;
+	case 4: *((int*)mData)   = value; break;
+	}
+}
+
+void IntPropChioce::init( int numSet , int valueSet[] , char const* strSet[] )
+{
+	for( int i = 0 ; i < numSet ; ++i )
+	{
+		unsigned pos = appendItem( strSet[i] );
+		setItemData( pos , (void*)valueSet[i] );
 	}
 }

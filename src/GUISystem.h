@@ -185,7 +185,14 @@ public:
 
 class GChoice : public GUI::Choice< GChoice >
 {
+	typedef GUI::Choice< GChoice > BaseClass;
 public:
+
+	GChoice( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent )
+		:BaseClass(  pos , size , parent )
+	{
+		mId = id;
+	}
 
 	struct MyData 
 	{
@@ -194,9 +201,14 @@ public:
 
 	typedef MyData ExtraData;
 
-	void onAddItem( unsigned pos , Item& item );
-	void onRemoveItem( unsigned pos , Item& item );
+	void onRender();
+
+	void onItemSelect( unsigned select ){  sendEvent( EVT_CHOICE_SELECT );  }
+	int  getMenuItemHeight(){ return 20; }
+	void onAddItem( Item& item );
+	void onRemoveItem( Item& item );
 	void doRenderItem( Vec2i const& pos , Item& item , bool beLight );
+	void doRenderMenuBG( Menu* menu );
 };
 
 

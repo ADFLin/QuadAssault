@@ -5,10 +5,18 @@ class IPropEditor
 {
 public:
 	virtual void addProp( char const* name , int& value ) = 0;
+	
 	virtual void addProp( char const* name , unsigned char& value ) = 0;
 	virtual void addProp( char const* name , float& value ) = 0;
 	virtual void addProp( char const* name , string& value ) = 0;
 	virtual void addProp( char const* name , bool& value ) = 0;
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] ) = 0;
+
+	template< class T >
+	void addEnumProp( char const* name , T& value , int numSet , int valueSet[] , char const* strSet[] )
+	{
+		addProp( name , &value , sizeof( T ) , numSet , valueSet , strSet );
+	}
 };
 
 

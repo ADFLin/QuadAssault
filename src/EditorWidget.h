@@ -56,6 +56,21 @@ public:
 	PropType mTypeData;
 };
 
+class IntPropChioce : public GChoice
+{
+	typedef GChoice BaseClass;
+public:
+	IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
+
+	void     init( int numSet , int valueSet[] , char const* strSet[] );
+	void     inputData();
+	void     outputData();
+	void     setData( void* data , int dataSize ){ mData = data; mDataSize = dataSize; }
+
+	void*    mData;
+	int      mDataSize;
+};
+
 class PropFrame : public GFrame
 	            , public IPropEditor
 {
@@ -67,6 +82,7 @@ public:
 	enum 
 	{
 		UI_PROP_TEXTCTRL = UI_WIDGET_ID ,
+		UI_INT_PROP_CHIOCE ,
 	};
 
 	void  setupEdit( IEditable& obj )
@@ -80,7 +96,7 @@ public:
 	Vec2i calcWidgetPos();
 
 #define ADD_TEXT_PROP( TYPE )\
-	void addProp( char const* name , TYPE& value )\
+	virtual void addProp( char const* name , TYPE& value )\
 	{\
 		PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );\
 		textCtrl->setData( value );\
@@ -92,7 +108,10 @@ public:
 	ADD_TEXT_PROP( float )
 	ADD_TEXT_PROP( string )
 	ADD_TEXT_PROP( bool )
-	
+
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] );
+
+
 	void addPorpWidget( char const* name , GWidget* widget );
 
 

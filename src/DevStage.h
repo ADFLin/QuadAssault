@@ -33,7 +33,10 @@ public:
 		GUISystem::getInstance().addWidget( button );
 
 		GChoice* chioce = new GChoice( UI_ANY , Vec2i( 200 , 200 ) , Vec2i( 200 , 30 ) , NULL );
-
+		chioce->appendItem( "Hello" );
+		chioce->appendItem( "Good" );
+		chioce->appendItem( "Test" );
+		GUISystem::getInstance().addWidget( chioce );
 
 
 		frame->inputData();

@@ -26,6 +26,7 @@ enum UIFlag
 	UF_BLOCK_DESTROY      = BIT(6) ,
 	UF_PARENT_MOUSE_EVENT = BIT(7) ,
 	UF_MARK_DESTROY       = BIT(8) ,
+	UF_INTERNAL_USE       = BIT(9) ,
 };
 
 #ifdef max

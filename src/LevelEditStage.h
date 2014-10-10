@@ -57,7 +57,15 @@ public:
 
 	virtual void enumProp( IPropEditor& editor )
 	{
-		editor.addProp( "Type" , mTile->type );
+		int tileValue[] = 
+		{ 
+			TID_FLAT , TID_WALL , TID_GAP  ,TID_DOOR ,TID_ROCK ,
+		};
+		char const* tileStr[] = 
+		{
+			"TID_FLAT" , "TID_WALL" , "TID_GAP"  , "TID_DOOR" , "TID_ROCK" ,
+		};
+		editor.addEnumProp( "Block Type" , mTile->type , 5 , tileValue , tileStr );
 		editor.addProp( "Meta" , mTile->meta );
 	}
 	virtual void updateEdit()

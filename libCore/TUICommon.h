@@ -259,14 +259,16 @@ public:
 		mCurSelect   = -1;
 	}
 
+	~TItemOwnerUI()
+	{
+		removeAllItem();
+	}
+
 	unsigned appendItem( char const* str );
 	void     removeItem( char const* str );
 	void     removeItem( unsigned pos );
-	void     removeAllItem()
-	{
-		mItemList.clear();
-		mCurSelect = -1;
-	}
+	void     removeAllItem();
+
 	unsigned getItemNum(){ return mItemList.size(); }
 	void*    getSelectedItemData()
 	{ 
@@ -306,7 +308,7 @@ public:
 	void    insertValue( unsigned pos , char const* str )
 	{
 		mItemList.insert( mItemList.begin() + pos , Item(str) );
-		_this()->onAddItem( pos , mItemList[pos] );
+		_this()->onAddItem( mItemList[pos] );
 	}
 
 	char const* getSelectValue()
@@ -322,6 +324,7 @@ public:
 		_this()->onItemSelect( pos );
 	}
 
+
 protected:
 
 	struct Item : public Impl::ExtraData
@@ -334,8 +337,8 @@ protected:
 
 	///////// override function ////////
 	void onItemSelect( unsigned select ){}
-	void onAddItem( unsigned pos , Item& item ){}
-	void onRemoveItem( unsigned pos , Item& item ){}
+	void onAddItem( Item& item ){}
+	void onRemoveItem( Item& item ){}
 protected:
 	void tryMoveSelect( bool beNext );
 	bool onKeyMsg( unsigned key , bool isDown );

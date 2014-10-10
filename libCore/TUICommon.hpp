@@ -50,7 +50,7 @@ unsigned TItemOwnerUI<Impl, CoreImpl>::appendItem( char const* str )
 { 
 	mItemList.push_back( Item( str ) );
 	unsigned pos = unsigned( mItemList.size() - 1 );
-	_this()->onAddItem( pos , mItemList.back() );
+	_this()->onAddItem( mItemList.back() );
 	return pos; 
 }
 
@@ -62,12 +62,24 @@ void  TItemOwnerUI<Impl, CoreImpl>::removeItem( unsigned pos )
 
 	ItemVec::iterator iter = mItemList.begin() + pos;
 
-	_this()->onRemoveItem( pos , *iter );
+	_this()->onRemoveItem( *iter );
 	mItemList.erase( iter );
 	if ( mCurSelect == (int)pos )
 		mCurSelect = -1;
 	else if ( mCurSelect > (int)pos )
 		--mCurSelect;
+}
+
+
+template < class Impl, class CoreImpl >
+void  TItemOwnerUI<Impl, CoreImpl>::removeAllItem()
+{
+	for( int i = 0 ; i < mItemList.size() ; ++i )
+	{
+		_this()->onRemoveItem( mItemList[i] );
+	}
+	mItemList.clear();
+	mCurSelect = -1;
 }
 
 template < class Impl, class CoreImpl >
