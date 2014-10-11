@@ -107,6 +107,7 @@ public:
 	int               random(int i1, int i2);
 
 	Tile*             getTile( Vec2f const& pos );
+	LevelObject*      hitObjectTest( Vec2f const& pos );
 
 	
 public:

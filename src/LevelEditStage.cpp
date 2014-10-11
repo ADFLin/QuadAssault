@@ -487,6 +487,9 @@ bool TileEditMode::onMouse( MouseMsg const& msg )
 		{
 			tile->type = mEditTileType;
 			tile->meta = mEditTileMeta;
+
+			mTile = tile;
+			getWorld().mPropFrame->changeEdit( *this );
 			return false;
 		}
 	}
@@ -595,6 +598,15 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 			mObject = getWorld().getLevel()->spawnObjectByName( mObjectName , wPos , true );
 			getWorld().mPropFrame->changeEdit( *mObject );
 			return false;
+		}
+	}
+	else if ( msg.onLeftDown() )
+	{
+		LevelObject* obj = getWorld().getLevel()->hitObjectTest( wPos );
+		if ( obj )
+		{
+			mObject = obj;
+			getWorld().mPropFrame->changeEdit( *mObject );
 		}
 	}
 	return true;

@@ -171,7 +171,7 @@ bool TChoiceUI<Impl, CoreImpl>::onMouseMsg( MouseMsg const& msg )
 
 		Menu* menu = new Menu( pos , size , this );
 		getManager()->addUI( menu );
-		_addFlag( UF_HITTEST_CHILDREN );
+		//_addFlag( UF_HITTEST_CHILDREN );
 		menu->setTop();
 		menu->setFocus();
 	}

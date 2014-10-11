@@ -63,6 +63,7 @@ public:
 	FixString& operator += ( CharT const* str ){ CFT::cat( mStr , str ); return *this; }
 	FixString& operator += ( StdString const& str ){ CFT::cat( mStr , str.c_str() ); return *this; }
 
+
 	void  clear(){ mStr[0] = 0; }
 	void  format( CharT const* fmt , ... )
 	{

@@ -170,7 +170,7 @@ protected:
 	void    onResize( Vec2i const& size ){}
 	bool    doHitTest( Vec2i const& pos ){ return testPointInRect( pos , mBoundRect ); }
 	bool    doClipTest(){ return true; }
-	
+
 public:
 
 	virtual void  deleteThis(){ delete this; }

@@ -8,12 +8,12 @@ LightObject::LightObject()
 }
 LightObject::~LightObject()
 {	
-
+	
 }
 
 void LightObject::init()
 {
-
+	setSize( Vec2f( 32 , 32 ) );
 }
 
 

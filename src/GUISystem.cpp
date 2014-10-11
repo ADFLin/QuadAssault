@@ -82,6 +82,16 @@ GWidget* GWidget::findChild( int id , GWidget* start )
 	return NULL;
 }
 
+void GWidget::onPostRenderChildren()
+{
+	GWidget* ui = getChild();
+	while( ui )
+	{
+		ui->onRenderSiblingsEnd();
+		ui = nextChild( ui );
+	}
+}
+
 GTextButton::GTextButton( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
 	:BaseClass( id , pos , size , parent )
 {
@@ -266,6 +276,19 @@ void GImageButton::onRender()
 	drawSprite( pos , size ,texImag );
 	glColor3f(1.0, 1.0, 1.0);
 
+}
+
+void GImageButton::setHelpText( char const* str )
+{
+	if ( !mHelpText )
+	{
+		mHelpText = IText::create( getGame()->getFont(0) , 24 , Color( 255 , 255 , 255 ) );
+	}
+	mHelpText->setString( str );
+}
+
+void GImageButton::onRenderSiblingsEnd()
+{
 	if( getButtonState() == BS_HIGHLIGHT && mHelpText )
 	{
 		Vec2f sizeHelp = mHelpText->getBoundSize() + 2 * Vec2f( 4 , 4 );
@@ -278,15 +301,6 @@ void GImageButton::onRender()
 		glDisable(GL_BLEND);
 		getRenderSystem()->drawText( mHelpText , posHelp + sizeHelp / 2 );
 	}
-}
-
-void GImageButton::setHelpText( char const* str )
-{
-	if ( !mHelpText )
-	{
-		mHelpText = IText::create( getGame()->getFont(0) , 24 , Color( 255 , 255 , 255 ) );
-	}
-	mHelpText->setString( str );
 }
 
 GTextCtrl::GTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
@@ -387,7 +401,6 @@ void GChoice::onRender()
 
 void GChoice::doRenderMenuBG( Menu* menu )
 {
-
 	Vec2i pos =  menu->getWorldPos();
 	Vec2i size = menu->getSize();
 

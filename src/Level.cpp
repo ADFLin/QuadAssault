@@ -393,3 +393,20 @@ LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos , boo
 	addObject( obj );
 	return obj;
 }
+
+LevelObject* Level::hitObjectTest( Vec2f const& pos )
+{
+	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end() ;
+		 iter != itEnd ; ++iter )
+	{
+		LevelObject* obj = *iter;
+
+		Rect bBox;
+		obj->calcBoundBox( bBox );
+
+		if ( bBox.hitTest( pos ) )
+			return obj;
+	}
+	return NULL;
+
+}

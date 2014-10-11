@@ -25,14 +25,37 @@ PorpTextCtrl::~PorpTextCtrl()
 
 void PorpTextCtrl::inputData()
 {
+	if ( !mData )
+		return;
+
 	FixString< 256 > str;
 	switch( mTypeData )
 	{
-	
 	case PROP_INT:   str.format( "%d" , *((int*)mData) ); setValue( str );break;
 	case PROP_UCHAR: str.format( "%u" , *((unsigned char*)mData) ); setValue( str ); break;
 	case PROP_BOOL:  str = *((bool*)mData) ? "true" : "false"; setValue( str ); break;
-	case PROP_FLOAT: str.format( "%f" , *((float*)mData) ); setValue( str );break;
+	case PROP_FLOAT: 
+		{
+			str.format( "%f" , *((float*)mData) );
+			int len = strlen( str );
+			if ( len )
+			{
+				char* c = &str[0] + len - 1;
+				while( &str[0] != c )
+				{ 
+					if ( *c != '0' )
+					{
+						if ( *c == '.' )
+							*c = 0;
+						break;
+					}
+					*c = 0; 
+					--c; 
+				}
+			}
+			setValue( str );
+		}
+		break;
 	case PROP_STRING:str = *((string*)mData); break;
 	case PROP_CTRL:  setValue( static_cast< IPropCtrl* >( mData )->input().c_str() ); break;
 	}
@@ -41,6 +64,9 @@ void PorpTextCtrl::inputData()
 
 void PorpTextCtrl::outputData()
 {
+	if ( !mData )
+		return;
+
 	switch( mTypeData )
 	{
 	case PROP_FLOAT: *((float*)mData) = ::atof( getValue() );break;
@@ -49,6 +75,63 @@ void PorpTextCtrl::outputData()
 	case PROP_BOOL:  *((bool*)mData) = strcmp( getValue() , "true" ) ? true : false; break;
 	case PROP_STRING:*((string*)mData) = getValue();break;
 	case PROP_CTRL:  static_cast< IPropCtrl* >( mData )->output( getValue() );
+	}
+}
+
+IntPropChioce::IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
+	:BaseClass( id , pos , size , parent )
+{
+	mDataSize = 0;
+	mData = NULL;
+
+}
+
+void IntPropChioce::init( int numSet , int valueSet[] , char const* strSet[] )
+{
+	for( int i = 0 ; i < numSet ; ++i )
+	{
+		unsigned pos = appendItem( strSet[i] );
+		setItemData( pos , (void*)valueSet[i] );
+	}
+}
+
+void IntPropChioce::inputData()
+{
+	if ( !mData )
+		return;
+
+	int value;
+	switch( mDataSize )
+	{
+	case 1: value = *((char*)mData);  break;
+	case 2: value = *((short*)mData); break;
+	case 4: value = *((int*)mData);   break;
+	}
+	for( int i = 0 ; i < getItemNum() ; ++i )
+	{
+		if ( value == (int)getItemData( i ) )
+		{
+			setSelection( i );
+			break;
+		}
+	}
+}
+
+void IntPropChioce::outputData()
+{
+	if ( !mData )
+		return;
+
+	int pos = getSelection();
+	if ( pos == -1 )
+		return;
+
+	int  value = (int)getItemData( pos );
+	switch( mDataSize )
+	{
+	case 1: *((char*)mData)  = value; break;
+	case 2: *((short*)mData) = value; break;
+	case 4: *((int*)mData)   = value; break;
 	}
 }
 
@@ -203,55 +286,6 @@ TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent )
 		button->texImag = Block::FromType( i )->getTexture( 0 );
 		button->setHelpText( "block" );
 		button->setUserData( (void*)i );
-	}
-}
-
-IntPropChioce::IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
-	:BaseClass( id , pos , size , parent )
-{
-
-}
-
-void IntPropChioce::inputData()
-{
-	int value;
-	switch( mDataSize )
-	{
-	case 1: value = *((char*)mData);  break;
-	case 2: value = *((short*)mData); break;
-	case 4: value = *((int*)mData);   break;
-	}
-	for( int i = 0 ; i < getItemNum() ; ++i )
-	{
-		if ( value == (int)getItemData( i ) )
-		{
-			setSelection( i );
-			break;
-		}
-	}
-}
-
-void IntPropChioce::outputData()
-{
-	int pos = getSelection();
-	if ( pos == -1 )
-		return;
-
-	int  value = (int)getItemData( pos );
-	switch( mDataSize )
-	{
-	case 1: *((char*)mData)  = value; break;
-	case 2: *((short*)mData) = value; break;
-	case 4: *((int*)mData)   = value; break;
-	}
-}
-
-void IntPropChioce::init( int numSet , int valueSet[] , char const* strSet[] )
-{
-	for( int i = 0 ; i < numSet ; ++i )
-	{
-		unsigned pos = appendItem( strSet[i] );
-		setItemData( pos , (void*)valueSet[i] );
 	}
 }
 

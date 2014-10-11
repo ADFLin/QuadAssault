@@ -61,10 +61,13 @@ public:
 	//Use for Prop Edit
 	virtual void  inputData(){}
 	virtual void  outputData(){}
+	
 
 	void onPrevRender(){}
-	void onPostRenderChildren(){}
+	void onPostRenderChildren();
 	void onPostRender(){}
+
+	virtual void  onRenderSiblingsEnd(){}
 	//bool doClipTest();
 
 	GWidget*  findChild( int id , GWidget* start = NULL );
@@ -145,13 +148,10 @@ public:
 
 	void onRender();
 	void setHelpText( char const* str );
-
+	void onRenderSiblingsEnd();
 	Texture* texImag;
 	IText*   mHelpText;
 };
-
-
-
 
 class  GFrame : public GUI::Panel< GFrame >
 {

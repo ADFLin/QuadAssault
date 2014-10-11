@@ -57,6 +57,7 @@ bool Game::init( char const* pathConfig )
 	mWindow->setSystemListener( *this );
 	mWindow->showCursor( false );
 
+	cout << "Build Render System..." << endl;
 	mRenderSystem = new RenderSystem;
 	if ( !mRenderSystem->init( *mWindow ) )
 	{

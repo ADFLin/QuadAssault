@@ -583,17 +583,18 @@ void TUIManager<T>::render()
 template< class T >
 void TUIManager<T>::renderInternal( TUICore<T>* ui )
 {
-	while( ui )
+	TUICore<T>* cur = ui;
+	while( cur )
 	{
-		if ( ui->isShow() && ui->clipTest() )
+		if ( cur->isShow() && cur->clipTest() )
 		{
-			ui->prevRender();
-			ui->render();
-			ui->postRender();
-			renderInternal( ui->getChild() );
-			ui->postRenderChildren();
+			cur->prevRender();
+			cur->render();
+			cur->postRender();
+			renderInternal( cur->getChild() );
+			cur->postRenderChildren();
 		}
-		ui = ui->getNext();
+		cur = cur->getNext();
 	}
 }
 
