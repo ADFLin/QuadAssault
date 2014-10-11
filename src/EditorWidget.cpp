@@ -277,14 +277,20 @@ void PropFrame::addProp( char const* name , Vec3f& value )
 TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent ) 
 	:BaseClass( id , pos , Vec2f(  4 + 2 * 32 + 2 ,  4 + NUM_BLOCK_TYPE * ( 32 + 2 ) + TopSideHeight ) , parent )
 {
+	char const* blockName[] =
+	{
+#define BLOCK_INFO( TYPE , NAME ) NAME ,
+#include "BlockType.h"
+	};
+
 	for( int i = 0; i < NUM_BLOCK_TYPE ; ++i )
 	{
 		Vec2i pos;
 		pos.x = ( i % 2 ) * ( 32 + 2 ) + 2;
 		pos.y = ( i / 2 ) * ( 32 + 2 ) + TopSideHeight + 2;
-		GImageButton* button = new GImageButton( UI_TILE_BUTTON , pos , Vec2i( 32 , 32 ) , this );
+		GImageButton* button = new GImageButton( UI_TILE_SELECT , pos , Vec2i( 32 , 32 ) , this );
 		button->texImag = Block::FromType( i )->getTexture( 0 );
-		button->setHelpText( "block" );
+		button->setHelpText( blockName[i] );
 		button->setUserData( (void*)i );
 	}
 }
@@ -306,7 +312,7 @@ void ObjectEditFrame::setupObjectList( ObjectCreator& creator )
 		Vec2i pos;
 		pos.x = 2;
 		pos.y = TopSideHeight + 2 + ( num ) * ( getButtonSize().y + 2 );
-		GTextButton* button = new GTextButton( UI_OBJ_SELECT_BUTTON , pos , getButtonSize() , this );
+		GTextButton* button = new GTextButton( UI_OBJECT_SELECT , pos , getButtonSize() , this );
 		button->text->setFont( getGame()->getFont(0) );
 		button->text->setCharSize( 20 );
 		button->text->setString( iter->first );

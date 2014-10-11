@@ -6,6 +6,7 @@
 #include "Singleton.h"
 
 class IText;
+class GFrame;
 class PropFrame;
 
 
@@ -13,8 +14,7 @@ class EditWorldData : public WorldData
 {
 public:
 	PropFrame* mPropFrame;
-
-
+	GFrame*    mEditToolFrame;
 };
 
 class EditMode
@@ -55,6 +55,8 @@ public:
 	virtual bool onMouse( MouseMsg const& msg );
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
 	virtual void render();
+
+	void changeObject( LevelObject* object );
 
 
 	class ObjectEditFrame* mFrame;
@@ -119,18 +121,8 @@ protected:
 
 	friend class LevelStage;
 
+	EditMode*    mMode;
 
-	LightObject*     mEditLight;
-	float      sr,sg,sb, si, srad; //boja postavljenog svjetla
-
-
-	bool       postavljaLight;
-	int        mStepEdit;
-	AreaTrigger* mEditTrigger;
-
-	EditMode*  mMode;
-
-	Vec2f t1, t2, t3; //pocetak, kraj i spawnpoint triggera
 };
 
 

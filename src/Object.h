@@ -41,12 +41,19 @@ class IRenderer;
 struct Tile;
 class ColBody;
 
+//TODO: Contruct Object RTTI System
 class ObjectClass
 {
 	char const*  name;
 	ObjectType   type;
 	ObjectClass* parent;
 	IRenderer*   renderer;
+};
+
+enum DevDrawMode
+{
+	DDM_EDIT ,
+	DDM_COLLISION ,
 };
 
 class LevelObject : public Object
@@ -64,7 +71,7 @@ public:
 	virtual void postTick(){}
 	virtual void updateRender( float dt ){}
 	
-	virtual void render( RenderPass pass ){}
+	virtual void renderDev( DevDrawMode mode ){}
 	virtual void enumProp( IPropEditor& editor );
 
 	virtual void onTileCollision( ColBody& self , Tile& tile ){}
@@ -114,7 +121,6 @@ public:
 	virtual void init() = 0;
 	virtual void render( RenderPass pass , LevelObject* object ) = 0;
 	virtual void renderGroup( RenderPass pass , LevelObject* object );
-	virtual void renderDev( LevelObject* object ){}
 
 	int    getOrder(){ return mRenderOrder; }
 

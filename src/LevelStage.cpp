@@ -611,8 +611,6 @@ void LevelStage::loadLevel()
 			}
 			else if(token=="mob_trigger")
 			{
-				AreaTrigger* trigger = new AreaTrigger;
-
 				Vec2f v1 , v2;
 				getline(lstring,token,' ');
 				v1.x=atof(token.c_str());
@@ -623,22 +621,22 @@ void LevelStage::loadLevel()
 				getline(lstring,token,' ');
 				v2.y=atof(token.c_str());
 				getline(lstring,token,' ');
-				trigger->init( v1 , v2 );
+				
+				AreaTrigger* trigger = new AreaTrigger( v1 , v2 );
+				trigger->init();
 
-				SpawnMobAct* act = new SpawnMobAct;
+				SpawnAct* act = new SpawnAct;
 				act->pos.x =atof(token.c_str());
 				getline(lstring,token,' ');
 				act->pos.y =atof(token.c_str());
 				getline(lstring,token,' ');	
-				act->mobName = token;
+				act->className = token;
 				trigger->addAction( act );
 
 				mLevel->addOjectInternal( trigger );
 			}
 			else if(token=="goal_trigger")
 			{
-				AreaTrigger* trigger = new AreaTrigger;
-
 				Vec2f v1 , v2;
 				getline(lstring,token,' ');
 				v1.x=atof(token.c_str());
@@ -649,7 +647,8 @@ void LevelStage::loadLevel()
 				getline(lstring,token,' ');
 				v2.y=atof(token.c_str());
 				getline(lstring,token,' ');
-				trigger->init( v1 , v2 );
+				AreaTrigger* trigger = new AreaTrigger( v1 , v2 );
+				trigger->init();
 
 				trigger->addAction( new GoalAct );
 
@@ -657,8 +656,6 @@ void LevelStage::loadLevel()
 			}
 			else if(token=="msg_trigger")
 			{				
-				AreaTrigger* trigger = new AreaTrigger;
-
 				Vec2f v1 , v2;
 				getline(lstring,token,' ');
 				v1.x=atof(token.c_str());
@@ -669,7 +666,8 @@ void LevelStage::loadLevel()
 				getline(lstring,token,' ');
 				v2.y=atof(token.c_str());
 				getline(lstring,token,' ');
-				trigger->init( v1 , v2 );
+				AreaTrigger* trigger = new AreaTrigger( v1 , v2 );
+				trigger->init();
 
 				MessageAct* act = new MessageAct;
 				getline(lstring,token,';');
@@ -698,4 +696,5 @@ void LevelStage::reigsterObject()
 	mObjectCreator->registerClass< KeyPickup >( "Pickup.Key" );
 	mObjectCreator->registerClass< WeaponPickup >( "Pickup.Weapon" );
 	mObjectCreator->registerClass< LightObject >( "Light" );
+	mObjectCreator->registerClass< AreaTrigger >( "Trigger.Area" );
 }

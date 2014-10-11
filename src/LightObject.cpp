@@ -45,8 +45,8 @@ void LightObject::setupDefault()
 {
 	BaseClass::setupDefault();
 
-	radius = 64;
+	radius = 128;
 	color = Vec3f( 1, 1 ,1 );
-	intensity = 4;
+	intensity = 8;
 }
 

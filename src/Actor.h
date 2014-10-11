@@ -13,15 +13,16 @@ public:
 		rotation = 0.0f;
 	}
 
-	float getRotation(){ return rotation; }
-	void  rotate(float theta)
-	{
-		rotation += theta;
+	float getRotation() const { return rotation; }
+	void  setRotation( float theta )
+	{ 
+		rotation = theta;
 		while(rotation > 2 * PI )
 			rotation -= 2 * PI;
 		while(rotation < 2 * PI)
 			rotation += 2 * PI;	
 	}
+	void  rotate(float theta){ setRotation( rotation + theta ); }
 
 	virtual void enumProp( IPropEditor& editor )
 	{

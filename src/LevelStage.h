@@ -55,7 +55,7 @@ protected:
 
 	enum
 	{
-		UI_MAP_TOOL = 100 ,
+		UI_EDIT_TOOL = 100 ,
 
 		UI_MENU_PANEL ,
 		UI_BACK_GAME ,

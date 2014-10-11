@@ -99,6 +99,7 @@ public:
 	Message*          getTopMessage(){ return mTopMessage; }
 	
 	void              renderObjects( RenderPass pass );
+	void              renderDev( DevDrawMode mode );
 
 	void              addListerner( EventListener& listener );
 	void              sendEvent( LevelEvent const& event );

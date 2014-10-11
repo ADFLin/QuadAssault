@@ -6,6 +6,8 @@
 #include "Message.h"
 #include "Mob.h"
 
+#include "RenderUtility.h"
+
 TriggerBase::TriggerBase()
 {
 	mEnable = true;
@@ -35,11 +37,20 @@ AreaTrigger::~AreaTrigger()
 	}
 }
 
-void AreaTrigger::init( Vec2f const& v1, Vec2f const& v2 )
+AreaTrigger::AreaTrigger( Vec2f const& min , Vec2f const& max )
+	:BaseClass( min )
 {
-	setPos( v1 );
-	mSize   = v2-v1;
-	mMode   = FM_ONCE_AND_DESTROY;
+	mSize = max - min;
+}
+
+AreaTrigger::AreaTrigger()
+{
+
+}
+
+void AreaTrigger::init()
+{
+	BaseClass::init();
 }
 
 void AreaTrigger::tick()
@@ -108,25 +119,48 @@ void AreaTrigger::tick()
 	}
 }
 
-
-void AreaTrigger::renderDev()
+void AreaTrigger::renderDev( DevDrawMode mode )
 {
-	Vec2f pos  = getRenderPos();
-	Vec2f size = getSize();
-	glColor3f(1,1,1);
-	glBegin(GL_LINE_LOOP);
-	glVertex2f( pos.x        , pos.y        );
-	glVertex2f( pos.x+size.x , pos.y        );
-	glVertex2f( pos.x+size.x , pos.y+size.y );
-	glVertex2f( pos.x        , pos.y+size.y );
-	glEnd();
+	if ( mode == DDM_EDIT )
+	{
+		Vec2f pos  = getRenderPos();
+		Vec2f size = getSize();
+
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
+		glColor4f( 1 , 0.4 , 0.4 , 0.2 );
+		drawRect( pos , size );
+		glDisable( GL_BLEND );
+		glColor3f( 1 , 0.2 , 0.2 );
+		drawRectLine( pos , size );
+	}
 }
 
-void SpawnMobAct::fire( Level* level )
+void AreaTrigger::enumProp( IPropEditor& editor )
 {
-	LevelObject* object = level->spawnObjectByName( mobName.c_str() , pos );
+	int fireModeValue[] = { FM_ONCE , FM_ON_TOUCH , FM_ALWAYS , FM_ONCE_AND_DESTROY };
+	char const* fireModeStr[] = { "Once" , "On Touch" , "Always" , "Once And Destroy" };
+
+	editor.addProp( "AreaSize" , mSize );
+	editor.addEnumProp( "FireMode" , mMode , ARRAY_SIZE( fireModeValue ) , fireModeValue , fireModeStr );
+}
+
+void AreaTrigger::setupDefault()
+{
+	setSize( Vec2f( 100 , 100 ) );
+}
+
+void SpawnAct::fire( Level* level )
+{
+	LevelObject* object = level->spawnObjectByName( className.c_str() , pos );
 	if ( object->getType() == OT_MOB )
 		object->cast< Mob >()->spawnEffect();
+}
+
+void SpawnAct::enumProp( IPropEditor& editor )
+{
+	editor.addProp( "ClassName" , className );
+	editor.addProp( "SpawnPos" , pos );
 }
 
 void MessageAct::fire( Level* level )
@@ -136,7 +170,22 @@ void MessageAct::fire( Level* level )
 	level->addMessage( msg );
 }
 
+void MessageAct::enumProp( IPropEditor& editor )
+{
+	
+}
+
+void MessageAct::setupDefault()
+{
+	
+}
+
 void GoalAct::fire( Level* level )
 {
 	level->changeState( Level::eFINISH );
+}
+
+void PlaySoundAct::fire( Level* level )
+{
+	level->playSound( soundName.c_str() );
 }

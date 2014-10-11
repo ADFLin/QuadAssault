@@ -410,3 +410,13 @@ LevelObject* Level::hitObjectTest( Vec2f const& pos )
 	return NULL;
 
 }
+
+void Level::renderDev( DevDrawMode mode )
+{
+	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end() ;
+		iter != itEnd ; ++iter )
+	{
+		LevelObject* obj = *iter;
+		obj->renderDev( mode );
+	}
+}

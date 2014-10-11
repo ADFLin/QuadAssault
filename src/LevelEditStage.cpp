@@ -34,13 +34,12 @@ bool LevelEditStage::onInit()
 
 	EditMode::mWorldData = this;
 
-	postavljaLight = false;
-	mStepEdit=0;
-	sr=1.0; sg=10; sb=1.0; si=8.0; srad=128.0;
 
 	{
-		GFrame* frame = new GFrame( UI_MAP_TOOL , Vec2i( 10 , 40 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
+		GFrame* frame = new GFrame( UI_EDIT_TOOL , Vec2i( 10 , 40 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
 		//"Tools"
+
+		mEditToolFrame = frame;
 		GUISystem::getInstance().addWidget( frame );
 
 
@@ -60,6 +59,7 @@ bool LevelEditStage::onInit()
 			button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
 			pos.x += offset;
 			
+#if 0
 			button = new GImageButton( UI_CREATE_LIGHT , pos , size , frame );
 			button->setHelpText( "Create Light" );
 			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
@@ -69,6 +69,7 @@ bool LevelEditStage::onInit()
 			button->setHelpText( "Create Trigger" );
 			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
 			pos.x += offset;
+#endif
 		}
 		{
 
@@ -76,15 +77,21 @@ bool LevelEditStage::onInit()
 			int offset = size.x + 4;
 
 			GTextButton* button;
-			button = new GTextButton( UI_TILE_EDIT_BUTTON , pos , size  , frame );
+			button = new GTextButton( UI_TILE_EDIT , pos , size  , frame );
 			button->text->setFont( getGame()->getFont(0) );
 			button->text->setCharSize( 20 );
 			button->text->setString( "Tile" );
 			pos.x += offset;
-			button = new GTextButton( UI_OBJECT_EDIT_BUTTON , pos , size  , frame );
+			button = new GTextButton( UI_OBJECT_EDIT , pos , size  , frame );
 			button->text->setFont( getGame()->getFont(0) );
 			button->text->setCharSize( 20 );
 			button->text->setString( "Object" );
+			pos.x += offset;
+			button = new GTextButton( UI_TRIGGER_EDIT , pos , size  , frame );
+			button->text->setFont( getGame()->getFont(0) );
+			button->text->setCharSize( 20 );
+			button->text->setString( "Trigger" );
+			button->enable( false );
 			pos.x += offset;
 		}
 	}
@@ -103,8 +110,9 @@ void LevelEditStage::onExit()
 {
 	ObjectEditMode::getInstance().cleanup();
 	TileEditMode::getInstance().cleanup();
-	GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
-	GUISystem::getInstance().findTopWidget( UI_PROP_FRAME )->destroy();
+
+	mPropFrame->destroy();
+	mEditToolFrame->destroy();
 	BaseClass::onExit();
 }
 
@@ -123,50 +131,7 @@ void LevelEditStage::onUpdate( float deltaT )
 	if( Platform::isKeyPressed( Keyboard::eDOWN ) || Platform::isKeyPressed( Keyboard::eS ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(0, speed*deltaT));
 
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD7))
-		sr+=0.5*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD4))
-		sr-=0.5*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD8))
-		sg+=0.5*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD5))
-		sg-=0.5*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD9))
-		sb+=0.5*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD6))
-		sb-=0.5*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD2))
-		si+=50*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eNUMPAD1))
-		si-=50*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eI))
-		srad+=50*deltaT;
-	if(Platform::isKeyPressed(Keyboard::eK))
-		srad-=50*deltaT;
-	if(sr<0.0)
-		sr=0.0;
-	if(sr>1.0)
-		sr=1.0;
-	if(sg<0.0)
-		sg=0.0;
-	if(sg>1.0)
-		sg=1.0;
-	if(sb<0.0)
-		sb=0.0;
-	if(sb>1.0)
-		sb=1.0;
-	if(si<0.0)
-		si=0.0;
-
 	getGame()->procSystemEvent();
-
-	if(postavljaLight==true)
-	{
-		mEditLight->radius=srad;
-		mEditLight->setColorParam(Vec3f(sr,sg,sb),si);
-		mEditLight->setPos( convertToWorldPos( getGame()->getMousePos() ) );
-	}
-
 	mLevel->updateRender( deltaT );
 }
 
@@ -187,7 +152,13 @@ void LevelEditStage::onRender()
 
 	renderEngine->renderScene( mRenderParam );
 
+
+	Vec2f camPos = getCamera()->getPos();
+	glPushMatrix();
+	glTranslatef( -camPos.x , -camPos.y , 0 );
+	getLevel()->renderDev( DDM_EDIT );
 	mMode->render();
+	glPopMatrix();
 
 	Player* player = mLevel->getPlayer();
 	glLoadIdentity();
@@ -223,37 +194,7 @@ void LevelEditStage::onRender()
 bool LevelEditStage::onMouse( MouseMsg const& msg )
 {
 	if ( !mMode->onMouse( msg ) )
-		return false;
-
-	if( msg.onLeftDown() )
-	{
-		Vec2f wPos = convertToWorldPos( msg.getPos() );
-		if(postavljaLight==true)
-		{
-			postavljaLight=false;
-		}
-
-		switch( mStepEdit )
-		{
-		case 1:
-			t1= wPos;
-			mStepEdit=2;
-			break;
-		case 2:
-			t2 = wPos;
-			mStepEdit=3;
-			break;
-		case 3:
-			t3 = wPos;
-			mEditTrigger->init(t1,t2);
-			mLevel->addOjectInternal( mEditTrigger );
-			mEditTrigger = NULL;
-			mStepEdit=0;
-			break;
-
-		}
-
-	}			
+		return false;		
 
 	return false;
 }
@@ -318,24 +259,13 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 		}
 		break;
 	case UI_CREATE_TRIGGER:
-		if( mStepEdit == 0 )
-		{		
-			mEditTrigger = new AreaTrigger;
-			mStepEdit    = 1;
-		}
 		break;
 	case UI_CREATE_LIGHT:
-		if(postavljaLight==false)
-		{
-			postavljaLight = true;
-			mEditLight = mLevel->createLight( getGame()->getMousePos() , 128 );
-			mEditLight->setColorParam(Vec3f(1.0, 1.0, 1.0), 8);
-		}
 		break;
-	case UI_OBJECT_EDIT_BUTTON:
+	case UI_OBJECT_EDIT:
 		changeMode( ObjectEditMode::getInstance() );
 		break;
-	case UI_TILE_EDIT_BUTTON:
+	case UI_TILE_EDIT:
 		changeMode( TileEditMode::getInstance() );
 		break;
 	}
@@ -494,6 +424,7 @@ bool TileEditMode::onMouse( MouseMsg const& msg )
 		}
 	}
 
+
 	return true;
 }
 
@@ -517,7 +448,7 @@ void TileEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 {
 	switch( id )
 	{
-	case UI_TILE_BUTTON:
+	case UI_TILE_SELECT:
 		int id = (int)sender->getUserData();
 		mEditTileType = id;
 		break;
@@ -539,9 +470,8 @@ void TileEditMode::render()
 {
 	if (  mTile  )
 	{
-		Vec2f camPos = getWorld().getCamera()->getPos();
 		glColor3f( 0 , 1 , 0 );
-		drawRectLine( mTile->pos - camPos , gSimpleBlockSize );
+		drawRectLine( mTile->pos , gSimpleBlockSize );
 		glColor3f( 1 , 1 , 1 );
 	}
 }
@@ -595,8 +525,9 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 	{
 		if ( mObjectName )
 		{
-			mObject = getWorld().getLevel()->spawnObjectByName( mObjectName , wPos , true );
-			getWorld().mPropFrame->changeEdit( *mObject );
+			LevelObject* obj = getWorld().getLevel()->spawnObjectByName( mObjectName , wPos , true );
+			changeObject( obj );
+
 			return false;
 		}
 	}
@@ -605,10 +536,33 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 		LevelObject* obj = getWorld().getLevel()->hitObjectTest( wPos );
 		if ( obj )
 		{
-			mObject = obj;
-			getWorld().mPropFrame->changeEdit( *mObject );
+			changeObject( obj );
+			return false;
 		}
 	}
+	else if ( msg.onMoving() )
+	{
+		if ( mObject && msg.isLeftDown() )
+		{
+			if ( Platform::isKeyPressed( Keyboard::eLSHIFT ) )
+			{
+				mObject->setPos( wPos );
+				getWorld().mPropFrame->inputData();
+			}
+			else if ( Platform::isKeyPressed( Keyboard::eLCONTROL ) )
+			{
+				//TODO Dont use dynamic_cast
+				Actor* actor = dynamic_cast< Actor* >( mObject );
+				if ( actor )
+				{
+					Vec2f dir = wPos - mObject->getPos();
+					float angle = Math::atan2( dir.y , dir.x );
+					actor->setRotation( angle );
+				}
+			}
+		}
+	}
+
 	return true;
 
 }
@@ -617,7 +571,7 @@ void ObjectEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 {
 	switch( id )
 	{
-	case UI_OBJ_SELECT_BUTTON:
+	case UI_OBJECT_SELECT:
 		mObjectName = static_cast< char const* >( sender->getUserData() );
 		break;
 	}
@@ -627,9 +581,8 @@ void ObjectEditMode::render()
 {
 	if ( mObject )
 	{
-		Vec2f camPos = getWorld().getCamera()->getPos();
 		glColor3f( 0 , 1 , 0 );
-		drawRectLine( mObject->getRenderPos() - camPos , mObject->getSize() );
+		drawRectLine( mObject->getRenderPos() , mObject->getSize() );
 		glColor3f( 1 , 1 , 1 );
 	}
 }
@@ -644,4 +597,24 @@ void ObjectEditMode::cleanup()
 
 	mObjectName = NULL;
 	mObject = NULL;
+}
+
+void ObjectEditMode::changeObject( LevelObject* object )
+{
+	if ( mObject == object )
+		return;
+
+	mObject = object;
+	if ( mObject )
+	{
+		getWorld().mPropFrame->changeEdit( *mObject );
+		GWidget* widget = getWorld().mEditToolFrame->findChild( UI_TRIGGER_EDIT );
+		if ( widget )
+			widget->enable( mObject->getType() == OT_TRIGGER );
+	}
+	else
+	{
+		getWorld().mPropFrame->cleanAllPorp();
+	}
+
 }
