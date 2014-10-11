@@ -7,6 +7,7 @@ QuadAssault
 * Render Terrain Shadow 
 * Camera zoom in and zoom out
 * Improve Collision System
+* Improve Level Edit
 * New GUI System
 
 ###TODO###
