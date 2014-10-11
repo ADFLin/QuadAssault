@@ -371,9 +371,9 @@ void Level::addObject( LevelObject* object )
 	case OT_BULLET: mBullets.push_back( object->cast< Bullet >() ); break;
 	case OT_LIGHT:  mLights.push_back( object->cast< LightObject >() ); break;
 	case OT_PARTICLE:  mParticles.push_back( object->cast< Particle >() ); break;
+	case OT_ITEM:   mItems.push_back( object->cast< ItemPickup >() ); break;
 	case OT_PLAYER: 
 		{
-
 			return;
 		}
 		break;

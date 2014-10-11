@@ -124,3 +124,14 @@ void WeaponPickup::setupDefault()
 	BaseClass::setupDefault();
 	mId = WEAPON_LASER;
 }
+
+void WeaponPickup::updateEdit()
+{
+	BaseClass::updateEdit();
+	switch( mId )
+	{
+	case WEAPON_LASER:  mLight.setColorParam(Vec3f(0.2,1.0,0.2),6); break;
+	case WEAPON_PLAZMA: mLight.setColorParam(Vec3f(0.2,0.2,1.0),6); break;
+	case WEAPON_MINIGUN: mLight.setColorParam(Vec3f(1.0,0.2,2.0),6); break;
+	}
+}

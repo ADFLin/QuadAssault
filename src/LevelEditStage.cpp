@@ -187,6 +187,8 @@ void LevelEditStage::onRender()
 
 	renderEngine->renderScene( mRenderParam );
 
+	mMode->render();
+
 	Player* player = mLevel->getPlayer();
 	glLoadIdentity();
 
@@ -198,6 +200,7 @@ void LevelEditStage::onRender()
 		drawRect( Vec2f(0.0, 0.0) , Vec2f( getGame()->getScreenSize() ) );
 		glDisable(GL_BLEND);
 	}
+
 
 	GUISystem::getInstance().render();
 
@@ -420,6 +423,7 @@ void LevelEditStage::changeMode( EditMode& mode )
 TileEditMode::TileEditMode()
 {
 	mFrame = NULL;
+	mTile = NULL;
 	mEditTileMeta = 0;
 	mEditTileType = BID_FLAT;
 }
@@ -472,8 +476,8 @@ bool TileEditMode::onMouse( MouseMsg const& msg )
 	{
 		if ( tile )
 		{
-			mEdit.mTile = tile;
-			getWorld().mPropFrame->changeEdit( mEdit );
+			mTile = tile;
+			getWorld().mPropFrame->changeEdit( *this );
 			return false;
 		}
 	}
@@ -524,10 +528,22 @@ void TileEditMode::cleanup()
 		mFrame->destroy();
 		mFrame = NULL;
 	}
+	mTile = NULL;
 
 }
 
-void TileEdit::enumProp( IPropEditor& editor )
+void TileEditMode::render()
+{
+	if (  mTile  )
+	{
+		Vec2f camPos = getWorld().getCamera()->getPos();
+		glColor3f( 0 , 1 , 0 );
+		drawRectLine( mTile->pos - camPos , gSimpleBlockSize );
+		glColor3f( 1 , 1 , 1 );
+	}
+}
+
+void TileEditMode::enumProp( IPropEditor& editor )
 {
 	int tileValue[] = 
 	{ 
@@ -599,8 +615,9 @@ void ObjectEditMode::render()
 {
 	if ( mObject )
 	{
+		Vec2f camPos = getWorld().getCamera()->getPos();
 		glColor3f( 0 , 1 , 0 );
-		drawRectLine( mObject->getRenderPos() , mObject->getSize() );
+		drawRectLine( mObject->getRenderPos() - camPos , mObject->getSize() );
 		glColor3f( 1 , 1 , 1 );
 	}
 }
@@ -612,6 +629,7 @@ void ObjectEditMode::cleanup()
 		mFrame->destroy();
 		mFrame = NULL;
 	}
-	
 
+	mObjectName = NULL;
+	mObject = NULL;
 }

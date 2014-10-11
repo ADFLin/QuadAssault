@@ -4,7 +4,7 @@
 #include "Collision.h"
 #include "Block.h"
 #include "Object.h"
-#include "LightObject.h"
+#include "Light.h"
 
 #include "TGrid2D.h"
 #include "IntrList.h"

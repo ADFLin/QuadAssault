@@ -2,7 +2,6 @@
 #include "Level.h"
 #include "Explosion.h"
 
-#include "LightObject.h"
 
 Bullet::Bullet()
 {

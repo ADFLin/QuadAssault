@@ -17,7 +17,7 @@ int const BLOCK_SIZE = 64;
 
 class Level;
 class LevelObject;
-class LightObject;
+class Light;
 class ItemPickup;
 class Bullet;
 class Block;

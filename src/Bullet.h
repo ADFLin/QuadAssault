@@ -5,7 +5,6 @@
 
 #include "ColBody.h"
 
-class LightObject;
 
 enum Team
 {

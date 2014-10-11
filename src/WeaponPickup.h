@@ -33,6 +33,7 @@ public:
 
 	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
+	virtual void updateEdit();
 
 
 protected:

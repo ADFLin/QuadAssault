@@ -25,6 +25,7 @@ public:
 class IEditable
 {
 public:
+	virtual ~IEditable(){}
 	virtual void enumProp( IPropEditor& editor ){}
 	virtual void updateEdit(){}
 	virtual void setupDefault(){}

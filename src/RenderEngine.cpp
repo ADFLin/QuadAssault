@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 #include "Level.h"
-#include "LightObject.h"
+#include "Light.h"
 #include "Block.h"
 
 #include "DataPath.h"

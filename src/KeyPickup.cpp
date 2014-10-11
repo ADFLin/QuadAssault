@@ -49,7 +49,7 @@ KeyPickup::KeyPickup( Vec2f const& pos , int id )
 
 KeyPickup::KeyPickup()
 {
-	mId = DOOR_RED;
+
 }
 
 void KeyPickup::init()

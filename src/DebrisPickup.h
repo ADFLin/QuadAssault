@@ -2,7 +2,7 @@
 #define DebrisPickup_h__
 
 #include "ItemPickup.h"
-#include "LightObject.h"
+#include "Light.h"
 
 class DebrisPickup : public ItemPickup
 {

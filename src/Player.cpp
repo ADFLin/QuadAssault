@@ -5,7 +5,7 @@
 #include "TextureManager.h"
 #include "SoundManager.h"
 
-#include "LightObject.h"
+#include "Light.h"
 #include "Bullet.h"
 #include "Mob.h"
 #include "Explosion.h"

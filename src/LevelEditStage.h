@@ -64,28 +64,14 @@ public:
 
 
 
-class TileEdit : public IEditable
-{
-public:
-	Tile* getTile(){ return mTile; }
-
-	virtual void enumProp( IPropEditor& editor );
-	virtual void updateEdit()
-	{
-
-	}
-
-	Tile* mTile;
-};
-
-
 class TileEditMode : public EditMode
 	               , public SingletonT< TileEditMode >
+				   , public IEditable
 {
 public:
 	TileEditMode();
 
-	TileEdit mEdit;
+	Tile*    mTile;
 	int      mEditTileType; //vrsta bloka koji se postavlja
 	int      mEditTileMeta;
 
@@ -97,7 +83,8 @@ public:
 	virtual bool onKey( unsigned key , bool isDown );
 	virtual bool onMouse( MouseMsg const& msg );
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
-
+	virtual void render();
+	virtual void enumProp( IPropEditor& editor );
 
 };
 
