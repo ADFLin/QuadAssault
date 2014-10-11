@@ -20,7 +20,7 @@ class Game : public IGame
 {
 public:
 	Game();
-	bool init(char* configFile);
+	bool init( char const* pathConfig );
 	void run();
 	void exit();
 

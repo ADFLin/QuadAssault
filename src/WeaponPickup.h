@@ -3,9 +3,14 @@
 
 #include "ItemPickup.h"
 
-#define LASER1 0
-#define PLAZMA1 1
-#define MINIGUN1 2
+#include "Light.h"
+
+enum WeaponId
+{
+	WEAPON_LASER ,
+	WEAPON_PLAZMA ,
+	WEAPON_MINIGUN ,
+};
 
 class WeaponPickup : public ItemPickup
 {
@@ -15,18 +20,18 @@ public:
 
 	WeaponPickup( Vec2f const& pos , int id );
 	void init();
-	void tick();
-	void onPick(Player* player);
 
-	void onSpawn();
-	void onDestroy();
+	virtual void tick();
+	virtual void onPick(Player* player);
+	virtual void onSpawn();
+	virtual void onDestroy();
 
 	virtual IRenderer* getRenderer();
 
 protected:
-	float rotation;
-	Light* s;
-	int mId;
+	float      mRotation;
+	Light  mLight;
+	int        mId;
 
 	friend class WeaponPickupRenderer;
 

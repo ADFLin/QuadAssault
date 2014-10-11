@@ -4,7 +4,7 @@
 #include "Collision.h"
 #include "Block.h"
 #include "Object.h"
-#include "Light.h"
+#include "LightObject.h"
 
 #include "TGrid2D.h"
 #include "IntrList.h"
@@ -15,7 +15,7 @@
 class LevelObject;
 class ObjectCreator;
 class Mob;
-class Light;
+class LightObject;
 class ItemPickup;
 class Particle;
 class Bullet;
@@ -47,7 +47,8 @@ public:
 
 	Level();
 
-	void              init();
+	void              setupTerrain( int w , int h );
+	void              init( ObjectCreator& creator );
 	void              tick();
 	void              updateRender( float dt );
 	void              cleanup();
@@ -68,23 +69,29 @@ public:
 	State             getState(){ return mState; }
 	void              changeState( State state );
 
-	void              setupTerrain( int w , int h );
+	
 
 	TileMap&          getTerrain(){ return mTerrain; }
 	CollisionManager& getColManager(){  return mColManager; }
 
+	void              destroyAllObject( bool bPlayerIncluded );
 
-	Player*           getPlayer(){  return mPlayer;  }
+	Player*           createPlayer();
+	Player*           getPlayer( int id = 0 ){  return mPlayers[id];  }
 
 	Explosion*        createExplosion( Vec2f const& pos , float raidus );
-	Light*            createLight( Vec2f const& pos , float radius , bool bStatic );
+
+	// Create Light Object
+	LightObject*      createLight( Vec2f const& pos ,float radius );
+	void              addLight( Light& light );
 
 	Bullet*           addBullet( Bullet* bullet );
 	ItemPickup*       addItem( ItemPickup* item );
 	Mob*              addMob( Mob* mob );
 	Particle*         addParticle(Particle* particle );
+	void              addObject( LevelObject* object );
 
-	Mob*              spawnMobByName(string const& name , Vec2f const& pos );
+	LevelObject*      spawnObjectByName( char const* name , Vec2f const& pos );
 
 	Sound*            playSound( char const* name , bool canRepeat = false );
 	Message*          addMessage(Message* msg );
@@ -106,21 +113,31 @@ public:
 
 	void       addOjectInternal( LevelObject* obj );
 
+
 	typedef MemberHook< LevelObject , &LevelObject::baseHook > ObjHook;
 	typedef MemberHook< LevelObject , &LevelObject::typeHook > TypeHook;
 
-	typedef IntrList< Light  , TypeHook , PointerType > LightList;
+	typedef IntrList< LightObject  , TypeHook , PointerType > LightList;
 	typedef IntrList< Bullet , TypeHook , PointerType > BulletList;
 	typedef IntrList< Mob    , TypeHook , PointerType > MobList;
 
-	MobList&    getMobs()   { return mMobs; }
-	BulletList& getBullets(){ return mBullets; }
-	LightList&  getLights() { return mLights; }
+	typedef IntrList< Light , MemberHook< Light , &Light::mHook > , PointerType > RenderLightList;
+
+	MobList&         getMobs()   { return mMobs; }
+	BulletList&      getBullets(){ return mBullets; }
+	LightList&       getLights() { return mLights; }
+	RenderLightList& getRenderLights(){ return mRenderLights; }
 
 protected:
 	typedef IntrList< LevelObject , ObjHook , PointerType > ObjectList;
 	typedef IntrList< ItemPickup  , TypeHook , PointerType > ItemList;
 	typedef IntrList< Particle , TypeHook , PointerType > ParticleList;
+
+
+	void              destroyAllObjectImpl();
+
+	
+	RenderLightList mRenderLights;
 
 	void       destroyObject( LevelObject* object );
 	
@@ -139,7 +156,8 @@ protected:
 	LightList        mLights;
 	ParticleList     mParticles;
 	
-	Player*          mPlayer;
+	typedef std::vector< Player* > PlayerVec;
+	PlayerVec        mPlayers;
 	TileMap          mTerrain;
 	CollisionManager mColManager;
 
@@ -148,7 +166,8 @@ protected:
 	ListenerList     mListeners;
 };
 
-typedef Level::LightList  LightList;
+typedef Level::RenderLightList RenderLightList;
+typedef Level::LightList LightList;
 
 
 #endif // Level_h__

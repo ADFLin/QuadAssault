@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 #include "Level.h"
-#include "Light.h"
+#include "LightObject.h"
 #include "Block.h"
 
 #include "DataPath.h"
@@ -226,9 +226,9 @@ void RenderEngine::renderTerrainGlow( Level* level , TileRange const& range )
 }
 
 
-void RenderEngine::renderLighting( RenderParam& param , Light* light )
+void RenderEngine::renderLighting( RenderParam& param , Vec2f const& lightPos , Light* light )
 {
-	Vec2f posLight = light->getPos() - param.camera->getPos();
+	Vec2f posLight = lightPos - param.camera->getPos();
 
 	mShaderLighting->bind();
 
@@ -345,18 +345,19 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 	Shader* shader = mShaderLighting;
 
-	LightList& lights = param.level->getLights();
+	RenderLightList& lights = param.level->getRenderLights();
 	TileMap& terrain = param.level->getTerrain();
 
-	for( LightList::iterator iter = lights.begin() , itEnd = lights.end();
+	for( RenderLightList::iterator iter = lights.begin() , itEnd = lights.end();
 		iter != itEnd ; ++iter )
 	{		
 		Light* light = *iter;
+		Vec2f const& lightPos = light->cachePos;
 
-		if( light->getPos().x + light->radius < camera->getPos().x ||
-			light->getPos().x - light->radius > camera->getPos().x + w ||
-			light->getPos().y + light->radius < camera->getPos().y || 
-			light->getPos().y - light->radius > camera->getPos().y + h )
+		if( lightPos.x + light->radius < camera->getPos().x ||
+			lightPos.x - light->radius > camera->getPos().x + w ||
+			lightPos.y + light->radius < camera->getPos().y || 
+			lightPos.y - light->radius > camera->getPos().y + h )
 			continue;
 
 		if ( light->drawShadow )
@@ -378,8 +379,8 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 
 			TileRange range = param.terrainRange;
 
-			int tx = int( light->getPos().x / BLOCK_SIZE );
-			int ty = int( light->getPos().y / BLOCK_SIZE );
+			int tx = int( lightPos.x / BLOCK_SIZE );
+			int ty = int( lightPos.y / BLOCK_SIZE );
 
 			if ( tx < range.xMin )
 				range.xMin = tx;
@@ -396,7 +397,7 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 			range.yMin = Math::clamp( range.yMin , 0 , terrain.getSizeY() );
 			range.yMax = Math::clamp( range.yMax , 0 , terrain.getSizeY() );
 
-			renderTerrainShadow( param.level , light , range );
+			renderTerrainShadow( param.level , lightPos , light , range );
 
 #if 1
 			glStencilFunc(GL_ALWAYS, 0, 1);
@@ -424,7 +425,7 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 			glDisable( GL_STENCIL_TEST );
 		}
 
-		renderLighting( param , light);
+		renderLighting( param , lightPos , light );
 	}
 
 	glDisable( GL_STENCIL_TEST );
@@ -440,7 +441,7 @@ static int const offsetY[4] = { 0,-1,0,1};
 static Vec2f const tileVertex[4] = { Vec2f(0,0) , Vec2f(BLOCK_SIZE,0) , Vec2f(BLOCK_SIZE,BLOCK_SIZE ) , Vec2f(0,BLOCK_SIZE)   };
 static Vec2f const tileNormal[4] = { Vec2f(-1,0) , Vec2f(0,-1) , Vec2f(1,0) , Vec2f(0,1) };
 
-void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange const& range )
+void RenderEngine::renderTerrainShadow( Level* level , Vec2f const& lightPos , Light* light , TileRange const& range )
 {
 	TileMap& terrain = level->getTerrain();
 
@@ -456,11 +457,11 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 
 			if ( block->checkFlag( BF_NONSIMPLE ) )
 			{
-				block->renderShadow( tile , *light );
+				block->renderShadow( tile , lightPos , *light );
 			}
 			else
 			{
-				Vec2f tileOffset = tile.pos - light->getPos();
+				Vec2f tileOffset = tile.pos - lightPos;
 
 				for( int idxCur = 0 , idxPrev = 3; idxCur < 4; idxPrev = idxCur , ++idxCur )
 				{
@@ -482,8 +483,8 @@ void RenderEngine::renderTerrainShadow( Level* level , Light* light , TileRange 
 					Vec2f const& cur  = tile.pos + tileVertex[ idxCur ];
 					Vec2f const& prev = tile.pos + tileVertex[ idxPrev ];
 
-					Vec2f v1 = light->getPos() + 5000 * offsetPrev;
-					Vec2f v2 = light->getPos() + 5000 * offsetCur;
+					Vec2f v1 = lightPos + 5000 * offsetPrev;
+					Vec2f v2 = lightPos + 5000 * offsetCur;
 
 					glBegin( GL_QUADS );
 					glVertex2f( prev.x , prev.y );

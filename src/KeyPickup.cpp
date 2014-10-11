@@ -4,7 +4,6 @@
 #include "Level.h"
 #include "TextureManager.h"
 #include "Player.h"
-#include "Light.h"
 #include "Explosion.h"
 #include "RenderUtility.h"
 
@@ -31,7 +30,7 @@ public:
 		KeyPickup* key = static_cast< KeyPickup* >( object );
 		if ( pass == RP_GLOW )
 		{
-			glColor3fv( gDoorGlowColor[ key->mDoorId ] );
+			glColor3fv( gDoorGlowColor[ key->idDoor ] );
 		}
 		drawSprite(key->getRenderPos(),key->getSize(),key->mRotation, mTex[ pass ] );
 		glColor3f(1.0, 1.0, 1.0);
@@ -43,9 +42,14 @@ public:
 DEFINE_RENDERER( KeyPickup , KeyPickupRenderer )
 
 KeyPickup::KeyPickup( Vec2f const& pos , int id ) 
-	:BaseClass( pos ),mDoorId( id )
+	:BaseClass( pos ),idDoor( id )
 {
 
+}
+
+KeyPickup::KeyPickup()
+{
+	idDoor = DOOR_RED;
 }
 
 void KeyPickup::init()
@@ -60,18 +64,22 @@ void KeyPickup::init()
 void KeyPickup::onSpawn()
 {
 	BaseClass::onSpawn();
-	mLight = getLevel()->createLight( getPos() , 128 , false);
-	switch( mDoorId )
+
+	mLight.host = this;
+	mLight.radius = 128;
+	switch( idDoor )
 	{
-	case DOOR_RED:   mLight->setColorParam(Vec3f(1.0,0.1,0.1),4); break;
-	case DOOR_BLUE:  mLight->setColorParam(Vec3f(0.1,0.25,1.0),4); break;
-	case DOOR_GREEN: mLight->setColorParam(Vec3f(0.1,1.0,0.1),4); break;
+	case DOOR_RED:   mLight.setColorParam(Vec3f(1.0,0.1,0.1),4); break;
+	case DOOR_BLUE:  mLight.setColorParam(Vec3f(0.1,0.25,1.0),4); break;
+	case DOOR_GREEN: mLight.setColorParam(Vec3f(0.1,1.0,0.1),4); break;
 	}
+
+	getLevel()->addLight( mLight );
 }
 
 void KeyPickup::onDestroy()
 {
-	mLight->destroy();
+	mLight.remove();
 	BaseClass::onDestroy();
 }
 
@@ -94,14 +102,14 @@ void KeyPickup::onPick( Player* player )
 	{
 		Tile& tile = terrain.getData( x , y );
 
-		if( tile.type == BID_DOOR && tile.meta == mDoorId )
+		if( tile.type == BID_DOOR && tile.meta == idDoor )
 		{
 			tile.type = BID_FLAT;
 			tile.meta = 0;
 
 			Explosion* e=getLevel()->createExplosion( Vec2f(x*BLOCK_SIZE+BLOCK_SIZE/2, y*BLOCK_SIZE+BLOCK_SIZE/2), 128 );
 			e->setParam(20,1000,50);
-			e->setColor( gDoorGlowColor[ mDoorId ] );	
+			e->setColor( gDoorGlowColor[ idDoor ] );	
 		}
 	}
 

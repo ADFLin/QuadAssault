@@ -1,7 +1,7 @@
-#ifndef Light_h___
-#define Light_h___
+#ifndef Light_h__
+#define Light_h__
 
-#include "Object.h"
+#include "IntrList.h"
 
 enum LightingModel
 {
@@ -10,9 +10,20 @@ enum LightingModel
 
 
 };
-class LightBase
+
+class Light
 {
 public:
+
+	Light()
+	{
+		host = NULL;
+		offset = Vec2f( 0 , 0 );
+		dir   = Vec2f(0.0, 0.0);
+		angle = 0.0;
+		drawShadow = false;
+		isExplosion = false;
+	}
 
 	float  radius;
 	float  intensity;
@@ -20,36 +31,29 @@ public:
 	Vec2f  dir; //normal u kojem dir je light okrenuto (baterija)
 	float  angle; //od 0.0 do 1.0, odredjuje angle djelovanja baterije
 
-	bool  isStatic;
 	bool  isExplosion;
 	bool  drawShadow;
 
 	Vec2f   offset;
 	Object* host;
 
+	void setColorParam( Vec3f const& inColor , float inIntensity )
+	{
+		color    = inColor;
+		intensity= inIntensity;
+	}
+
+	void   remove()
+	{
+		if ( mHook.isLinked() )
+			mHook.unlink();
+	}
+private:
+	Vec2f    cachePos;
+	HookNode mHook;
+	friend class Level;
 	friend class RenderEngine;	
 };
 
-class Light : public LevelObject
-	        , public LightBase
-{
-	typedef LevelObject BaseClass;
-public:
-
-	Light();
-	~Light();
-
-	void init( Vec2f poz, float radius );
-
-	virtual ObjectType getType(){ return OT_LIGHT; }
-	virtual void enumProp( IPropEditor& editor );
-
-	void tick();
-	void setColorParam( Vec3f const& color , float intensity );
-	void SetExplozija(bool explozija);
-	void PostavkeKuta(Vec2f const& dir, float angle);
-
-	friend class RenderEngine;	
-};
 
 #endif // Light_h__

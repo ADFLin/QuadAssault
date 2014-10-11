@@ -8,7 +8,7 @@
 #include "EditorWidget.h"
 
 #include "Level.h"
-#include "Light.h"
+#include "LightObject.h"
 #include "Player.h"
 #include "Trigger.h"
 
@@ -313,7 +313,7 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 		if(postavljaLight==false)
 		{
 			postavljaLight = true;
-			mEditLight = mLevel->createLight( getGame()->getMousePos() , 128 , true);
+			mEditLight = mLevel->createLight( getGame()->getMousePos() , 128 );
 			mEditLight->setColorParam(Vec3f(1.0, 1.0, 1.0), 8);
 		}
 		break;
@@ -355,18 +355,17 @@ bool LevelEditStage::saveLevel( char const* path )
 	for( LightList::iterator iter = lights.begin() , itEnd = lights.end();
 		iter != itEnd ; ++iter )
 	{
-		Light* light = *iter;
-		if( light->isStatic )
-		{
-		  of << "light " 
-			 << light->getPos().x << " " 
-			 << light->getPos().y << " " 
-			 << light->radius << " " 
-			 << light->intensity << " " 
-			 << light->color.x << " " 
-			 << light->color.y << " " 
-			 << light->color.z << "\n";
-		}
+		LightObject* light = *iter;
+
+		of << "light " 
+			<< light->getPos().x << " " 
+			<< light->getPos().y << " " 
+			<< light->radius << " " 
+			<< light->intensity << " " 
+			<< light->color.x << " " 
+			<< light->color.y << " " 
+			<< light->color.z << "\n";
+
 	}
 	of.close ();
 
@@ -377,6 +376,8 @@ bool LevelEditStage::saveLevel( char const* path )
 
 void LevelEditStage::generateEmptyLevel()
 {
+	mLevel->destroyAllObject( false );
+
 	TileMap& terrain = mLevel->getTerrain();
 	for(int i=0; i< terrain.getSizeX() ; i++)
 	{
@@ -388,23 +389,6 @@ void LevelEditStage::generateEmptyLevel()
 			if(i==0 || j==0 || i== terrain.getSizeX()-1 || j== terrain.getSizeY() -1 )
 				tile.type = BID_WALL;
 		}	
-	}
-
-	LightList& lights = mLevel->getLights();
-	for(LightList::iterator iter = lights.begin();
-		iter != lights.end() ; )
-	{
-		Light* light = *iter;
-		if( light->isStatic )
-		{
-			++iter;
-			delete light;
-
-		}
-		else
-		{
-			++iter;
-		}
 	}
 }
 

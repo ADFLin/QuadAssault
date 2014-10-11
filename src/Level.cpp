@@ -3,9 +3,11 @@
 #include "GameInterface.h"
 #include "SoundManager.h"
 
+#include "ObjectFactory.h"
+
 #include "Block.h"
 
-#include "Light.h"
+#include "LightObject.h"
 #include "ItemPickup.h"
 #include "Bullet.h"
 #include "Mob.h"
@@ -24,24 +26,17 @@ Level::Level()
 }
 
 
-void Level::init()
+void Level::init( ObjectCreator& creator )
 {
 	mColManager.setTerrain( mTerrain );
-
-	mPlayer = new Player();
-	mPlayer->init();
+	mObjectCreator = &creator;
 }
 
 void Level::cleanup()
 {
-	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end();
-		iter != itEnd;  )
-	{
-		LevelObject* obj = *iter;
-		++iter;
-		delete obj;
-	}
+	destroyAllObjectImpl();
 
+	mPlayers.clear();
 	mObjects.clear();
 
 	mLights.clear();
@@ -49,8 +44,6 @@ void Level::cleanup()
 	mMobs.clear();	
 	mItems.clear();
 	mParticles.clear();
-
-	mPlayer = NULL;
 
 	mTopMessage = NULL;
 	for(int i=0; i<mMsgQueue.size(); i++)
@@ -124,7 +117,6 @@ void Level::setupTerrain( int w , int h )
 				tile.type = BID_WALL;
 		}	
 	}
-	addOjectInternal( mPlayer );
 }
 
 
@@ -136,17 +128,38 @@ void Level::updateRender( float dt )
 		obj->updateRender( dt );
 	}
 
+	RenderLightList& lights = getRenderLights();
+	for( RenderLightList::iterator iter = lights.begin() , itEnd = lights.end();
+		iter != itEnd ; ++iter )
+	{		
+		Light* light = *iter;
+		light->cachePos = light->offset;
+		if ( light->host )
+			light->cachePos += light->host->getPos();
+	}
+
 	if ( mTopMessage )
 		mTopMessage->updateRender( dt );
 }
 
 void Level::addOjectInternal( LevelObject* obj )
 {
-	assert( obj );
+	assert( obj && obj->mLevel == NULL );
 	mObjects.push_front( obj );
 
 	obj->mLevel = this;
 	obj->onSpawn();
+}
+
+Player* Level::createPlayer()
+{
+	Player* player = new Player;
+	player->init();
+	player->mPlayerId = mPlayers.size();
+	mPlayers.push_back( player );
+	addOjectInternal( player );
+
+	return player;
 }
 
 Explosion* Level::createExplosion( Vec2f const& pos , float raidus )
@@ -157,11 +170,12 @@ Explosion* Level::createExplosion( Vec2f const& pos , float raidus )
 	return e;
 }
 
-Light* Level::createLight( Vec2f const& pos ,float radius , bool bStatic )
+LightObject* Level::createLight( Vec2f const& pos ,float radius )
 {
-	Light* light = new Light();
-	light->init( pos , radius );
-	light->isStatic = bStatic;
+	LightObject* light = new LightObject();
+	light->init();
+	light->setPos( pos );
+	light->radius = radius;
 	mLights.push_back( light );
 	addOjectInternal( light );
 	return light;
@@ -200,24 +214,6 @@ int Level::random( int i1, int i2 )
 	return ::rand()%i2+i1;
 }
 
-Mob* Level::spawnMobByName( string const& name , Vec2f const& pos )
-{
-	Mob* mob = NULL;
-	if(name=="Mob.Laser")				
-		mob = new LaserMob();	
-	else if(name=="Mob.Plasma")				
-		mob = new PlasmaMob();	
-	else if(name=="Mob.Minigun")		
-		mob = new MinigunMob();
-
-	if ( mob )
-	{
-		mob->init( pos );
-		addMob( mob );
-	}
-	return mob;
-}
-
 void Level::renderObjects( RenderPass pass )
 {
 	for( ItemList::iterator iter = mItems.begin() , itEnd = mItems.end(); 
@@ -252,9 +248,14 @@ void Level::renderObjects( RenderPass pass )
 		renderer->render( pass , obj );
 	}
 
+	
+
+	for( PlayerVec::iterator iter = mPlayers.begin() , itEnd = mPlayers.end();
+		 iter != itEnd ; ++iter )
 	{
-		IRenderer* renderer = mPlayer->getRenderer();
-		renderer->render( pass , mPlayer );
+		Player* player = *iter;
+		IRenderer* renderer = player->getRenderer();
+		renderer->render( pass , player );
 	}
 }
 
@@ -316,4 +317,77 @@ Tile* Level::getTile( Vec2f const& pos )
 	return &mTerrain.getData( tx , ty );
 }
 
+void Level::addLight( Light& light )
+{
+	mRenderLights.push_back( &light );
+}
 
+void Level::destroyAllObjectImpl()
+{
+	for( ObjectList::iterator iter = mObjects.begin() , itEnd = mObjects.end();
+		iter != itEnd;  )
+	{
+		LevelObject* obj = *iter;
+		++iter;
+		delete obj;
+	}
+}
+
+void Level::destroyAllObject( bool bPlayerIncluded )
+{
+	if ( !bPlayerIncluded )
+	{
+		for( PlayerVec::iterator iter = mPlayers.begin();
+			iter != mPlayers.end() ; ++iter )
+		{
+			Player* player = *iter;
+			player->baseHook.unlink();
+		}
+	}
+
+	destroyAllObjectImpl();
+
+	if ( bPlayerIncluded )
+	{
+		mPlayers.clear();
+	}
+	else
+	{
+		for( PlayerVec::iterator iter = mPlayers.begin();
+			iter != mPlayers.end() ; ++iter )
+		{
+			Player* player = *iter;
+			addOjectInternal( player );
+		}
+	}
+}
+
+void Level::addObject( LevelObject* object )
+{
+	assert( object );
+	switch( object->getType() )
+	{
+	case OT_MOB:    mMobs.push_back( object->cast< Mob >() ); break;
+	case OT_BULLET: mBullets.push_back( object->cast< Bullet >() ); break;
+	case OT_LIGHT:  mLights.push_back( object->cast< LightObject >() ); break;
+	case OT_PARTICLE:  mParticles.push_back( object->cast< Particle >() ); break;
+	case OT_PLAYER: 
+		{
+
+			return;
+		}
+		break;
+	}
+	addOjectInternal( object );
+	
+}
+
+LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos )
+{
+	LevelObject* obj = mObjectCreator->createObject( name );
+	if ( !obj )
+		return NULL;
+	obj->setPos( pos );
+	addObject( obj );
+	return obj;
+}

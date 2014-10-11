@@ -7,13 +7,18 @@
 #include "Block.h"
 #include "Weapon.h"
 #include "Message.h"
+#include "Light.h"
 
-class Light;
+class LightObject;
 
 class Player : public Actor
 {
 	typedef Actor BaseClass;
 public:
+
+	Player();
+
+	int getPlayerId(){ return mPlayerId; }
 
 	virtual ObjectType getType(){ return OT_PLAYER; }
 	virtual void onSpawn();
@@ -46,6 +51,9 @@ private:
 
 	void updateHeadlight();
 
+
+	friend class Level;
+	int   mPlayerId;
 	
 
 	ColBody mBody;
@@ -65,7 +73,7 @@ private:
 	Weapon* mWeaponSlot[ NUM_WEAPON_SLOT ];
 	bool    haveShoot;
 
-	Light* light;
+	Light mHeadLight;
 
 	float  shiftTrack;
 

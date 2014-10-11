@@ -1,8 +1,6 @@
 #include "Explosion.h"
 #include "Level.h"
 
-#include "Light.h"
-
 Explosion::Explosion()
 {
 
@@ -32,14 +30,17 @@ void Explosion::Init( Vec2f poz, float radius )
 void Explosion::onSpawn()
 {
 	BaseClass::onSpawn();
-	light = getLevel()->createLight( getPos() , radius , false);
-	light->setColorParam(color, 0);	
-	light->isExplosion = true;
+
+	mLight.host   = this;
+	mLight.radius = radius;
+	mLight.setColorParam(color, 0);
+	mLight.isExplosion = true;
+	getLevel()->addLight( mLight );
 }
 
 void Explosion::onDestroy()
 {
-	light->destroy();
+	mLight.remove();
 	BaseClass::onDestroy();
 }
 
@@ -78,6 +79,6 @@ void Explosion::tick()
 			intensity=maxIntenzitet;
 		}
 	}	
-	light->setColorParam(color, intensity);	
+	mLight.setColorParam(color, intensity);	
 }
 

@@ -120,7 +120,7 @@ protected:
 	friend class LevelStage;
 
 
-	Light*     mEditLight;
+	LightObject*     mEditLight;
 	float      sr,sg,sb, si, srad; //boja postavljenog svjetla
 
 

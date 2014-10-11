@@ -28,7 +28,7 @@ Game::Game()
 	mMouseState = 0;
 }
 
-bool Game::init(char* configFile)
+bool Game::init( char const* pathConfig )
 {
 	using std::cout;
 	using std::endl;
@@ -142,9 +142,9 @@ void Game::run()
 
 	IText* text = IText::create( mFonts[0] , 18 , Color(255,255,25) );
 
-	static int const NUM_FPS_SAMPLES = 24;
+	static int const NUM_FPS_SAMPLES = 12;
 	float fpsSamples[NUM_FPS_SAMPLES];
-	int   NumFrameSample = 4;
+	int   NumFramePerSample = 10;
 	std::fill_n( fpsSamples , NUM_FPS_SAMPLES , 60.0f );
 	int  idxSample = 0;
 
@@ -164,7 +164,7 @@ void Game::run()
 			mStageStack.back()->onRender();
 
 			++frameCount;
-			if ( frameCount > NumFrameSample )
+			if ( frameCount > NumFramePerSample )
 			{
 				int64 temp = Platform::getTickCount();
 				fpsSamples[idxSample] = 1000.0f * ( frameCount ) / (  temp - timeFrame );

@@ -124,8 +124,9 @@ void AreaTrigger::renderDev()
 
 void SpawnMobAct::fire( Level* level )
 {
-	Mob* mob = level->spawnMobByName( mobName , pos );
-	mob->spawnEffect();
+	LevelObject* object = level->spawnObjectByName( mobName.c_str() , pos );
+	if ( object->getType() == OT_MOB )
+		object->cast< Mob >()->spawnEffect();
 }
 
 void MessageAct::fire( Level* level )

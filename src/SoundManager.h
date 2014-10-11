@@ -22,7 +22,7 @@ public:
 	void stop(){ mSoundImpl.stop(); }
 	bool isPlaying(){ return mSoundImpl.getStatus() == sf::Sound::Playing; }
 
-	SoundData* GetData(){ return mData; }
+	SoundData* getData(){ return mData; }
 
 private:
 	sf::Sound  mSoundImpl;

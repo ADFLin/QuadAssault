@@ -7,6 +7,7 @@
 class Level;
 class Object;
 class Shader;
+class Light;
 class IRenderer;
 
 struct TileRange
@@ -75,12 +76,10 @@ private:
 	void   renderTerrain( Level* level , TileRange const& range );
 	void   renderTerrainNormal( Level* level , TileRange const& range );
 	void   renderTerrainGlow( Level* level , TileRange const& range );
-	void   renderTerrainShadow( Level* level , Light* light , TileRange const& range );
-
-	void   renderLighting( RenderParam& param , Light* light );
+	void   renderTerrainShadow( Level* level , Vec2f const& lightPos , Light* light , TileRange const& range );
+	void   renderLighting( RenderParam& param , Vec2f const& lightPos , Light* light );
 	bool   setupFBO( int width , int height );
 	void   setupLightShaderParam( Shader* shader , Light* light );
-
 	struct GroupCompFun
 	{
 		bool operator()( RenderGroup* a , RenderGroup* b ) const 

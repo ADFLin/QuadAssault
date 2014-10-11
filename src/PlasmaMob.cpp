@@ -20,9 +20,9 @@ public:
 
 static PlasmaMobRenderer gRenderer;
 
-void PlasmaMob::init(Vec2f const& poz )
+void PlasmaMob::init()
 {
-	BaseClass::init(poz);
+	BaseClass::init();
 
 	mSize.x=64;
 	mSize.y=64;
@@ -31,7 +31,6 @@ void PlasmaMob::init(Vec2f const& poz )
 	maxbrzina=75;
 	brzinaPunjenja=50;	
 	domet=512;
-
 	mHP=60;
 
 }
@@ -45,7 +44,7 @@ void PlasmaMob::tick()
 {
 	BaseClass::tick();
 	
-	shoot( BulletFactoryT< PlasmaBullet >() );	
+	shoot( IBulletFactory::Make< PlasmaBullet >() );	
 	
 	Vec2f dir;
 	dir= getLevel()->getPlayer()->getPos() - getPos();

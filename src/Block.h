@@ -55,7 +55,7 @@ public:
 	virtual void  renderNoTexture( Tile const& tile );
 
 	//call when block is not simple
-	virtual void  renderShadow( Tile const& tile , Light& light ){}
+	virtual void  renderShadow( Tile const& tile , Vec2f const& lightPos , Light& light ){}
 	virtual bool  rayTest( Tile const& tile , Vec2f const& from , Vec2f const& to ){ return false; }
 	virtual bool  testIntersect( Tile const& tile , Rect const& bBox ){ return false; }
 

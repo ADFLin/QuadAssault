@@ -3,21 +3,22 @@
 
 #include "Bullet.h"
 
+#include "Light.h"
+
 class LevelStage;
 
 class PlasmaBullet : public Bullet
 {
-
+	typedef Bullet BaseClass;
 public:	
-	void init(Vec2f const& poz, Vec2f const& dir, int team );
-
+	virtual void init();
 	virtual void tick();
 	virtual void onDestroy();
 	virtual void onSpawn();
 	virtual IRenderer* getRenderer();
-
+	
 private:
-	Light* light;
+	Light mLight;
 	float  dimTimer; //dok ostvari 10, ostavlja cesticu dima
 };
 

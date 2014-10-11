@@ -151,6 +151,15 @@ public:
 	TileEditFrame( int id , Vec2f const& pos , GWidget* parent );
 };
 
+class ObjectEditFrame : public GFrame
+{
+
+
+
+
+
+
+};
 
 
 

@@ -5,7 +5,7 @@
 
 #include "ColBody.h"
 
-class Light;
+class LightObject;
 
 enum Team
 {
@@ -22,7 +22,8 @@ public:
 	Bullet();
 	~Bullet();
 
-	virtual void init(Vec2f const& poz, Vec2f const& dir, int team );
+	virtual void init();
+	void setup( Vec2f const& poz, Vec2f const& dir, int team );
 
 	virtual ObjectType getType() { return OT_BULLET; }
 	virtual void onSpawn();
@@ -32,13 +33,14 @@ public:
 
 	float getDamage(){ return mDamage; }
 
+
 	int  team;
 
 protected:
 
 	friend class MinigunBulletRenderer;
 	friend class LaserBulletRenderer;
-	Vec2f   dir;
+	Vec2f   mDir;
 	float   mLifeTime;
 	float   mTime;
 	float   mDamage;

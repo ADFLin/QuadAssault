@@ -5,7 +5,7 @@
 #include "TextureManager.h"
 #include "SoundManager.h"
 
-#include "Light.h"
+#include "LightObject.h"
 #include "Bullet.h"
 #include "Mob.h"
 #include "Explosion.h"
@@ -187,6 +187,12 @@ public:
 DEFINE_RENDERER( Player , PlayerRenderer )
 
 
+Player::Player()
+{
+	mPlayerId = -1;
+}
+
+
 void Player::init()
 {
 	setSize( Vec2f(64,64) );
@@ -217,10 +223,12 @@ void Player::onSpawn()
 
 	getLevel()->getColManager().addBody( *this , mBody );
 
-	light = getLevel()->createLight( Vec2f(0.0, 0.0), 1024 , false );
-	light->setColorParam(Vec3f(1.0, 1.0, 1.0), 16);
-	light->drawShadow = true;
-	
+	mHeadLight.radius = 1024;
+	mHeadLight.host = this;
+	mHeadLight.angle  = 2;
+	mHeadLight.setColorParam(Vec3f(1.0, 1.0, 1.0), 16);
+	mHeadLight.drawShadow = true;
+	getLevel()->addLight( mHeadLight );
 }
 
 void Player::onDestroy()
@@ -296,7 +304,8 @@ void Player::update( Vec2f const& aimPos )
 			Message* gameOverMsg = new Message();
 			gameOverMsg->init("Base", "All units lost, mission Failed." , 4, "blip.wav" );
 			getLevel()->addMessage( gameOverMsg );
-			light->setColorParam(Vec3f(0,0,0), 0);
+
+			mHeadLight.setColorParam(Vec3f(0,0,0), 0);
 
 			mIsDead = true;
 
@@ -331,12 +340,11 @@ void Player::updateHeadlight()
 	dir.x = cos( angle );
 	dir.y = sin( angle );
 	Math::normalize( dir );	
-	light->PostavkeKuta(dir,2);
+	mHeadLight.dir = dir;
 
-	Vec2f offset;
-	offset.x=cos( rotationAim );
-	offset.y=sin( rotationAim );
-	light->setPos(getPos()+ 34 * offset);
+	float dist = 34;
+	mHeadLight.offset.x = dist * cos( rotationAim );
+	mHeadLight.offset.y = dist * sin( rotationAim );
 }
 
 void Player::addMoment(float x)

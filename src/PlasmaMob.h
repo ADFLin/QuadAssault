@@ -8,12 +8,12 @@ class PlasmaMob : public Mob
 	typedef Mob BaseClass;
 private:
 public:
-	void init(Vec2f const& poz);
-	void tick();
-	void takeDamage(Bullet* p);
-	void onDestroy();
-	void onSpawn();
+	virtual void init();
+	virtual void onDestroy();
+	virtual void onSpawn();
+	virtual void tick();
 
+	void takeDamage(Bullet* p);
 	virtual IRenderer* getRenderer();
 };
 

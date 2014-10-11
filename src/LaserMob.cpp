@@ -20,9 +20,9 @@ public:
 
 DEFINE_RENDERER( LaserMob , LaserMobRenderer );
 
-void LaserMob::init(Vec2f const& poz)
+void LaserMob::init()
 {
-	BaseClass::init(poz);
+	BaseClass::init();
 
 	mSize.x=64;
 	mSize.y=64;
@@ -49,7 +49,7 @@ void LaserMob::tick()
 {
 	Mob::tick();
 
-	shoot( BulletFactoryT< LaserBullet >() );
+	shoot( IBulletFactory::Make< LaserBullet >() );
 
 	Vec2f dir = getLevel()->getPlayer()->getPos()- getPos();
 	

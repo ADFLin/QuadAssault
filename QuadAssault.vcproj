@@ -203,10 +203,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\FontImpl.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Game.h"
 				>
 			</File>
@@ -228,6 +224,10 @@
 			</File>
 			<File
 				RelativePath=".\src\LevelEditor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Light.h"
 				>
 			</File>
 			<File
@@ -604,11 +604,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Light.cpp"
+				RelativePath=".\src\LightObject.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\Light.h"
+				RelativePath=".\src\LightObject.h"
 				>
 			</File>
 			<File

@@ -11,9 +11,9 @@ class ItemPickup : public LevelObject
 {
 	typedef LevelObject BaseClass;
 public:
+	ItemPickup();
 	ItemPickup( Vec2f const& pos );
-	void init();
-
+	virtual void init();
 	virtual ObjectType getType(){ return OT_ITEM; }
 	virtual void tick();
 	virtual void onSpawn();

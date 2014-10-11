@@ -30,7 +30,7 @@ GLContext* PlatformSF::createGLContext( GameWindow& window , GLConfig& config )
 
 sf::Keyboard::Key convertToSFKey( unsigned key )
 {
-	
+	//FIXME
 	switch( key )
 	{
 	case Keyboard::eCANCEL : break;
@@ -224,16 +224,17 @@ int convertSFKey( sf::Keyboard::Key key )
 	if ( key <= sf::Keyboard::Num9 )
 		return Keyboard::eNUM0 + ( key - sf::Keyboard::Num0 );
 
+	//FIXME
 	switch( key )
 	{
-	case sf::Keyboard::Escape: return VK_ESCAPE;
-	case sf::Keyboard::Return: return VK_RETURN;
-	case sf::Keyboard::BackSpace: return VK_BACK;
-	case sf::Keyboard::Left:  return VK_LEFT;
-	case sf::Keyboard::Right: return VK_RIGHT;
-	case sf::Keyboard::Up:    return VK_UP;
-	case sf::Keyboard::Down:  return VK_DOWN;
-	case sf::Keyboard::Pause: return VK_PAUSE;
+	case sf::Keyboard::Escape: return Keyboard::eESCAPE;
+	case sf::Keyboard::Return: return Keyboard::eRETURN;
+	case sf::Keyboard::BackSpace: return Keyboard::eBACK;
+	case sf::Keyboard::Left:  return Keyboard::eLEFT;
+	case sf::Keyboard::Right: return Keyboard::eRIGHT;
+	case sf::Keyboard::Up:    return Keyboard::eUP;
+	case sf::Keyboard::Down:  return Keyboard::eDOWN;
+	case sf::Keyboard::Pause: return Keyboard::ePAUSE;
 	}
 	if ( key <  sf::Keyboard::Numpad0 )
 		return -1;

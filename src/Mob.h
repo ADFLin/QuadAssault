@@ -2,22 +2,14 @@
 #define MOB_H
 
 #include "Actor.h"
-
-
 #include "ColBody.h"
 #include "ObjectFactory.h"
 
-class Bullet;
+
 class Player;
 
+class Bullet;
 typedef IFactoryT< Bullet > IBulletFactory;
-
-template< class T >
-class BulletFactoryT : public IBulletFactory
-{
-public:
-	T* create() const { return new T; }
-};
 
 class MobRenderer : public IRenderer
 {
@@ -32,7 +24,7 @@ class Mob : public Actor
 	typedef Actor BaseClass;
 
 public:
-	virtual void init( Vec2f const& poz );
+	virtual void init();
 
 	virtual ObjectType getType(){ return OT_MOB; }
 	virtual void onSpawn();

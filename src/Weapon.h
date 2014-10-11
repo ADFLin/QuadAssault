@@ -8,10 +8,14 @@ class Bullet;
 class Player;
 class Weapon;
 
+
+#include "ObjectFactory.h"
+typedef IFactoryT< Bullet > IBulletFactory;
+
 class FireHelper
 {
 public:
-	void fire( Bullet* bullet , Vec2f const& offset = Vec2f(0,0) );
+	void fire( IBulletFactory& factory , Vec2f const& offset = Vec2f(0,0) );
 	Vec2f pos;
 	Vec2f dir;
 	int   team;

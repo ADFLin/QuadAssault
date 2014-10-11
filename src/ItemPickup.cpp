@@ -8,9 +8,13 @@ ItemPickup::ItemPickup( Vec2f const& pos )
 
 }
 
-void ItemPickup::init()
+ItemPickup::ItemPickup()
 {
 
+}
+
+void ItemPickup::init()
+{
 	setSize( Vec2f( 32 , 32 ) );
 	mBody.setSize( Vec2f( 32 , 32 ) );
 	mBody.setMask( COL_ITEM | COL_RENDER );

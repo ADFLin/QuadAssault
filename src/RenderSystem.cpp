@@ -67,7 +67,7 @@ public:
 	}
 };
 
-#else
+#else //FIXME : FPS is low  :( , and decrease by Time
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

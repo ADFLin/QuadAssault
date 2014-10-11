@@ -93,7 +93,7 @@ Sound* SoundManager::addSound( char const* name , bool canRepeat )
 		for(int i=0; i<mSounds.size(); i++)
 		{
 			Sound* sound = mSounds[i];
-			if( sound->GetData() != data )
+			if( sound->getData() != data )
 				continue;
 
 			sound->stop();

@@ -9,9 +9,9 @@
 #include "TextureManager.h"
 #include "RenderUtility.h"
 
-void Mob::init( Vec2f const& poz )
+void Mob::init()
 {
-	setPos( poz );
+	BaseClass::init();
 
 	mTarget = NULL;
 	mSize.x=64;
@@ -161,7 +161,7 @@ void Mob::shoot( IBulletFactory const& creator )
 		{
 			Math::normalize( offset );
 			Bullet* p = creator.create();
-			p->init( getPos() ,offset , TEAM_EMPTY );	
+			p->setup( getPos() ,offset , TEAM_EMPTY );	
 			getLevel()->addBullet(p);
 		}	
 		punjenje=0;

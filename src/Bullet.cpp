@@ -2,7 +2,7 @@
 #include "Level.h"
 #include "Explosion.h"
 
-#include "Light.h"
+#include "LightObject.h"
 
 Bullet::Bullet()
 {
@@ -10,21 +10,23 @@ Bullet::Bullet()
 
 Bullet::~Bullet()
 {	
+
 }
 
-void Bullet::init( Vec2f const& poz, Vec2f const& dir, int team )
+void Bullet::init()
 {
-	setPos( poz );
-	setSize( Vec2f(2 ,2 ) );
-
-	this->dir=dir;
-	this->team = team;	
-
 	mTime=0;
-
 	mSpeed    = 1000;
 	mLifeTime = 0.6;
 	mDamage   = 50;
+}
+
+void Bullet::setup( Vec2f const& poz, Vec2f const& dir, int team )
+{
+	setPos( poz );
+	setSize( Vec2f( 2 , 2 ) );
+	mDir=dir;
+	this->team = team;	
 }
 
 void Bullet::onSpawn()
@@ -52,7 +54,7 @@ void Bullet::tick()
 	if ( mNeedDestroy )
 		return;
 
-	mPos += ( mSpeed * TICK_TIME ) * dir;
+	mPos += ( mSpeed * TICK_TIME ) * mDir;
 
 	mTime += TICK_TIME;
 

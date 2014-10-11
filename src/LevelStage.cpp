@@ -17,7 +17,7 @@
 #include "Player.h"
 #include "Explosion.h"
 #include "Mob.h"
-#include "Light.h"
+#include "LightObject.h"
 #include "Trigger.h"
 #include "Message.h"
 
@@ -135,11 +135,16 @@ bool LevelStage::onInit()
 
 	}
 
+
 	Block::initialize();
 	IRenderer::initialize();
 
+
+	mObjectCreator = new ObjectCreator;
+	reigsterObject();
+
 	mLevel = new Level;
-	mLevel->init();
+	mLevel->init( *mObjectCreator );
 	mLevel->addListerner( *this );
 
 	mCamera = new Object();
@@ -158,8 +163,8 @@ bool LevelStage::onInit()
 
 	for ( int i = 0 ; i < 20 ; ++i )
 	{
-		Mob* mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
-		mob = mLevel->spawnMobByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
+		mLevel->spawnObjectByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
+		mLevel->spawnObjectByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
 	}
 
 
@@ -391,6 +396,7 @@ bool LevelStage::onKey( unsigned key , bool isDown )
 			stage->mLevel  = mLevel;
 			stage->mCamera = mCamera;
 			stage->mWorldScaleFactor = mWorldScaleFactor;
+			stage->mObjectCreator = mObjectCreator;
 			getGame()->addStage( stage , false );
 		}
 		break;
@@ -469,7 +475,7 @@ void LevelStage::loadLevel()
 
 	mLevel->setupTerrain( mapWidth , mapHeight );
 
-	Player* player = mLevel->getPlayer();
+	Player* player = mLevel->createPlayer();
 
 	TileMap& terrain = mLevel->getTerrain();
 
@@ -520,7 +526,7 @@ void LevelStage::loadLevel()
 					getline(lstring,token,' ');
 					color.z = atof(token.c_str());
 
-					Light* light = mLevel->createLight( pos , radius , true );
+					LightObject* light = mLevel->createLight( pos , radius );
 					light->setColorParam( color ,intensity);
 					//light->drawShadow = true;
 				}
@@ -593,7 +599,7 @@ void LevelStage::loadLevel()
 				mMusic.setLoop(true);
 				mMusic.play();
 			}
-			else if(token=="mob")
+			else if(token=="mob" || token == "object")
 			{
 				Vec2f pos;
 				getline(lstring,token,' ');
@@ -601,7 +607,7 @@ void LevelStage::loadLevel()
 				getline(lstring,token,' ');
 				pos.y=atof(token.c_str());
 				getline(lstring,token,' ');
-				Mob* m = mLevel->spawnMobByName( token , pos );
+				mLevel->spawnObjectByName( token.c_str() , pos );
 			}
 			else if(token=="mob_trigger")
 			{
@@ -681,5 +687,14 @@ void LevelStage::loadLevel()
 		}
 	}
 	levelFS.close();
+
+}
+
+void LevelStage::reigsterObject()
+{
+	mObjectCreator->registerClass< LaserMob >( "Mob.Laser" );
+	mObjectCreator->registerClass< MinigunMob >( "Mob.Minigun" );
+	mObjectCreator->registerClass< PlasmaMob >( "Mob.Plasma" );
+	mObjectCreator->registerClass< KeyPickup >( "Pickup.Key" );
 
 }

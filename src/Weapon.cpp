@@ -7,9 +7,11 @@
 #include "TextureManager.h"
 #include "Texture.h"
 
-void FireHelper::fire( Bullet* bullet , Vec2f const& offset )
+
+void FireHelper::fire( IBulletFactory& factory , Vec2f const& offset /*= Vec2f(0,0) */ )
 {
-	bullet->init( pos + offset , dir ,team );
+	Bullet* bullet = factory.create();
+	bullet->setup( pos + offset , dir ,team );
 	weapon->getOwner()->getLevel()->addBullet( bullet );
 	weapon->onFireBullet( bullet );
 }

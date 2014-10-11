@@ -11,9 +11,9 @@ public:
 	Object();
 	Object( Vec2f const& pos );
 	virtual ~Object(){}
-	
-	Vec2f const& getPos() const { return mPos; }
-	void         setPos(Vec2f const& pos){ mPos = pos; }
+
+	Vec2f const&  getPos() const { return mPos; }
+	void          setPos(Vec2f const& pos){ mPos = pos; }
 
 protected:
 	Vec2f mPos;
@@ -57,7 +57,7 @@ public:
 	LevelObject( Vec2f const& pos );
 	
 	virtual ObjectType getType() = 0;
-
+	virtual void init(){}
 	virtual void onSpawn(){}
 	virtual void onDestroy(){}
 	virtual void tick(){}

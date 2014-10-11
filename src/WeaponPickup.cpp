@@ -1,10 +1,10 @@
 #include "WeaponPickup.h"
+
 #include "GameInterface.h"
 #include "Level.h"
 #include "TextureManager.h"
 
 #include "Player.h"
-#include "Light.h"
 
 #include "Laser.h"
 #include "Plasma.h"
@@ -18,24 +18,24 @@ public:
 	virtual void init()
 	{
 		TextureManager* texMgr = getGame()->getTextureMgr();
-		mTex[ LASER1 ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-		mTex[ LASER1 ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
-		mTex[ LASER1 ][ RP_GLOW    ] = texMgr->getTexture("oruzje1Glow.tga");
+		mTex[ WEAPON_LASER ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
+		mTex[ WEAPON_LASER ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
+		mTex[ WEAPON_LASER ][ RP_GLOW    ] = texMgr->getTexture("oruzje1Glow.tga");
 
-		mTex[ PLAZMA1 ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-		mTex[ PLAZMA1 ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
-		mTex[ PLAZMA1 ][ RP_GLOW    ] = texMgr->getTexture("oruzje2Glow.tga");
+		mTex[ WEAPON_PLAZMA ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
+		mTex[ WEAPON_PLAZMA ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
+		mTex[ WEAPON_PLAZMA ][ RP_GLOW    ] = texMgr->getTexture("oruzje2Glow.tga");
 
-		mTex[ MINIGUN1 ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-		mTex[ MINIGUN1 ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
-		mTex[ MINIGUN1 ][ RP_GLOW    ] = texMgr->getTexture("oruzje3Glow.tga");
+		mTex[ WEAPON_MINIGUN ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
+		mTex[ WEAPON_MINIGUN ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
+		mTex[ WEAPON_MINIGUN ][ RP_GLOW    ] = texMgr->getTexture("oruzje3Glow.tga");
 
 	}
 
 	virtual void render( RenderPass pass , LevelObject* object )
 	{
 		WeaponPickup* pickup = static_cast< WeaponPickup* >( object );
-		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->rotation , mTex[ pickup->mId ][ pass ] );
+		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->mRotation , mTex[ pickup->mId ][ pass ] );
 	}
 	Texture* mTex[ 3 ][ NUM_RENDER_PASS ];
 };
@@ -55,32 +55,37 @@ void WeaponPickup::init()
 
 	mSize.x=32;
 	mSize.y=32;
-	rotation=0;
+	mRotation=0;
 }
 
 void WeaponPickup::onSpawn()
 {
 	BaseClass::onSpawn();
 
-	s = getLevel()->createLight( getPos() , 256 , false );
-	if(mId==LASER1)
-		s->setColorParam(Vec3f(0.2,1.0,0.2),6);
-	else if(mId==PLAZMA1)
-		s->setColorParam(Vec3f(0.2,0.2,1.0),6);
+	mLight.host   = this;
+	mLight.radius = 256;
+	switch( mId )
+	{
+	case WEAPON_LASER:  mLight.setColorParam(Vec3f(0.2,1.0,0.2),6); break;
+	case WEAPON_PLAZMA: mLight.setColorParam(Vec3f(0.2,0.2,1.0),6); break;
+	case WEAPON_MINIGUN: mLight.setColorParam(Vec3f(1.0,0.2,2.0),6); break;
+	}
+	getLevel()->addLight( mLight );
+	
 }
 
 void WeaponPickup::onDestroy()
 {
-	s->destroy();
+	mLight.remove();
 	BaseClass::onDestroy();
 }
 
 void WeaponPickup::tick()
 {
 	BaseClass::tick();
-	rotation+=100*TICK_TIME;
-	if(rotation>360)
-		rotation -= 360;
+	mRotation+=100*TICK_TIME;
+	if(mRotation>360)
+		mRotation -= 360;
 }
 
 
@@ -92,9 +97,9 @@ void WeaponPickup::onPick(Player* player)
 
 	switch( mId )
 	{
-	case LASER1: weapon = new Laser; break;
-	case PLAZMA1: weapon = new Plasma; break;
-	case MINIGUN1: weapon = new Minigun; break;
+	case WEAPON_LASER: weapon = new Laser; break;
+	case WEAPON_PLAZMA: weapon = new Plasma; break;
+	case WEAPON_MINIGUN: weapon = new Minigun; break;
 	}
 
 	if ( weapon )

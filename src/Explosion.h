@@ -3,7 +3,7 @@
 
 #include "Object.h"
 
-class Light;
+#include "Light.h"
 
 class Explosion : public LevelObject
 {
@@ -26,8 +26,8 @@ public:
 
 protected:
 
-	float  radius;
-	Light* light;
+	float radius;
+	Light mLight;
 
 	// if you die, the intensity is reduced, if not, then increases
 	bool  mbDead;

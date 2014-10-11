@@ -7,7 +7,7 @@ class MinigunMob : public Mob
 {
 	typedef Mob BaseClass;
 public:
-	void init(Vec2f const& poz);
+	virtual void init();
 	virtual void tick();
 	virtual void takeDamage(Bullet* p);
 	virtual IRenderer* getRenderer();

@@ -2,21 +2,21 @@
 #define LaserBullet_h__
 
 #include "Bullet.h"
+#include "Light.h"
 
 class LaserBullet : public Bullet
 {
 	typedef Bullet BaseClass;
-
 public:	
-	void init(Vec2f const& poz, Vec2f const& dir, int team );
-	void tick();
-	void onDestroy();
-	void onSpawn();
+	virtual void init();
+	virtual void tick();
+	virtual void onDestroy();
+	virtual void onSpawn();
 
 	virtual IRenderer* getRenderer();
 
 private:
-	Light* light;
+	Light mLight;
 };
 
 

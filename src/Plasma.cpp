@@ -27,5 +27,5 @@ void Plasma::tick()
 
 void Plasma::doFire( FireHelper& heler )
 {
-	heler.fire( new PlasmaBullet );
+	heler.fire( IBulletFactory::Make< PlasmaBullet >() );
 }

@@ -5,7 +5,6 @@
 #include "TextureManager.h"
 #include "SmokeParticle.h"
 #include "Explosion.h"
-#include "Light.h"
 #include "RenderUtility.h"
 
 
@@ -29,34 +28,45 @@ public:
 
 DEFINE_RENDERER( PlasmaBullet , PlasmaBulletRenderer )
 
-void PlasmaBullet::init(Vec2f const& poz, Vec2f const& dir, int team )
+void PlasmaBullet::init()
 {
-	Bullet::init(poz,dir,team );
+	BaseClass::init();
 	mSpeed = 800;
 	mLifeTime = 0.8;
 	mDamage=12;
 
 	mSize = Vec2f(1,1);
-
 	dimTimer=0.0;
 }
 
 void PlasmaBullet::onSpawn()
 {
-	Bullet::onSpawn();
+	BaseClass::onSpawn();
 
-	light = getLevel()->createLight( getPos() , 256 , false );	
-	light->setColorParam(Vec3f(0.25, 0.5, 1.0),18);	
+	mLight.host   = this;
+	mLight.radius = 256;
+	mLight.setColorParam(Vec3f(0.25, 0.5, 1.0),18);
+	getLevel()->addLight( mLight );
 
 	getLevel()->playSound("plazma1.wav");	
 
 }
+void PlasmaBullet::onDestroy()
+{		
+	mLight.remove();
+	Explosion* e = getLevel()->createExplosion( getPos() , 256 );	
+	e->setParam(20,1000,50);
+	e->setColor(Vec3f(1.0, 0.75, 0.5));
+
+	getLevel()->playSound("explosion1.wav");	
+
+	BaseClass::onDestroy();
+}
+
 void PlasmaBullet::tick()
 {
-	Bullet::tick();
+	BaseClass::tick();
 
-	light->setPos( getPos() );	
-	
 	dimTimer += TICK_TIME * 750;
 	if(dimTimer>=10.0)
 	{
@@ -65,14 +75,4 @@ void PlasmaBullet::tick()
 		getLevel()->addParticle( p );
 		dimTimer=0.0;
 	}
-}
-
-void PlasmaBullet::onDestroy()
-{		
-	light->destroy();
-	Explosion* e = getLevel()->createExplosion( getPos() , 256 );	
-	e->setParam(20,1000,50);
-	e->setColor(Vec3f(1.0, 0.75, 0.5));
-
-	getLevel()->playSound("explosion1.wav");		
 }

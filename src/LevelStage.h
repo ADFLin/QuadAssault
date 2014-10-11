@@ -14,6 +14,7 @@
 
 class SoundManager;
 class GUIManager;
+class ObjectCreator;
 class IText;
 
 class WorldData
@@ -37,6 +38,7 @@ protected:
 	Object*        mCamera;
 	float          mWorldScaleFactor;
 	Level*         mLevel;
+	ObjectCreator* mObjectCreator;
 };
 
 class LevelStageBase : public GameStage
@@ -61,11 +63,10 @@ protected:
 
 	};
 
-
-
-	IText*      mDevMsg;
-	Texture*    mTexCursor;
-	RenderParam mRenderParam;
+	IText*         mDevMsg;
+	Texture*       mTexCursor;
+	RenderParam    mRenderParam;
+	
 
 	bool        mPause;
 };
@@ -95,6 +96,7 @@ public:
 
 	void loadLevel();
 	void generateEmptyLevel();
+	void reigsterObject();
 
 private:
 

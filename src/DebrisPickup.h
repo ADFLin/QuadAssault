@@ -2,7 +2,7 @@
 #define DebrisPickup_h__
 
 #include "ItemPickup.h"
-#include "Light.h"
+#include "LightObject.h"
 
 class DebrisPickup : public ItemPickup
 {
@@ -29,7 +29,7 @@ protected:
 
 	float cesticaTimer; //dok dosegne 0, spawna cesticu
 
-	Light* light;
+	Light mLight;
 
 };
 

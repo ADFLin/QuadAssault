@@ -7,10 +7,11 @@ class LaserMob : public Mob
 {
 	typedef Mob BaseClass;
 public:
-	void init(Vec2f const& poz);
-	void onSpawn();
-	void onDestroy();
-	void tick();
+	virtual void init();
+	virtual void onSpawn();
+	virtual void onDestroy();
+	virtual void tick();
+
 	void takeDamage(Bullet* p);
 	void shoot( IBulletFactory const& creator );
 

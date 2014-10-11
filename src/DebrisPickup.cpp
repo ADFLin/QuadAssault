@@ -66,14 +66,15 @@ void DebrisPickup::onSpawn()
 	dir.y/=5;
 	Math::normalize( dir );
 
-	light = getLevel()->createLight( getPos() ,64 , false);
-	light->setColorParam(Vec3f(1.0, 0.75, 0.5),4);	
-	light->isExplosion = true;
+	mLight.host = this;
+	mLight.isExplosion = true;
+	mLight.setColorParam(Vec3f(1.0, 0.75, 0.5),4);
+	getLevel()->addLight( mLight );
 }
 
 void DebrisPickup::onDestroy()
 {
-	light->destroy();
+	mLight.remove();
 	BaseClass::onDestroy();
 }
 
@@ -83,7 +84,6 @@ void DebrisPickup::tick()
 	
 	if(brzina>0.0)
 	{
-		light->setPos(getPos());
 		if(cesticaTimer>=1.0)
 		{
 			DebrisParticle* c = new DebrisParticle( getPos() );

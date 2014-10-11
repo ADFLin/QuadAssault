@@ -21,9 +21,9 @@ public:
 
 static MinigunMobRenderer gRenderer;
 
-void MinigunMob::init(Vec2f const& poz)
+void MinigunMob::init()
 {
-	BaseClass::init(poz);
+	BaseClass::init();
 
 	mSize.x=64;
 	mSize.y=64;
@@ -51,7 +51,7 @@ void MinigunMob::onDestroy()
 void MinigunMob::tick()
 {
 	BaseClass::tick();
-	shoot( BulletFactoryT< MinigunBullet >() );	
+	shoot( IBulletFactory::Make< MinigunBullet >() );	
 	Vec2f dir;
 	dir= getLevel()->getPlayer()->getPos()- getPos();
 	if( dir.length2()< 300 * 300 )

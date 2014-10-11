@@ -26,15 +26,8 @@ void Message::init( string const& sender, string const& content, float durstion,
 	p_text = IText::create( getGame()->getFont(0) , 24 , Color(25,255,25) );
 	p_text->setString( sender.c_str() );
 
-	
-
 	text = IText::create( getGame()->getFont(0) , 24 , Color(255,255,255) );
 	text->setString( content.c_str() );
-
-
-
-
-
 
 	portrait = getGame()->getTextureMgr()->getTexture("portrait2.tga");	
 }
