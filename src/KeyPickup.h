@@ -21,8 +21,14 @@ public:
 	virtual void onSpawn();
 	virtual IRenderer* getRenderer();
 
-	int       idDoor;
+	virtual void enumProp( IPropEditor& editor );
+	virtual void setupDefault();
+
+	virtual void updateEdit();
+
+	
 protected:
+	int       mId;
 	float     mRotation;
 	Light     mLight;
 	

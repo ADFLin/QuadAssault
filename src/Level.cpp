@@ -333,9 +333,9 @@ void Level::destroyAllObjectImpl()
 	}
 }
 
-void Level::destroyAllObject( bool bPlayerIncluded )
+void Level::destroyAllObject( bool skipPlayer )
 {
-	if ( !bPlayerIncluded )
+	if ( skipPlayer )
 	{
 		for( PlayerVec::iterator iter = mPlayers.begin();
 			iter != mPlayers.end() ; ++iter )
@@ -347,18 +347,18 @@ void Level::destroyAllObject( bool bPlayerIncluded )
 
 	destroyAllObjectImpl();
 
-	if ( bPlayerIncluded )
-	{
-		mPlayers.clear();
-	}
-	else
+	if ( skipPlayer )
 	{
 		for( PlayerVec::iterator iter = mPlayers.begin();
 			iter != mPlayers.end() ; ++iter )
 		{
 			Player* player = *iter;
-			addOjectInternal( player );
+			mObjects.push_back( player );
 		}
+	}
+	else
+	{
+		mPlayers.clear();
 	}
 }
 
@@ -382,12 +382,14 @@ void Level::addObject( LevelObject* object )
 	
 }
 
-LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos )
+LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos , bool bSetDefault )
 {
 	LevelObject* obj = mObjectCreator->createObject( name );
 	if ( !obj )
 		return NULL;
 	obj->setPos( pos );
+	if ( bSetDefault )
+		obj->setupDefault();
 	addObject( obj );
 	return obj;
 }

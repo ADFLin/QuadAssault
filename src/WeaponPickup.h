@@ -10,6 +10,8 @@ enum WeaponId
 	WEAPON_LASER ,
 	WEAPON_PLAZMA ,
 	WEAPON_MINIGUN ,
+
+	NUM_WEAPON_ID ,
 };
 
 class WeaponPickup : public ItemPickup
@@ -17,6 +19,7 @@ class WeaponPickup : public ItemPickup
 	typedef ItemPickup BaseClass;
 
 public:
+	WeaponPickup();
 
 	WeaponPickup( Vec2f const& pos , int id );
 	void init();
@@ -28,10 +31,14 @@ public:
 
 	virtual IRenderer* getRenderer();
 
+	virtual void enumProp( IPropEditor& editor );
+	virtual void setupDefault();
+
+
 protected:
-	float      mRotation;
+	float  mRotation;
 	Light  mLight;
-	int        mId;
+	int    mId;
 
 	friend class WeaponPickupRenderer;
 

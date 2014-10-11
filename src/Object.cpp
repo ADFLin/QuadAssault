@@ -37,8 +37,7 @@ void LevelObject::calcBoundBox( Rect& bBox )
 
 void LevelObject::enumProp( IPropEditor& editor )
 {
-	editor.addProp( "Pos.X" , mPos.x );
-	editor.addProp( "Pos.Y" , mPos.y );
+	editor.addProp( "Pos" , mPos );
 }
 
 

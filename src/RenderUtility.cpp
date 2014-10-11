@@ -62,3 +62,13 @@ void drawSprite(Vec2f const& poz, Vec2f const& dim, float rot, Texture* tex )
 	glPopMatrix();
 }
 
+void drawRectLine( Vec2f const& pos , Vec2f const size )
+{
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(pos.x         , pos.y       );
+	glVertex2f(pos.x + size.x, pos.y       );
+	glVertex2f(pos.x + size.x, pos.y+size.y);
+	glVertex2f(pos.x         , pos.y+size.y);
+	glEnd();	
+}
+

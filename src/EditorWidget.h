@@ -6,19 +6,22 @@
 #include "GameEdit.h"
 #include "GUISystem.h"
 #include "Dependence.h"
+#include "ObjectFactory.h"
 
 enum
 {
 	UI_CREATE_LIGHT   = UI_EDIT_ID ,
 	UI_CREATE_TRIGGER ,
-	UI_EMPTY_MAP ,
+	UI_NEW_MAP ,
 	UI_SAVE_MAP  ,
 
 	UI_TILE_BUTTON ,
-	UI_PROP_FRAME,
+	UI_PROP_FRAME ,
+	UI_OBJ_SELECT_BUTTON ,
 
 	UI_OBJECT_EDIT_BUTTON ,
 	UI_TILE_EDIT_BUTTON ,
+	
 
 };
 
@@ -88,16 +91,12 @@ public:
 		UI_INT_PROP_CHIOCE ,
 	};
 
-	void  setupEdit( IEditable& obj )
-	{
-		cleanAllPorp();
-		mEditObj = &obj;
-		mEditObj->enumProp( *this );
-		inputData();
-	}
+	void  changeEdit( IEditable& obj );
 	Vec2i getWidgetSize(){ return Vec2i( 130 , 20 ); }
 	Vec2i calcWidgetPos();
 
+	virtual void addProp( char const* name , Vec2f& value );
+	virtual void addProp( char const* name , Vec3f& value );
 #define ADD_TEXT_PROP( TYPE )\
 	virtual void addProp( char const* name , TYPE& value )\
 	{\
@@ -136,6 +135,8 @@ public:
 
 };
 
+
+//TODO : IMPL
 class TileButton : public GButtonBase
 {
 	typedef GButtonBase BaseClass;
@@ -147,14 +148,20 @@ class TileButton : public GButtonBase
 
 class TileEditFrame : public GFrame
 {
+	typedef GFrame BaseClass;
 public:
 	TileEditFrame( int id , Vec2f const& pos , GWidget* parent );
 };
 
+
+
 class ObjectEditFrame : public GFrame
 {
-
-
+	typedef GFrame BaseClass;
+public:
+	ObjectEditFrame( int id , Vec2f const& pos , GWidget* parent );
+	static Vec2i getButtonSize(){ return Vec2i( 90 , 20 );}
+	void setupObjectList( ObjectCreator& creator );
 
 
 

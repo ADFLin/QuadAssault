@@ -74,7 +74,7 @@ public:
 	TileMap&          getTerrain(){ return mTerrain; }
 	CollisionManager& getColManager(){  return mColManager; }
 
-	void              destroyAllObject( bool bPlayerIncluded );
+	void              destroyAllObject( bool skipPlayer );
 
 	Player*           createPlayer();
 	Player*           getPlayer( int id = 0 ){  return mPlayers[id];  }
@@ -91,7 +91,7 @@ public:
 	Particle*         addParticle(Particle* particle );
 	void              addObject( LevelObject* object );
 
-	LevelObject*      spawnObjectByName( char const* name , Vec2f const& pos );
+	LevelObject*      spawnObjectByName( char const* name , Vec2f const& pos , bool bSetDefalut = false );
 
 	Sound*            playSound( char const* name , bool canRepeat = false );
 	Message*          addMessage(Message* msg );

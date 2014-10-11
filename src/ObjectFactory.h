@@ -29,12 +29,12 @@ public:
 	static CFactory< Q >* Create(){ return new CFactory< Q >(); }
 };
 
+typedef IFactoryT< LevelObject > ObjectFactory;
+
 class ObjectCreator
 {
 public:
-	typedef IFactoryT< LevelObject > ObjectFactory;
-
-
+	
 	template< class T >
 	class CFactory : public ObjectFactory
 	{
@@ -79,7 +79,11 @@ public:
 	};
 
 	typedef std::map< char const* , ObjectFactory* , StrCmp > FactoryMap;
+	FactoryMap& getFactoryMap(){ return mNameMap; }
+protected:
 	FactoryMap mNameMap;
 };
+
+typedef ObjectCreator::FactoryMap ObjectFactoryMap;
 
 #endif // ObjectFactory_h__

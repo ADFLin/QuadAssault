@@ -22,6 +22,11 @@
 
 EditWorldData* EditMode::mWorldData = NULL;
 
+static Vec2i getModeWidgetPos( Vec2i const& size )
+{
+	return Vec2i( getGame()->getScreenSize().x - size.x - 10 , 30 );
+}
+
 bool LevelEditStage::onInit()
 {
 	if( !BaseClass::onInit() )
@@ -34,16 +39,27 @@ bool LevelEditStage::onInit()
 	sr=1.0; sg=10; sb=1.0; si=8.0; srad=128.0;
 
 	{
-		GFrame* frame = new GFrame( UI_MAP_TOOL , Vec2i(32,32), Vec2i(220, 140) , NULL );
+		GFrame* frame = new GFrame( UI_MAP_TOOL , Vec2i( 10 , 40 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
 		//"Tools"
 		GUISystem::getInstance().addWidget( frame );
 
+
+		Vec2i pos = Vec2i( 4 , GFrame::TopSideHeight + 4 );
 		{
-			Vec2i pos = Vec2i( 4 , GFrame::TopSideHeight + 4 );
 			Vec2i size = Vec2i( 32 , 32 );
 			int offset = size.x + 4;
 
 			GImageButton* button;
+			button = new GImageButton( UI_NEW_MAP  , pos , size  , frame );
+			button->setHelpText( "New Map" );
+			button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
+			pos.x += offset;
+
+			button = new GImageButton( UI_SAVE_MAP , pos , size  , frame );
+			button->setHelpText( "Save Map" );
+			button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
+			pos.x += offset;
+			
 			button = new GImageButton( UI_CREATE_LIGHT , pos , size , frame );
 			button->setHelpText( "Create Light" );
 			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
@@ -53,39 +69,31 @@ bool LevelEditStage::onInit()
 			button->setHelpText( "Create Trigger" );
 			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
 			pos.x += offset;
-
-			button = new GImageButton( UI_EMPTY_MAP  , pos , size  , frame );
-			button->setHelpText( "New Map" );
-			button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
-			pos.x += offset;
-
-			button = new GImageButton( UI_SAVE_MAP , pos , size  , frame );
-			button->setHelpText( "Save Map" );
-			button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
-			pos.x += offset;
 		}
-
 		{
 
-			Vec2i pos = Vec2i( 4 , GFrame::TopSideHeight + 4 + 32 + 4 );
+			Vec2i size = Vec2i( 64 , 32 );
+			int offset = size.x + 4;
+
 			GTextButton* button;
-			button = new GTextButton( UI_TILE_EDIT_BUTTON , pos , Vec2i( 64 , 32 ) , frame );
+			button = new GTextButton( UI_TILE_EDIT_BUTTON , pos , size  , frame );
 			button->text->setFont( getGame()->getFont(0) );
 			button->text->setCharSize( 20 );
 			button->text->setString( "Tile" );
-			pos.x += 64 + 4;
-			button = new GTextButton( UI_TILE_EDIT_BUTTON , pos , Vec2i( 64 , 32 ) , frame );
+			pos.x += offset;
+			button = new GTextButton( UI_OBJECT_EDIT_BUTTON , pos , size  , frame );
 			button->text->setFont( getGame()->getFont(0) );
 			button->text->setCharSize( 20 );
 			button->text->setString( "Object" );
+			pos.x += offset;
 		}
 	}
 
 
-	mPropFrame = new PropFrame( UI_PROP_FRAME , Vec2i( 0 , 0 ) , NULL );
+	mPropFrame = new PropFrame( UI_PROP_FRAME , Vec2i( 10 , 120 ) , NULL );
 	GUISystem::getInstance().addWidget( mPropFrame );
 
-	mPropFrame->setupEdit( *mLevel->getPlayer() );
+	mPropFrame->changeEdit( *mLevel->getPlayer() );
 
 	changeMode( TileEditMode::getInstance() );
 	return true;
@@ -93,6 +101,8 @@ bool LevelEditStage::onInit()
 
 void LevelEditStage::onExit()
 {
+	ObjectEditMode::getInstance().cleanup();
+	TileEditMode::getInstance().cleanup();
 	GUISystem::getInstance().findTopWidget( UI_MAP_TOOL )->destroy();
 	GUISystem::getInstance().findTopWidget( UI_PROP_FRAME )->destroy();
 	BaseClass::onExit();
@@ -156,6 +166,8 @@ void LevelEditStage::onUpdate( float deltaT )
 		mEditLight->setColorParam(Vec3f(sr,sg,sb),si);
 		mEditLight->setPos( convertToWorldPos( getGame()->getMousePos() ) );
 	}
+
+	mLevel->updateRender( deltaT );
 }
 
 
@@ -297,7 +309,7 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 			saveLevel( path.c_str() );
 		}
 		break;
-	case UI_EMPTY_MAP:
+	case UI_NEW_MAP:
 		{
 			generateEmptyLevel();
 		}
@@ -376,7 +388,7 @@ bool LevelEditStage::saveLevel( char const* path )
 
 void LevelEditStage::generateEmptyLevel()
 {
-	mLevel->destroyAllObject( false );
+	mLevel->destroyAllObject( true );
 
 	TileMap& terrain = mLevel->getTerrain();
 	for(int i=0; i< terrain.getSizeX() ; i++)
@@ -461,7 +473,7 @@ bool TileEditMode::onMouse( MouseMsg const& msg )
 		if ( tile )
 		{
 			mEdit.mTile = tile;
-			getWorld().mPropFrame->setupEdit( mEdit );
+			getWorld().mPropFrame->changeEdit( mEdit );
 			return false;
 		}
 	}
@@ -483,6 +495,7 @@ void TileEditMode::onEnable()
 	if ( mFrame == NULL )
 	{
 		mFrame = new TileEditFrame( UI_ANY , Vec2i( 10 , 10 ) , NULL );
+		mFrame->setPos( getModeWidgetPos( mFrame->getSize() ) );
 		GUISystem::getInstance().addWidget( mFrame );
 	}
 	mFrame->show( true );
@@ -504,6 +517,16 @@ void TileEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 	}
 }
 
+void TileEditMode::cleanup()
+{
+	if ( mFrame )
+	{
+		mFrame->destroy();
+		mFrame = NULL;
+	}
+
+}
+
 void TileEdit::enumProp( IPropEditor& editor )
 {
 	int tileValue[] = 
@@ -518,4 +541,77 @@ void TileEdit::enumProp( IPropEditor& editor )
 	};
 	editor.addEnumProp( "Block Type" , mTile->type , ARRAY_SIZE( tileValue ) , tileValue , tileStr );
 	editor.addProp( "Meta" , mTile->meta );
+}
+
+ObjectEditMode::ObjectEditMode()
+{
+	mFrame = NULL;
+	mObject = NULL;
+	mObjectName = NULL;
+}
+
+
+void ObjectEditMode::onEnable()
+{
+	if ( mFrame == NULL )
+	{
+		mFrame = new ObjectEditFrame( UI_ANY , Vec2i( 0 , 0 ) , NULL );
+		mFrame->setupObjectList( *getWorld().getObjectCreateor() );
+		mFrame->setPos( getModeWidgetPos( mFrame->getSize() ) );
+		GUISystem::getInstance().addWidget( mFrame );
+	}
+	mFrame->show( true );
+}
+
+void ObjectEditMode::onDisable()
+{
+	mFrame->show( false );
+}
+
+bool ObjectEditMode::onMouse( MouseMsg const& msg )
+{
+	Vec2f wPos = getWorld().convertToWorldPos( msg.getPos() );
+
+	if ( msg.onRightDown() )
+	{
+		if ( mObjectName )
+		{
+			mObject = getWorld().getLevel()->spawnObjectByName( mObjectName , wPos , true );
+			getWorld().mPropFrame->changeEdit( *mObject );
+			return false;
+		}
+	}
+	return true;
+
+}
+
+void ObjectEditMode::onWidgetEvent( int event , int id , GWidget* sender )
+{
+	switch( id )
+	{
+	case UI_OBJ_SELECT_BUTTON:
+		mObjectName = static_cast< char const* >( sender->getUserData() );
+		break;
+	}
+}
+
+void ObjectEditMode::render()
+{
+	if ( mObject )
+	{
+		glColor3f( 0 , 1 , 0 );
+		drawRectLine( mObject->getRenderPos() , mObject->getSize() );
+		glColor3f( 1 , 1 , 1 );
+	}
+}
+
+void ObjectEditMode::cleanup()
+{
+	if ( mFrame )
+	{
+		mFrame->destroy();
+		mFrame = NULL;
+	}
+	
+
 }

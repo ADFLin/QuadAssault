@@ -696,5 +696,6 @@ void LevelStage::reigsterObject()
 	mObjectCreator->registerClass< MinigunMob >( "Mob.Minigun" );
 	mObjectCreator->registerClass< PlasmaMob >( "Mob.Plasma" );
 	mObjectCreator->registerClass< KeyPickup >( "Pickup.Key" );
-
+	mObjectCreator->registerClass< WeaponPickup >( "Pickup.Weapon" );
+	mObjectCreator->registerClass< LightObject >( "Light" );
 }

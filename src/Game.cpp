@@ -180,8 +180,9 @@ void Game::run()
 					mFPS += fpsSamples[i];
 
 				mFPS /= NUM_FPS_SAMPLES;
-
+#if 0
 				std::cout << "FPS =" << mFPS << std::endl;
+#endif
 			}
 
 			FixString< 256 > str;

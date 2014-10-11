@@ -29,7 +29,6 @@ public:
 		mTex[ WEAPON_MINIGUN ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
 		mTex[ WEAPON_MINIGUN ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
 		mTex[ WEAPON_MINIGUN ][ RP_GLOW    ] = texMgr->getTexture("oruzje3Glow.tga");
-
 	}
 
 	virtual void render( RenderPass pass , LevelObject* object )
@@ -37,7 +36,7 @@ public:
 		WeaponPickup* pickup = static_cast< WeaponPickup* >( object );
 		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->mRotation , mTex[ pickup->mId ][ pass ] );
 	}
-	Texture* mTex[ 3 ][ NUM_RENDER_PASS ];
+	Texture* mTex[ NUM_WEAPON_ID ][ NUM_RENDER_PASS ];
 };
 
 DEFINE_RENDERER( WeaponPickup , WeaponPickupRenderer )
@@ -45,6 +44,11 @@ DEFINE_RENDERER( WeaponPickup , WeaponPickupRenderer )
 
 WeaponPickup::WeaponPickup( Vec2f const& pos , int id ) 
 	:BaseClass( pos ),mId( id )
+{
+
+}
+
+WeaponPickup::WeaponPickup()
 {
 
 }
@@ -107,4 +111,16 @@ void WeaponPickup::onPick(Player* player)
 		player->addWeapon( weapon );
 	}
 	destroy();
+}
+
+void WeaponPickup::enumProp( IPropEditor& editor )
+{
+	BaseClass::enumProp( editor );
+	editor.addProp( "WeaponId" , mId );
+}
+
+void WeaponPickup::setupDefault()
+{
+	BaseClass::setupDefault();
+	mId = WEAPON_LASER;
 }

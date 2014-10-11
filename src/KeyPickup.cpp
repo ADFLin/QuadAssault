@@ -30,7 +30,7 @@ public:
 		KeyPickup* key = static_cast< KeyPickup* >( object );
 		if ( pass == RP_GLOW )
 		{
-			glColor3fv( gDoorGlowColor[ key->idDoor ] );
+			glColor3fv( gDoorGlowColor[ key->mId ] );
 		}
 		drawSprite(key->getRenderPos(),key->getSize(),key->mRotation, mTex[ pass ] );
 		glColor3f(1.0, 1.0, 1.0);
@@ -42,14 +42,14 @@ public:
 DEFINE_RENDERER( KeyPickup , KeyPickupRenderer )
 
 KeyPickup::KeyPickup( Vec2f const& pos , int id ) 
-	:BaseClass( pos ),idDoor( id )
+	:BaseClass( pos ),mId( id )
 {
 
 }
 
 KeyPickup::KeyPickup()
 {
-	idDoor = DOOR_RED;
+	mId = DOOR_RED;
 }
 
 void KeyPickup::init()
@@ -67,13 +67,12 @@ void KeyPickup::onSpawn()
 
 	mLight.host = this;
 	mLight.radius = 128;
-	switch( idDoor )
+	switch( mId )
 	{
 	case DOOR_RED:   mLight.setColorParam(Vec3f(1.0,0.1,0.1),4); break;
 	case DOOR_BLUE:  mLight.setColorParam(Vec3f(0.1,0.25,1.0),4); break;
 	case DOOR_GREEN: mLight.setColorParam(Vec3f(0.1,1.0,0.1),4); break;
 	}
-
 	getLevel()->addLight( mLight );
 }
 
@@ -102,17 +101,39 @@ void KeyPickup::onPick( Player* player )
 	{
 		Tile& tile = terrain.getData( x , y );
 
-		if( tile.type == BID_DOOR && tile.meta == idDoor )
+		if( tile.type == BID_DOOR && tile.meta == mId )
 		{
 			tile.type = BID_FLAT;
 			tile.meta = 0;
 
 			Explosion* e=getLevel()->createExplosion( Vec2f(x*BLOCK_SIZE+BLOCK_SIZE/2, y*BLOCK_SIZE+BLOCK_SIZE/2), 128 );
 			e->setParam(20,1000,50);
-			e->setColor( gDoorGlowColor[ idDoor ] );	
+			e->setColor( gDoorGlowColor[ mId ] );	
 		}
 	}
 
 	destroy();
-	
+}
+
+void KeyPickup::enumProp( IPropEditor& editor )
+{
+	BaseClass::enumProp( editor );
+	editor.addProp( "DoorId" , mId );
+}
+
+void KeyPickup::setupDefault()
+{
+	BaseClass::setupDefault();
+	mId = DOOR_RED;
+}
+
+void KeyPickup::updateEdit()
+{
+	BaseClass::updateEdit();
+	switch( mId )
+	{
+	case DOOR_RED:   mLight.setColorParam(Vec3f(1.0,0.1,0.1),4); break;
+	case DOOR_BLUE:  mLight.setColorParam(Vec3f(0.1,0.25,1.0),4); break;
+	case DOOR_GREEN: mLight.setColorParam(Vec3f(0.1,1.0,0.1),4); break;
+	}
 }

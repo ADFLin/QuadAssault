@@ -20,11 +20,15 @@ public:
 class EditMode
 {
 public:
+	virtual void cleanup(){}
 	virtual void onEnable(){}
 	virtual void onDisable(){}
+	
+
 	virtual bool onKey( unsigned key , bool isDown ){ return true; }
 	virtual bool onMouse( MouseMsg const& msg ){ return true; }
 	virtual void onWidgetEvent( int event , int id , GWidget* sender ){}
+	virtual void render(){}
 
 	EditWorldData& getWorld(){ return *mWorldData; }
 	static EditWorldData* mWorldData;
@@ -42,11 +46,20 @@ class ObjectEditMode  : public EditMode
 {
 public:
 
+	
+	ObjectEditMode();
+	virtual void onEnable();
+	virtual void onDisable();
+	virtual void cleanup();
+
+	virtual bool onMouse( MouseMsg const& msg );
+	virtual void onWidgetEvent( int event , int id , GWidget* sender );
+	virtual void render();
 
 
-
-
+	class ObjectEditFrame* mFrame;
 	LevelObject* mObject;
+	char const*  mObjectName;
 };
 
 
@@ -80,6 +93,7 @@ public:
 
 	virtual void onEnable();
 	virtual void onDisable();
+	virtual void cleanup();
 	virtual bool onKey( unsigned key , bool isDown );
 	virtual bool onMouse( MouseMsg const& msg );
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
@@ -101,7 +115,6 @@ public:
 	}
 	virtual bool onInit();
 	virtual void onExit();
-
 	virtual void onUpdate( float deltaT );
 	virtual void onRender();
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );

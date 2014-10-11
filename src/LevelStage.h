@@ -32,8 +32,9 @@ public:
 		return Vec2i( Math::floor( wPos.x / BLOCK_SIZE ) , Math::floor( wPos.y  / BLOCK_SIZE ) );
 	}
 
-	Level*  getLevel(){ return mLevel; }
-	Object* getCamera(){ return mCamera; }
+	Level*         getLevel(){ return mLevel; }
+	Object*        getCamera(){ return mCamera; }
+	ObjectCreator* getObjectCreateor(){ return mObjectCreator; }
 protected:
 	Object*        mCamera;
 	float          mWorldScaleFactor;
