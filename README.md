@@ -14,10 +14,10 @@ The game was developed by Marko Stanik as his [graduation project](http://stanik
   - Translate to English 
   - Refactor most codes
 * Improve Render
-  - Render Terrain Shadow 
+  - Render terrain shadow 
   - Camera zoom in and zoom out
 * Improve Collision System
-  - Large Scale Body Support ( New! )
+  - Large scale body Support ( New! )
 * New GUI System
   - Support ImageButton , TextButton 
   - Support Frame , Panel
