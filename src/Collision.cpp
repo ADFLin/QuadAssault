@@ -10,6 +10,7 @@ ColBody::ColBody()
 	idxCell = -1;
 	colMask = 0;
 	colMaskCheck = 0;
+	bUpdateSize = true;
 }
 
 void ColBody::updateCache()
@@ -57,22 +58,60 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 
 	if ( maskCheck & COL_OBJECT )
 	{
-		int cx , cy;
-		calcCellPos( body.cachePos + offset , cx , cy );
-
-		for( int oy = -1 ; oy <= 1 ; ++oy )
+		//Test Global Object
+		for ( CellBodyList::iterator iter = mGlobalBodies.begin() , itEnd = mGlobalBodies.end();
+			iter != itEnd ; ++iter )
 		{
-			for( int ox = -1 ; ox <= 1 ; ++ox )
-			{
-				if ( !mCellMap.checkRange( cx + ox , cy + oy ) )
-					continue;
+			ColBody& bodyTest = *iter;
 
-				int idxCell = mCellMap.toIndex( cx + ox , cy + oy );
+			if ( &bodyTest == &body )
+				continue;
+
+			if ( ( maskCheck & bodyTest.colMask ) == 0 )
+				continue;
+
+			if ( !bBox.intersect( bodyTest.boundBox ) )
+				continue;
+
+			info.isTerrain = false;
+			info.body = &bodyTest;
+
+			return true;
+		}
+
+
+		int xMin , xMax , yMin , yMax;
+		//
+		if ( body.idxCell >= 0 )
+		{
+			int cx , cy;
+			calcCellPos( body.cachePos + offset , cx , cy );
+			xMin = std::max( cx - 1 , 0 );
+			xMax = std::min( cx + 1 , mCellMap.getSizeX() - 1 );
+			yMin = std::max( cx - 1 , 0 );
+			yMax = std::min( cx + 1 , mCellMap.getSizeY() - 1 );
+		}
+		else
+		{
+			xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
+			xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
+			yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
+			yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
+		}
+
+		for( int cy = yMin ; cy <= xMax ; ++cy )
+		{
+			for( int cx = xMin ; cx <= xMax ; ++cx )
+			{
+				assert( mCellMap.checkRange( cx  , cy ) );
+
+				int idxCell = mCellMap.toIndex( cx  , cy );
 
 				Cell& cell = mCellMap[ idxCell ];
 
+				CellBodyList& bodyList = cell.bodies;
 
-				for ( CellBodyList::iterator iter = cell.bodies.begin() , itEnd = cell.bodies.end();
+				for ( CellBodyList::iterator iter = bodyList.begin() , itEnd = bodyList.end();
 					iter != itEnd ; ++iter )
 				{
 					ColBody& bodyTest = *iter;
@@ -101,9 +140,7 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 
 bool CollisionManager::checkCollision( ColBody& body )
 {
-	int cx , cy;
-	assert( body.halfSize.x < mCellLength / 2 && body.halfSize.y < mCellLength / 2 );
-	calcCellPos( body.cachePos , cx , cy );
+
 
 	bool result = false;
 
@@ -120,14 +157,53 @@ bool CollisionManager::checkCollision( ColBody& body )
 
 	if ( body.colMaskCheck & COL_OBJECT )
 	{
-		for( int oy = -1 ; oy <= 1 ; ++oy )
+		for ( CellBodyList::iterator iter = mGlobalBodies.begin() , itEnd = mGlobalBodies.end();
+			iter != itEnd ; ++iter )
 		{
-			for( int ox = -1 ; ox <= 1 ; ++ox )
-			{
-				if ( !mCellMap.checkRange( cx + ox , cy + oy ) )
-					continue;
+			ColBody& bodyTest = *iter;
 
-				int idxCell = mCellMap.toIndex( cx + ox , cy + oy );
+			if ( &bodyTest == &body )
+				continue;
+
+			unsigned mask = body.colMaskCheck & bodyTest.colMask;
+
+			if ( mask == 0 )
+				continue;
+
+			if ( !body.boundBox.intersect( bodyTest.boundBox ) )
+				continue;
+
+			body.object->onBodyCollision( body , bodyTest );
+			result = true;
+		}
+
+		int xMin , xMax , yMin , yMax;
+		//
+		if ( body.idxCell >= 0 )
+		{
+			int cx , cy;
+			calcCellPos( body.cachePos , cx , cy );
+			xMin = std::max( cx - 1 , 0 );
+			xMax = std::min( cx + 1 , mCellMap.getSizeX() - 1 );
+			yMin = std::max( cx - 1 , 0 );
+			yMax = std::min( cx + 1 , mCellMap.getSizeY() - 1 );
+		}
+		else
+		{
+			Rect const& bBox = body.boundBox;
+			xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
+			xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
+			yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
+			yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
+		}
+
+		for( int cy = yMin ; cy <= xMax ; ++cy )
+		{
+			for( int cx = xMin ; cx <= xMax ; ++cx )
+			{
+				assert( mCellMap.checkRange( cx  , cy  ) );
+
+				int idxCell = mCellMap.toIndex( cx , cy );
 
 				Cell& cell = mCellMap[ idxCell ];
 
@@ -158,6 +234,7 @@ bool CollisionManager::checkCollision( ColBody& body )
 	return result;
 }
 
+
 void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 {
 	assert( body.idxCell = -1 );
@@ -165,13 +242,23 @@ void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 
 	Vec2f posBody = body.object->getPos() + body.getOffset();
 
-	int cx , cy;
-	calcCellPos( posBody , cx , cy );
-	int idxCell = mCellMap.toIndex( cx , cy );
+	float halfLen = mCellLength / 2;
+	if ( body.halfSize.x > halfLen || body.halfSize.y > halfLen )
+	{
+		body.idxCell = IdxGlobalCell;
+		mGlobalBodies.push_back( body );
+	}
+	else
+	{
+		int cx , cy;
+		calcCellPos( posBody , cx , cy );
+		int idxCell = mCellMap.toIndex( cx , cy );
 
-	body.idxCell = idxCell;
-	mCellMap[ idxCell ].bodies.push_back( body );
+		body.idxCell = idxCell;
+		mCellMap[ idxCell ].bodies.push_back( body );
+	}
 
+	body.bUpdateSize = false;
 	mBodies.push_back( body );
 }
 
@@ -185,16 +272,62 @@ void CollisionManager::removeBody( ColBody& body )
 void CollisionManager::updateBody( ColBody& body )
 {
 	body.updateCache();
-	int cx , cy;
-	calcCellPos( body.cachePos , cx , cy );
 
-	int idxCell = mCellMap.toIndex( cx , cy );
-	if ( idxCell != body.idxCell )
+	if ( updateBodySize( body ) )
+		return;
+
+	if ( body.idxCell != IdxGlobalCell )
 	{
-		body.cellHook.unlink();
-		mCellMap[ idxCell ].bodies.push_back( body );
-		body.idxCell = idxCell;
+		int cx , cy;
+		calcCellPos( body.cachePos , cx , cy );
+
+		int idxCell = mCellMap.toIndex( cx , cy );
+		if ( idxCell != body.idxCell )
+		{
+			body.cellHook.unlink();
+			mCellMap[ idxCell ].bodies.push_back( body );
+			body.idxCell = idxCell;
+		}
 	}
+}
+
+bool CollisionManager::updateBodySize( ColBody& body )
+{
+	assert( body.idxCell != -1 );
+
+	if ( !body.bUpdateSize )
+		return false;
+
+	body.bUpdateSize = true;
+	float halfLen = mCellLength / 2;
+	bool bBigSize = body.halfSize.x > halfLen || body.halfSize.y > halfLen;
+
+	if ( body.idxCell == IdxGlobalCell )
+	{
+		if ( !bBigSize )
+		{
+			body.cellHook.unlink();
+
+			int cx , cy;
+			calcCellPos( body.cachePos , cx , cy );
+			int idxCell = mCellMap.toIndex( cx , cy );
+
+			body.idxCell = idxCell;
+			mCellMap[ idxCell ].bodies.push_back( body );
+			return true;
+		}
+	}
+	else
+	{
+		if ( bBigSize )
+		{
+			body.cellHook.unlink();
+			body.idxCell = IdxGlobalCell;
+			mGlobalBodies.push_back( body );
+			return true;
+		}
+	}
+	return false;
 }
 
 void CollisionManager::update()

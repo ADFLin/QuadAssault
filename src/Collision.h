@@ -28,6 +28,9 @@ public:
 	void  setup( float width , float height  , float cellLength );
 	void  addBody( LevelObject& obj , ColBody& body );
 	void  removeBody( ColBody& body );
+	bool  updateBodySize( ColBody& body );
+
+
 
 	void  update();
 	bool  testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned maskCheckReplace = 0 );
@@ -44,19 +47,20 @@ private:
 	void updateBody( ColBody& body );
 	void calcCellPos( Vec2f const& pos , int& cx , int& cy );
 
-
 	Tile* rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned colMask );
 	
 	
 	typedef IntrList< ColBody , MemberHook< ColBody , &ColBody::cellHook > >    CellBodyList;
 	typedef IntrList< ColBody , MemberHook< ColBody , &ColBody::managerHook > > BodyList;
 
+	static int const IdxGlobalCell = -5;
 	struct Cell
 	{
 		CellBodyList bodies;
 	};
 	float            mCellLength;
 	TGrid2D< Cell >  mCellMap;
+	CellBodyList     mGlobalBodies;
 	BodyList         mBodies;
 	TileMap*         mTerrain;
 

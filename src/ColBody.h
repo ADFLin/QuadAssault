@@ -14,7 +14,7 @@ public:
 
 	void setMask( unsigned mask ){ colMask = mask; }
 	void setMaskCheck( unsigned mask ){ colMaskCheck = mask; }
-	void setSize( Vec2f const& size ){ halfSize = size / 2; }
+	void setSize( Vec2f const& size ){ halfSize = size / 2; bUpdateSize = true; }
 	void setOffset( Vec2f const& offset ){ mOffset = offset;  }
 
 	Vec2f const& getOffset(){ return mOffset;  }
@@ -27,7 +27,7 @@ private:
 
 	friend class CollisionManager;
 
-	bool         bBBoxDirty;
+	bool         bUpdateSize;
 	Vec2f        halfSize;
 	unsigned     colMaskCheck;
 	unsigned     colMask;
