@@ -6,15 +6,21 @@ Explosion::Explosion()
 
 }
 
+Explosion::Explosion( Vec2f const& pos , float radius )
+	:BaseClass( pos )
+	,radius( radius )
+{
+
+}
+
 Explosion::~Explosion()
 {
 
 }
 
-void Explosion::Init( Vec2f poz, float radius )
+void Explosion::init()
 {
-	setPos( poz );
-	this->radius=radius;
+	BaseClass::init();
 
 	mbDead=false;
 
@@ -24,7 +30,6 @@ void Explosion::Init( Vec2f poz, float radius )
 	deathRate=10;
 
 	color=Vec3f(1.0, 0.75, 0.5);
-
 }
 
 void Explosion::onSpawn()

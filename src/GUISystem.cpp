@@ -9,12 +9,39 @@
 class ScissorClipStack
 {
 public:
-	void push( Vec2i const& pos , Vec2i const& size );
+	
+	void push( Vec2i const& pos , Vec2i const& size , bool bOverlapPrev );
 	void pop();
+
 	struct Rect
 	{
 		Vec2i pos;
 		Vec2i size;
+
+		void overlap( Rect const& other )
+		{
+			int x = std::max( pos.x, other.pos.x );
+			int y = std::max( pos.y, other.pos.y );
+
+			Vec2i maxThis = pos + size;
+			Vec2i maxOther = other.pos + other.size;
+
+			int xMax = std::min( maxThis.x , maxOther.x );
+			int yMax = std::min( maxThis.y , maxOther.y );
+
+			if ( xMax  >= x && yMax >= y )
+			{
+				pos.x = x;
+				pos.y = y;
+				size.x = xMax - x;
+				size.y = yMax - y;
+			}
+			else
+			{
+				size.x = 0;
+				size.y = 0;
+			}
+		}
 	};
 	bool mPrevEnable;
 	std::vector< Rect > mStack;
@@ -22,9 +49,11 @@ public:
 
 ScissorClipStack gClipStack;
 
-void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size )
+void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size , bool bOverlapPrev )
 {
-	glScissor( pos.x , pos.y , size.x , size.y );
+	Rect rect;
+	rect.pos = pos;
+	rect.size = size;
 
 	if ( mStack.empty() )
 	{
@@ -32,9 +61,12 @@ void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size )
 		if ( !mPrevEnable )
 			glEnable( GL_SCISSOR_TEST );
 	}
-	Rect rect;
-	rect.pos = pos;
-	rect.size = size;
+	else if ( bOverlapPrev )
+	{
+		rect.overlap( mStack.back() );
+	}
+
+	glScissor( rect.pos.x , rect.pos.y , rect.size.x , rect.size.y );
 	mStack.push_back( rect );
 }
 
@@ -138,7 +170,7 @@ void GWidget::doRenderAll()
 		Vec2i pos  = getWorldPos();
 		Vec2i size = getSize();
 		pos.y = getGame()->getScreenSize().y - ( pos.y + size.y );
-		gClipStack.push( pos , size  );
+		gClipStack.push( pos , size , true );
 	}
 
 	TUICore< GWidget >::doRenderAll();

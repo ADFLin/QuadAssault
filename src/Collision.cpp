@@ -300,11 +300,11 @@ bool CollisionManager::updateBodySize( ColBody& body )
 
 	body.bUpdateSize = true;
 	float halfLen = mCellLength / 2;
-	bool bBigSize = body.halfSize.x > halfLen || body.halfSize.y > halfLen;
+	bool bLargeSize = body.halfSize.x > halfLen || body.halfSize.y > halfLen;
 
 	if ( body.idxCell == IdxGlobalCell )
 	{
-		if ( !bBigSize )
+		if ( !bLargeSize )
 		{
 			body.cellHook.unlink();
 
@@ -319,7 +319,7 @@ bool CollisionManager::updateBodySize( ColBody& body )
 	}
 	else
 	{
-		if ( bBigSize )
+		if ( bLargeSize )
 		{
 			body.cellHook.unlink();
 			body.idxCell = IdxGlobalCell;

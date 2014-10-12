@@ -164,8 +164,8 @@ Player* Level::createPlayer()
 
 Explosion* Level::createExplosion( Vec2f const& pos , float raidus )
 {
-	Explosion* e = new Explosion();
-	e->Init( pos , raidus );
+	Explosion* e = new Explosion( pos , raidus );
+	e->init();
 	addOjectInternal( e );
 	return e;
 }
@@ -247,8 +247,6 @@ void Level::renderObjects( RenderPass pass )
 		IRenderer* renderer =  obj->getRenderer();
 		renderer->render( pass , obj );
 	}
-
-	
 
 	for( PlayerVec::iterator iter = mPlayers.begin() , itEnd = mPlayers.end();
 		 iter != itEnd ; ++iter )

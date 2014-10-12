@@ -538,9 +538,7 @@ void ObjectEditMode::onEnable()
 		mActFrame->setupActionList( *getWorld().getActionCreator() );
 		mActFrame->setTile( "Action" );
 		mActFrame->show( false );
-		
 		GUISystem::getInstance().addWidget( mActFrame );
-
 	}
 
 	mObjFrame->show( true );
@@ -549,8 +547,7 @@ void ObjectEditMode::onEnable()
 void ObjectEditMode::onDisable()
 {
 	mObjFrame->show( false );
-	if ( mActFrame )
-		mActFrame->show( false );
+	mActFrame->show( false );
 }
 
 bool ObjectEditMode::onMouse( MouseMsg const& msg )

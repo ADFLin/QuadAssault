@@ -154,6 +154,7 @@ class TileEditFrame : public GFrame
 	typedef GFrame BaseClass;
 public:
 	TileEditFrame( int id , Vec2f const& pos , GWidget* parent );
+	static int const ButtonLength = 40;
 };
 
 class ObjectEditFrame : public GFrame

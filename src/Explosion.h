@@ -11,10 +11,10 @@ class Explosion : public LevelObject
 
 public:
 	Explosion();
+	Explosion( Vec2f const& pos , float radius );
 	~Explosion();
 
-	void Init( Vec2f poz , float radius );
-
+	virtual void init();
 	virtual ObjectType getType(){ return OT_EXPLOSION; }
 	virtual void tick();
 	virtual void onSpawn();

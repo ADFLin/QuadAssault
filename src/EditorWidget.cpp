@@ -10,7 +10,7 @@
 PorpTextCtrl::PorpTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
 	:GTextCtrl( id , pos , size , parent )
 {
-	text->setCharSize( 24 );
+	text->setCharSize( 20 );
 	text->setFont( getGame()->getFont(0) );
 	text->setColor( Color( 255 , 255 , 0 ) );
 
@@ -145,7 +145,7 @@ void PropFrame::addPorpWidget( char const* name , GWidget* widget )
 {
 	PropData data;
 	data.widget = widget;
-	data.name   = IText::create( getGame()->getFont(0) , 22 , Color( 0 , 0 , 255 ) );
+	data.name   = IText::create( getGame()->getFont(0) , 20 , Color( 0 , 0 , 255 ) );
 	data.name->setString( name );
 
 	mPorps.push_back( data );
@@ -275,7 +275,7 @@ void PropFrame::addProp( char const* name , Vec3f& value )
 }
 
 TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent ) 
-	:BaseClass( id , pos , Vec2f(  4 + 2 * 32 + 2 ,  4 + NUM_BLOCK_TYPE * ( 32 + 2 ) + TopSideHeight ) , parent )
+	:BaseClass( id , pos , Vec2f(  4 + 2 * ButtonLength + 2 ,  4 + NUM_BLOCK_TYPE * ( ButtonLength + 2 ) + TopSideHeight ) , parent )
 {
 	char const* blockName[] =
 	{
@@ -286,9 +286,9 @@ TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent )
 	for( int i = 0; i < NUM_BLOCK_TYPE ; ++i )
 	{
 		Vec2i pos;
-		pos.x = ( i % 2 ) * ( 32 + 2 ) + 2;
-		pos.y = ( i / 2 ) * ( 32 + 2 ) + TopSideHeight + 2;
-		GImageButton* button = new GImageButton( UI_TILE_SELECT , pos , Vec2i( 32 , 32 ) , this );
+		pos.x = ( i % 2 ) * ( ButtonLength + 2 ) + 2;
+		pos.y = ( i / 2 ) * ( ButtonLength + 2 ) + TopSideHeight + 2;
+		GImageButton* button = new GImageButton( UI_TILE_SELECT , pos , Vec2i( ButtonLength , ButtonLength ) , this );
 		button->texImag = Block::FromType( i )->getTexture( 0 );
 		button->setHelpText( blockName[i] );
 		button->setUserData( (void*)i );
