@@ -110,7 +110,6 @@ public:
 	virtual void onExit();
 
 	void cleanupEditMode();
-	void clearEditModeData();
 
 	virtual void onUpdate( float deltaT );
 	virtual void onRender();
