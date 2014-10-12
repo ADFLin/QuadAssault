@@ -24,7 +24,7 @@ The game was developed by Marko Stanik as his [graduation project](http://stanik
 ### Dependencies ###
 * [SFML 2.1](http://sfml-dev.org/download/sfml/2.1/)
 * [GLEW](http://glew.sourceforge.net/)
-* 
+
 ###TODO###
 * Game Serialize 
   - Save Game and Network 
