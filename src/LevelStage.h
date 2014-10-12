@@ -14,7 +14,6 @@
 
 class SoundManager;
 class GUIManager;
-class ObjectCreator;
 class IText;
 
 class WorldData
@@ -34,12 +33,18 @@ public:
 
 	Level*         getLevel(){ return mLevel; }
 	Object*        getCamera(){ return mCamera; }
-	ObjectCreator* getObjectCreateor(){ return mObjectCreator; }
+	ObjectCreator* getObjectCreator(){ return mObjectCreator; }
+	ActionCreator* getActionCreator(){ return mActionCreator; }
+
+	void          build();
+private:
+	void          reigsterObject();
 protected:
 	Object*        mCamera;
 	float          mWorldScaleFactor;
 	Level*         mLevel;
 	ObjectCreator* mObjectCreator;
+	ActionCreator* mActionCreator;
 };
 
 class LevelStageBase : public GameStage
@@ -97,12 +102,11 @@ public:
 
 	void loadLevel();
 	void generateEmptyLevel();
-	void reigsterObject();
+	
 
 private:
 
 	void changeMenuStage();
-
 
 
 	sf::Music  mMusic;

@@ -43,6 +43,46 @@
 #include <sstream>
 
 
+void WorldData::build()
+{
+	Block::initialize();
+	IRenderer::initialize();
+
+	mObjectCreator = new ObjectCreator;
+	mActionCreator = new ActionCreator;
+
+	reigsterObject();
+
+	mLevel = new Level;
+	mLevel->init( *mObjectCreator );
+
+	mCamera = new Object();
+	mCamera->setPos(Vec2f(0,0));
+	mWorldScaleFactor = 1.0f;
+}
+
+void WorldData::reigsterObject()
+{
+	mObjectCreator->registerClass< LaserMob >( "Mob.Laser" );
+	mObjectCreator->registerClass< MinigunMob >( "Mob.Minigun" );
+	mObjectCreator->registerClass< PlasmaMob >( "Mob.Plasma" );
+	mObjectCreator->registerClass< KeyPickup >( "Pickup.Key" );
+	mObjectCreator->registerClass< WeaponPickup >( "Pickup.Weapon" );
+	mObjectCreator->registerClass< LightObject >( "Light" );
+	mObjectCreator->registerClass< AreaTrigger >( "Trigger.Area" );
+
+#define REG_ACTION( ACTION )\
+	mActionCreator->registerClass< ACTION >( ACTION::Name() )
+
+	REG_ACTION( GoalAct );
+	REG_ACTION( PlaySoundAct );
+	REG_ACTION( MessageAct );
+	REG_ACTION( SpawnAct );
+
+#undef REG_ACTION
+
+}
+
 bool LevelStageBase::onInit()
 {
 	mPause    = false;
@@ -135,21 +175,8 @@ bool LevelStage::onInit()
 
 	}
 
-
-	Block::initialize();
-	IRenderer::initialize();
-
-
-	mObjectCreator = new ObjectCreator;
-	reigsterObject();
-
-	mLevel = new Level;
-	mLevel->init( *mObjectCreator );
+	WorldData::build();
 	mLevel->addListerner( *this );
-
-	mCamera = new Object();
-	mCamera->setPos(Vec2f(0,0));
-	mWorldScaleFactor = 1.0f;
 
 	loadLevel();
 
@@ -393,10 +420,12 @@ bool LevelStage::onKey( unsigned key , bool isDown )
 	case Keyboard::eF1:
 		{
 			LevelEditStage* stage = new LevelEditStage;
+			//FIXME
 			stage->mLevel  = mLevel;
 			stage->mCamera = mCamera;
 			stage->mWorldScaleFactor = mWorldScaleFactor;
 			stage->mObjectCreator = mObjectCreator;
+			stage->mActionCreator = mActionCreator;
 			getGame()->addStage( stage , false );
 		}
 		break;
@@ -626,9 +655,9 @@ void LevelStage::loadLevel()
 				trigger->init();
 
 				SpawnAct* act = new SpawnAct;
-				act->pos.x =atof(token.c_str());
+				act->spawnPos.x =atof(token.c_str());
 				getline(lstring,token,' ');
-				act->pos.y =atof(token.c_str());
+				act->spawnPos.y =atof(token.c_str());
 				getline(lstring,token,' ');	
 				act->className = token;
 				trigger->addAction( act );
@@ -675,7 +704,7 @@ void LevelStage::loadLevel()
 				getline(lstring,token,';');
 				act->content = token;
 				getline(lstring,token,' ');
-				act->durstion = atof(token.c_str());	
+				act->duration = atof(token.c_str());	
 				getline(lstring,token,' ');
 				act->soundName = token;
 				trigger->addAction( act );
@@ -686,15 +715,4 @@ void LevelStage::loadLevel()
 	}
 	levelFS.close();
 
-}
-
-void LevelStage::reigsterObject()
-{
-	mObjectCreator->registerClass< LaserMob >( "Mob.Laser" );
-	mObjectCreator->registerClass< MinigunMob >( "Mob.Minigun" );
-	mObjectCreator->registerClass< PlasmaMob >( "Mob.Plasma" );
-	mObjectCreator->registerClass< KeyPickup >( "Pickup.Key" );
-	mObjectCreator->registerClass< WeaponPickup >( "Pickup.Weapon" );
-	mObjectCreator->registerClass< LightObject >( "Light" );
-	mObjectCreator->registerClass< AreaTrigger >( "Trigger.Area" );
 }

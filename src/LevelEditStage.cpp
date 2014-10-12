@@ -37,6 +37,7 @@ bool LevelEditStage::onInit()
 
 	{
 		GFrame* frame = new GFrame( UI_EDIT_TOOL , Vec2i( 10 , 40 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
+		frame->setTile( "Tool" );
 		//"Tools"
 
 		mEditToolFrame = frame;
@@ -87,17 +88,13 @@ bool LevelEditStage::onInit()
 			button->text->setCharSize( 20 );
 			button->text->setString( "Object" );
 			pos.x += offset;
-			button = new GTextButton( UI_TRIGGER_EDIT , pos , size  , frame );
-			button->text->setFont( getGame()->getFont(0) );
-			button->text->setCharSize( 20 );
-			button->text->setString( "Trigger" );
-			button->enable( false );
-			pos.x += offset;
+
 		}
 	}
 
 
 	mPropFrame = new PropFrame( UI_PROP_FRAME , Vec2i( 10 , 120 ) , NULL );
+	mPropFrame->setTile( "Property" );
 	GUISystem::getInstance().addWidget( mPropFrame );
 
 	mPropFrame->changeEdit( *mLevel->getPlayer() );
@@ -108,8 +105,7 @@ bool LevelEditStage::onInit()
 
 void LevelEditStage::onExit()
 {
-	ObjectEditMode::getInstance().cleanup();
-	TileEditMode::getInstance().cleanup();
+	cleanupEditMode();
 
 	mPropFrame->destroy();
 	mEditToolFrame->destroy();
@@ -255,6 +251,11 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 		break;
 	case UI_NEW_MAP:
 		{
+			cleanupEditMode();
+			mMode = NULL;
+			changeMode( TileEditMode::getInstance() );
+			mPropFrame->cleanAllPorp();
+			
 			generateEmptyLevel();
 		}
 		break;
@@ -349,6 +350,12 @@ void LevelEditStage::changeMode( EditMode& mode )
 	mMode->onEnable();
 }
 
+void LevelEditStage::cleanupEditMode()
+{
+	ObjectEditMode::getInstance().cleanup();
+	TileEditMode::getInstance().cleanup();
+}
+
 
 TileEditMode::TileEditMode()
 {
@@ -433,6 +440,7 @@ void TileEditMode::onEnable()
 	if ( mFrame == NULL )
 	{
 		mFrame = new TileEditFrame( UI_ANY , Vec2i( 10 , 10 ) , NULL );
+		mFrame->setTile( "Block" );
 		mFrame->setPos( getModeWidgetPos( mFrame->getSize() ) );
 		GUISystem::getInstance().addWidget( mFrame );
 	}
@@ -494,27 +502,55 @@ void TileEditMode::enumProp( IPropEditor& editor )
 
 ObjectEditMode::ObjectEditMode()
 {
-	mFrame = NULL;
+	mObjFrame = NULL;
+	mActFrame = NULL;
 	mObject = NULL;
 	mObjectName = NULL;
 }
 
 
+void ObjectEditMode::cleanup()
+{
+	if ( mObjFrame )
+	{
+		mObjFrame->destroy();
+		mObjFrame = NULL;
+
+		mActFrame->destroy();
+		mActFrame = NULL;
+	}
+
+	mObjectName = NULL;
+	mObject = NULL;
+}
+
 void ObjectEditMode::onEnable()
 {
-	if ( mFrame == NULL )
+	if ( mObjFrame == NULL )
 	{
-		mFrame = new ObjectEditFrame( UI_ANY , Vec2i( 0 , 0 ) , NULL );
-		mFrame->setupObjectList( *getWorld().getObjectCreateor() );
-		mFrame->setPos( getModeWidgetPos( mFrame->getSize() ) );
-		GUISystem::getInstance().addWidget( mFrame );
+		mObjFrame = new ObjectEditFrame( UI_ANY , Vec2i( 0 , 0 ) , NULL );
+		mObjFrame->setTile( "Object" );
+		mObjFrame->setupObjectList( *getWorld().getObjectCreator() );
+		mObjFrame->setPos( getModeWidgetPos( mObjFrame->getSize() ) );
+		GUISystem::getInstance().addWidget( mObjFrame );
+
+		mActFrame = new ActionEditFrame( UI_ANY , Vec2i( 0 , 0 ) , NULL );
+		mActFrame->setupActionList( *getWorld().getActionCreator() );
+		mActFrame->setTile( "Action" );
+		mActFrame->show( false );
+		
+		GUISystem::getInstance().addWidget( mActFrame );
+
 	}
-	mFrame->show( true );
+
+	mObjFrame->show( true );
 }
 
 void ObjectEditMode::onDisable()
 {
-	mFrame->show( false );
+	mObjFrame->show( false );
+	if ( mActFrame )
+		mActFrame->show( false );
 }
 
 bool ObjectEditMode::onMouse( MouseMsg const& msg )
@@ -551,7 +587,7 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 			}
 			else if ( Platform::isKeyPressed( Keyboard::eLCONTROL ) )
 			{
-				//TODO Dont use dynamic_cast
+				//TODO: Dont use dynamic_cast
 				Actor* actor = dynamic_cast< Actor* >( mObject );
 				if ( actor )
 				{
@@ -574,6 +610,26 @@ void ObjectEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 	case UI_OBJECT_SELECT:
 		mObjectName = static_cast< char const* >( sender->getUserData() );
 		break;
+	case UI_ACTION_SELECT:
+		{
+			ActionCreator::FactoryType* factory = static_cast< ActionCreator::FactoryType*>( sender->getUserData() );
+			Action* action = factory->create();
+			action->setupDefault();
+			mObject->cast< AreaTrigger >()->addAction( action );
+			mActFrame->refreshList();
+			getWorld().mPropFrame->changeEdit( *action );
+		}
+		break;
+	case UI_ACTION_LISTCTRL:
+		if ( event == EVT_LISTCTRL_SELECT )
+		{
+			GListCtrl* listCtrl = static_cast< GListCtrl* >( sender );
+
+			Action* action = static_cast< Action* >( listCtrl->getSelectedItemData() );
+			if ( action )
+				getWorld().mPropFrame->changeEdit( *action );
+		}
+		break;
 	}
 }
 
@@ -587,18 +643,6 @@ void ObjectEditMode::render()
 	}
 }
 
-void ObjectEditMode::cleanup()
-{
-	if ( mFrame )
-	{
-		mFrame->destroy();
-		mFrame = NULL;
-	}
-
-	mObjectName = NULL;
-	mObject = NULL;
-}
-
 void ObjectEditMode::changeObject( LevelObject* object )
 {
 	if ( mObject == object )
@@ -608,9 +652,15 @@ void ObjectEditMode::changeObject( LevelObject* object )
 	if ( mObject )
 	{
 		getWorld().mPropFrame->changeEdit( *mObject );
-		GWidget* widget = getWorld().mEditToolFrame->findChild( UI_TRIGGER_EDIT );
-		if ( widget )
-			widget->enable( mObject->getType() == OT_TRIGGER );
+		if ( mObject->getType() == OT_TRIGGER )
+		{
+			mActFrame->setTrigger( mObject->cast< AreaTrigger >() );
+			mActFrame->show( true );
+		}
+		else
+		{
+			mActFrame->show( false );
+		}
 	}
 	else
 	{

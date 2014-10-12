@@ -162,13 +162,17 @@ protected:
 	void    onChangePos( Vec2i const& pos , bool beLocal ){}
 	void    onShow( bool beS ){}
 	void    onMouse( bool beIn ){}
+
+	void    onFocus( bool beF ){}
+	void    onResize( Vec2i const& size ){}
+	bool    doHitTest( Vec2i const& pos ){ return testPointInRect( pos , mBoundRect ); }
+
+	void    doRenderAll();
 	void    onRender(){}
 	void    onPrevRender(){}
 	void    onPostRender(){}
 	void    onPostRenderChildren(){}
-	void    onFocus( bool beF ){}
-	void    onResize( Vec2i const& size ){}
-	bool    doHitTest( Vec2i const& pos ){ return testPointInRect( pos , mBoundRect ); }
+	bool    haveChildClipTest(){ return false; }
 	bool    doClipTest(){ return true; }
 
 public:
@@ -217,10 +221,12 @@ protected:
 
 private:
 
+	void    renderAll()         { _this()->doRenderAll(); }
 	void    prevRender()        {  _this()->onPrevRender();  }
 	void    postRender()        {  _this()->onPostRender();  }
 	void    postRenderChildren(){  _this()->onPostRenderChildren(); }
-	
+
+
 private:
 	TUICore();
 

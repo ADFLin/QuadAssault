@@ -61,11 +61,9 @@ public:
 	//Use for Prop Edit
 	virtual void  inputData(){}
 	virtual void  outputData(){}
-	
 
-	void onPrevRender(){}
-	void onPostRenderChildren();
-	void onPostRender(){}
+	void doRenderAll();
+	
 
 	virtual void  onRenderSiblingsEnd(){}
 	//bool doClipTest();
@@ -78,6 +76,7 @@ protected:
 
 	void sendEvent( int eventID );
 
+	bool   mClipEnable;
 	void*  mUserData;
 	int    mId;
 };
@@ -121,14 +120,6 @@ public:
 	virtual void onClick(){  sendEvent( EVT_BUTTON_CLICK );  }
 };
 
-class HelpTextPanel : public GPanel
-{
-
-
-
-
-};
-
 class GTextButton : public GButtonBase
 {
 	typedef GButtonBase BaseClass;
@@ -158,10 +149,18 @@ class  GFrame : public GUI::Panel< GFrame >
 	typedef GUI::Panel< GFrame > BaseClass;
 public:
 	GFrame( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
+	~GFrame();
 	static int const TopSideHeight = 20;
+	void setTile( char const* name );
+
 protected:
 	bool onMouseMsg( MouseMsg const& msg );
 	void onRender();
+	
+
+	bool   mbMiniSize;
+	Vec2i  mPrevSize;
+	IText* mTile;
 };
 
 
@@ -188,11 +187,7 @@ class GChoice : public GUI::Choice< GChoice >
 	typedef GUI::Choice< GChoice > BaseClass;
 public:
 
-	GChoice( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent )
-		:BaseClass(  pos , size , parent )
-	{
-		mId = id;
-	}
+	GChoice( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
 
 	struct MyData 
 	{
@@ -209,6 +204,29 @@ public:
 	void onRemoveItem( Item& item );
 	void doRenderItem( Vec2i const& pos , Item& item , bool beLight );
 	void doRenderMenuBG( Menu* menu );
+};
+
+class GListCtrl : public GUI::ListCtrl< GListCtrl >
+{
+	typedef GUI::ListCtrl< GListCtrl > BaseClass;
+public:
+
+	GListCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
+
+	struct MyData 
+	{
+		IText* text;
+	};
+	typedef MyData ExtraData;
+
+	void onItemSelect( unsigned pos ){ sendEvent( EVT_LISTCTRL_SELECT ); }
+	void onItemLDClick( unsigned pos ){ sendEvent( EVT_LISTCTRL_DCLICK ); }
+	void onAddItem( Item& item );
+	void onRemoveItem( Item& item );
+	void doRenderItem( Vec2i const& pos , Item& item , bool beSelected );
+	void doRenderBackground( Vec2i const& pos , Vec2i const& size );
+	int  getItemHeight(){ return 20; }
+
 };
 
 

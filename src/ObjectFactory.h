@@ -2,7 +2,7 @@
 #define ObjectFactory_h__
 
 #include <map>
-class LevelObject;
+
 
 template< class T >
 class IFactoryT
@@ -18,7 +18,6 @@ public:
 		Q* create() const
 		{ 
 			Q* obj = new Q;
-			obj->init();
 			return obj;
 		}
 	};
@@ -29,32 +28,32 @@ public:
 	static CFactory< Q >* Create(){ return new CFactory< Q >(); }
 };
 
-typedef IFactoryT< LevelObject > ObjectFactory;
-
-class ObjectCreator
+template < class BASE >
+class ObjectCreatorT
 {
+	typedef BASE BaseType;
 public:
+	typedef IFactoryT< BaseType > FactoryType;
 	
 	template< class T >
-	class CFactory : public ObjectFactory
+	class CFactory : public FactoryType
 	{
 	public:
 		CFactory( char const* name ):name( name ){}
 		T* create() const
 		{ 
 			T* obj = new T;
-			obj->init();
 			return obj;
 		}
 		string name;
 	};
 
-	LevelObject* createObject( char const* name )
+	BaseType* createObject( char const* name )
 	{
 		FactoryMap::iterator iter = mNameMap.find( name );
 		if ( iter == mNameMap.end() )
 			return NULL;
-		LevelObject* obj = iter->second->create();
+		BaseType* obj = iter->second->create();
 		return obj;
 	}
 
@@ -78,12 +77,19 @@ public:
 		}
 	};
 
-	typedef std::map< char const* , ObjectFactory* , StrCmp > FactoryMap;
+	typedef std::map< char const* , FactoryType* , StrCmp > FactoryMap;
 	FactoryMap& getFactoryMap(){ return mNameMap; }
 protected:
 	FactoryMap mNameMap;
 };
 
-typedef ObjectCreator::FactoryMap ObjectFactoryMap;
+class LevelObject;
+class Action;
+
+typedef ObjectCreatorT< LevelObject > ObjectCreator;
+typedef ObjectCreator::FactoryMap     ObjectFactoryMap;
+
+typedef ObjectCreatorT< Action >      ActionCreator;
+typedef ActionCreator::FactoryMap     ActionFactoryMap;
 
 #endif // ObjectFactory_h__

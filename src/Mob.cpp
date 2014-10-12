@@ -161,6 +161,7 @@ void Mob::shoot( IBulletFactory const& creator )
 		{
 			Math::normalize( offset );
 			Bullet* p = creator.create();
+			p->init();
 			p->setup( getPos() ,offset , TEAM_EMPTY );	
 			getLevel()->addBullet(p);
 		}	

@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LevelFile.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Light.h"
 				>
 			</File>

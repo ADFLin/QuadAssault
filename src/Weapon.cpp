@@ -11,6 +11,7 @@
 void FireHelper::fire( IBulletFactory& factory , Vec2f const& offset /*= Vec2f(0,0) */ )
 {
 	Bullet* bullet = factory.create();
+	bullet->init();
 	bullet->setup( pos + offset , dir ,team );
 	weapon->getOwner()->getLevel()->addBullet( bullet );
 	weapon->onFireBullet( bullet );

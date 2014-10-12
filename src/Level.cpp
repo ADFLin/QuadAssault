@@ -387,6 +387,8 @@ LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos , boo
 	LevelObject* obj = mObjectCreator->createObject( name );
 	if ( !obj )
 		return NULL;
+
+	obj->init();
 	obj->setPos( pos );
 	if ( bSetDefault )
 		obj->setupDefault();

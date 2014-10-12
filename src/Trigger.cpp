@@ -14,6 +14,15 @@ TriggerBase::TriggerBase()
 	mMode   = FM_ONCE_AND_DESTROY;
 }
 
+TriggerBase::~TriggerBase()
+{
+	for ( ActionList::iterator iter = mActions.begin() , itEnd = mActions.end();
+		iter != itEnd ; ++iter )
+	{
+		delete *iter;
+	}
+}
+
 void TriggerBase::fireActions( Level* level )
 {
 	for ( ActionList::iterator iter = mActions.begin() , itEnd = mActions.end();
@@ -28,13 +37,20 @@ void TriggerBase::addAction( Action* act )
 	mActions.push_back( act );
 }
 
+bool TriggerBase::removeAction( Action* act )
+{
+	ActionList::iterator iter = std::find( mActions.begin() , mActions.end() , act );
+	if ( iter == mActions.end() )
+		return false;
+
+	mActions.erase( iter );
+	delete act;
+	return true;
+}
+
 AreaTrigger::~AreaTrigger()
 {
-	for ( ActionList::iterator iter = mActions.begin() , itEnd = mActions.end();
-		iter != itEnd ; ++iter )
-	{
-		delete *iter;
-	}
+
 }
 
 AreaTrigger::AreaTrigger( Vec2f const& min , Vec2f const& max )
@@ -108,7 +124,7 @@ void AreaTrigger::tick()
 		Rect bBoxOther;
 		obj->calcBoundBox( bBoxOther );
 
-		if ( bBox.intersect(bBoxOther) )
+		if ( !bBox.intersect(bBoxOther) )
 		{
 			iter = mTouchObjects.erase( iter );
 		}
@@ -138,6 +154,7 @@ void AreaTrigger::renderDev( DevDrawMode mode )
 
 void AreaTrigger::enumProp( IPropEditor& editor )
 {
+	BaseClass::enumProp( editor );
 	int fireModeValue[] = { FM_ONCE , FM_ON_TOUCH , FM_ALWAYS , FM_ONCE_AND_DESTROY };
 	char const* fireModeStr[] = { "Once" , "On Touch" , "Always" , "Once And Destroy" };
 
@@ -147,37 +164,52 @@ void AreaTrigger::enumProp( IPropEditor& editor )
 
 void AreaTrigger::setupDefault()
 {
+	BaseClass::setupDefault();
 	setSize( Vec2f( 100 , 100 ) );
 }
 
 void SpawnAct::fire( Level* level )
 {
-	LevelObject* object = level->spawnObjectByName( className.c_str() , pos );
+	LevelObject* object = level->spawnObjectByName( className.c_str() , spawnPos );
 	if ( object->getType() == OT_MOB )
 		object->cast< Mob >()->spawnEffect();
 }
 
 void SpawnAct::enumProp( IPropEditor& editor )
 {
+	BaseClass::enumProp( editor );
 	editor.addProp( "ClassName" , className );
-	editor.addProp( "SpawnPos" , pos );
+	editor.addProp( "SpawnPos" , spawnPos );
+}
+
+void SpawnAct::setupDefault()
+{
+	className = "Mob.Minigun";
+	spawnPos = Vec2i( 100 , 100 );
 }
 
 void MessageAct::fire( Level* level )
 {
 	Message* msg = new Message();
-	msg->init( sender , content , durstion , soundName );
+	msg->init( sender , content , duration , soundName );
 	level->addMessage( msg );
 }
 
 void MessageAct::enumProp( IPropEditor& editor )
 {
-	
+	editor.addProp( "Sender" , sender );
+	editor.addProp( "Content" , content );
+	editor.addProp( "SoundName" , soundName );
+	editor.addProp( "Duration" , duration );
 }
 
 void MessageAct::setupDefault()
 {
-	
+	BaseClass::setupDefault();
+	sender  = "Base";
+	content = "This is context";
+	soundName = "blip.wav";
+	duration = 4;
 }
 
 void GoalAct::fire( Level* level )
@@ -188,4 +220,16 @@ void GoalAct::fire( Level* level )
 void PlaySoundAct::fire( Level* level )
 {
 	level->playSound( soundName.c_str() );
+}
+
+void PlaySoundAct::enumProp( IPropEditor& editor )
+{
+	BaseClass::enumProp( editor );
+	editor.addProp( "SoundName" , soundName );
+}
+
+void PlaySoundAct::setupDefault()
+{
+	BaseClass::setupDefault();
+	soundName = "blip.wav";
 }

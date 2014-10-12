@@ -9,6 +9,9 @@ class IText;
 class GFrame;
 class PropFrame;
 
+class ActionEditFrame;
+class TileEditFrame;
+class ObjectEditFrame;
 
 class EditWorldData : public WorldData
 {
@@ -23,7 +26,6 @@ public:
 	virtual void cleanup(){}
 	virtual void onEnable(){}
 	virtual void onDisable(){}
-	
 
 	virtual bool onKey( unsigned key , bool isDown ){ return true; }
 	virtual bool onMouse( MouseMsg const& msg ){ return true; }
@@ -59,7 +61,8 @@ public:
 	void changeObject( LevelObject* object );
 
 
-	class ObjectEditFrame* mFrame;
+	ObjectEditFrame* mObjFrame;
+	ActionEditFrame* mActFrame;
 	LevelObject* mObject;
 	char const*  mObjectName;
 };
@@ -77,7 +80,7 @@ public:
 	int      mEditTileType; //vrsta bloka koji se postavlja
 	int      mEditTileMeta;
 
-	class TileEditFrame* mFrame;
+	TileEditFrame* mFrame;
 
 	virtual void onEnable();
 	virtual void onDisable();
@@ -89,6 +92,7 @@ public:
 	virtual void enumProp( IPropEditor& editor );
 
 };
+
 
 class LevelEditStage : public LevelStageBase
 	                 , public EditWorldData
@@ -104,6 +108,10 @@ public:
 	}
 	virtual bool onInit();
 	virtual void onExit();
+
+	void cleanupEditMode();
+	void clearEditModeData();
+
 	virtual void onUpdate( float deltaT );
 	virtual void onRender();
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );

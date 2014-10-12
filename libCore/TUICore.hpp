@@ -394,6 +394,38 @@ void TUICore<T>::_destroyChildren()
 }
 
 template< class T >
+void TUICore<T>::doRenderAll()
+{
+	prevRender();
+	render();
+	postRender();
+
+	bool bClipTest = _this()->haveChildClipTest();
+
+	if ( bClipTest )
+	{
+		for( TUICore<T>* child = getChild(); child ; child = child->getNext() )
+		{
+			if ( !child->isShow() )
+				continue;
+			if ( !child->clipTest() )
+				continue;
+			child->renderAll();
+		}
+	}
+	else
+	{
+		for( TUICore<T>* child = getChild(); child ; child = child->getNext() )
+		{
+			if ( !child->isShow() )
+				continue;
+			child->renderAll();
+		}
+	}
+	postRenderChildren();
+}
+
+template< class T >
 TUIManager<T>::TUIManager()
 	:mUIFocus( NULL )
 	,mUIMouse( NULL )
@@ -577,26 +609,14 @@ void TUIManager<T>::updateInternal( TUICore<T>* ui )
 template< class T >
 void TUIManager<T>::render()
 {
-	renderInternal( mRoot.mChild );
-}
-
-template< class T >
-void TUIManager<T>::renderInternal( TUICore<T>* ui )
-{
-	TUICore<T>* cur = ui;
-	while( cur )
+	for( TUICore<T>* cur = mRoot.mChild;  cur ; cur = cur->getNext() )
 	{
-		if ( cur->isShow() && cur->clipTest() )
-		{
-			cur->prevRender();
-			cur->render();
-			cur->postRender();
-			renderInternal( cur->getChild() );
-			cur->postRenderChildren();
-		}
-		cur = cur->getNext();
+		if ( !cur->isShow() )
+			continue;
+		cur->renderAll();
 	}
 }
+
 
 template< class T >
 template< class Visitor >

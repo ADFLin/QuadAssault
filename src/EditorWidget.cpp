@@ -56,7 +56,7 @@ void PorpTextCtrl::inputData()
 			setValue( str );
 		}
 		break;
-	case PROP_STRING:str = *((string*)mData); break;
+	case PROP_STRING:setValue( ((string*)mData)->c_str() ); break;
 	case PROP_CTRL:  setValue( static_cast< IPropCtrl* >( mData )->input().c_str() ); break;
 	}
 	
@@ -296,7 +296,7 @@ TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent )
 }
 
 ObjectEditFrame::ObjectEditFrame( int id , Vec2f const& pos , GWidget* parent ) 
-	:BaseClass( id , pos , Vec2i( 4 , 4 ) + Vec2i( getButtonSize().x , 10 * ( getButtonSize().y + 2 ) ) , parent )
+	:BaseClass( id , pos , Vec2i( 4 , 4 ) + Vec2i( 0 , 0 ) , parent )
 {
 
 }
@@ -305,14 +305,15 @@ void ObjectEditFrame::setupObjectList( ObjectCreator& creator )
 {
 	ObjectFactoryMap& of = creator.getFactoryMap();
 
+
 	int num = 0;
 	for( ObjectFactoryMap::iterator iter = of.begin() , itEnd = of.end();
 		iter != itEnd ; ++iter )
 	{
 		Vec2i pos;
 		pos.x = 2;
-		pos.y = TopSideHeight + 2 + ( num ) * ( getButtonSize().y + 2 );
-		GTextButton* button = new GTextButton( UI_OBJECT_SELECT , pos , getButtonSize() , this );
+		pos.y = TopSideHeight + 2 + ( num ) * ( ButtonSize().y + 2 );
+		GTextButton* button = new GTextButton( UI_OBJECT_SELECT , pos , ButtonSize() , this );
 		button->text->setFont( getGame()->getFont(0) );
 		button->text->setCharSize( 20 );
 		button->text->setString( iter->first );
@@ -320,4 +321,55 @@ void ObjectEditFrame::setupObjectList( ObjectCreator& creator )
 
 		++num;
 	}
+	Vec2i size;
+	size.x = 4 + ButtonSize().x;
+	size.y = TopSideHeight + 4 + num * ( ButtonSize().y + 2 );
+	setSize( size );
+
+}
+
+ActionEditFrame::ActionEditFrame( int id , Vec2i const& pos , GWidget* widget ) 
+	:BaseClass( id , pos , Vec2i( ListCtrlWidth + ButtonSize().x + 4 + 3 , 200 ) , widget )
+{
+	mListCtrl = new GListCtrl( UI_ACTION_LISTCTRL , Vec2i( 2 , TopSideHeight + 2 ) , Vec2i( 100 , 100 ) , this );
+	mTrigger = NULL;
+}
+
+void ActionEditFrame::setupActionList( ActionCreator& creator )
+{
+	Vec2i  basePos = Vec2i( ListCtrlWidth + 2 + 3 , TopSideHeight + 2 );
+	ActionFactoryMap& of = creator.getFactoryMap();
+	int num = 0;
+	for( ActionFactoryMap::iterator iter = of.begin() , itEnd = of.end();
+		iter != itEnd ; ++iter )
+	{
+		Vec2i pos = basePos;
+		pos.y += num  * ( ButtonSize().y + 2 );
+		GTextButton* button = new GTextButton( UI_ACTION_SELECT , pos , ButtonSize() , this );
+		button->text->setFont( getGame()->getFont(0) );
+		button->text->setCharSize( 20 );
+		button->text->setString( iter->first );
+		button->setUserData( (void*)iter->second );
+		++num;
+	}
+}
+
+void ActionEditFrame::refreshList()
+{
+	mListCtrl->removeAllItem();
+	ActionList& actions = mTrigger->getActions();
+	for( ActionList::iterator iter = actions.begin() ,itEnd = actions.end();
+		iter != itEnd; ++iter )
+	{
+		Action* act = *iter;
+		unsigned idx = mListCtrl->appendItem( act->getName() );
+		mListCtrl->setItemData( idx , (void*) act );
+	}
+}
+
+void ActionEditFrame::setTrigger( TriggerBase* trigger )
+{
+	mTrigger = trigger;
+	if ( mTrigger )
+		refreshList();
 }

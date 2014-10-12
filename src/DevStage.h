@@ -39,6 +39,14 @@ public:
 		GUISystem::getInstance().addWidget( chioce );
 
 
+
+		GListCtrl* listCtrl = new GListCtrl( UI_ANY , Vec2i( 500 , 200 ) , Vec2i( 200 , 400 ) , NULL );
+		listCtrl->appendItem( "Hello" );
+		listCtrl->appendItem( "Good" );
+		listCtrl->appendItem( "Test" );
+		GUISystem::getInstance().addWidget( listCtrl );
+
+
 		frame->inputData();
 		return true;
 	}

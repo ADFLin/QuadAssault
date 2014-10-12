@@ -2,6 +2,7 @@
 #define Level_h__
 
 #include "Collision.h"
+#include "ObjectFactory.h"
 #include "Block.h"
 #include "Object.h"
 #include "Light.h"
@@ -13,7 +14,6 @@
 #include <vector>
 
 class LevelObject;
-class ObjectCreator;
 class Mob;
 class LightObject;
 class ItemPickup;

@@ -7,6 +7,7 @@
 #include "GUISystem.h"
 #include "Dependence.h"
 #include "ObjectFactory.h"
+#include "Trigger.h"
 
 enum
 {
@@ -17,12 +18,14 @@ enum
 	
 	UI_NEW_MAP ,
 	UI_SAVE_MAP  ,
-	UI_TRIGGER_EDIT ,
 	UI_OBJECT_EDIT ,
 	UI_TILE_EDIT ,
 
 	UI_TILE_SELECT ,
 	UI_OBJECT_SELECT ,
+	UI_ACTION_SELECT ,
+
+	UI_ACTION_LISTCTRL ,
 };
 
 class IPropCtrl
@@ -153,19 +156,34 @@ public:
 	TileEditFrame( int id , Vec2f const& pos , GWidget* parent );
 };
 
-
-
 class ObjectEditFrame : public GFrame
 {
 	typedef GFrame BaseClass;
 public:
 	ObjectEditFrame( int id , Vec2f const& pos , GWidget* parent );
-	static Vec2i getButtonSize(){ return Vec2i( 90 , 20 );}
+	static Vec2i ButtonSize(){ return Vec2i( 90 , 20 ); }
 	void setupObjectList( ObjectCreator& creator );
+};
 
 
+class ActionEditFrame : public GFrame
+{
+	typedef GFrame BaseClass;
+
+public:
+
+	ActionEditFrame( int id , Vec2i const& pos , GWidget* widget );
+
+	void setTrigger( TriggerBase* trigger );
+
+	static int const ListCtrlWidth = 100; 
+	static Vec2i ButtonSize(){ return Vec2i( 90 , 20 ); }
+	void setupActionList( ActionCreator& creator );
+	void refreshList();
 
 
+	TriggerBase*  mTrigger;
+	GListCtrl*    mListCtrl;
 };
 
 
