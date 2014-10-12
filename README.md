@@ -1,3 +1,5 @@
+![Imgur](http://i.imgur.com/vDTZ6FK.png)
+
 QuadAssault
 ===========
 ### About ###
