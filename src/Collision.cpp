@@ -88,18 +88,18 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 			calcCellPos( body.cachePos + offset , cx , cy );
 			xMin = std::max( cx - 1 , 0 );
 			xMax = std::min( cx + 1 , mCellMap.getSizeX() - 1 );
-			yMin = std::max( cx - 1 , 0 );
-			yMax = std::min( cx + 1 , mCellMap.getSizeY() - 1 );
+			yMin = std::max( cy - 1 , 0 );
+			yMax = std::min( cy + 1 , mCellMap.getSizeY() - 1 );
 		}
 		else
 		{
-			xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
-			xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
-			yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
-			yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
+			xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) - 1 , 0 , mCellMap.getSizeX() - 1 );
+			xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) + 1 , 0 , mCellMap.getSizeX() - 1 );
+			yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) - 1 , 0 , mCellMap.getSizeY() - 1 );
+			yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) + 1 , 0 , mCellMap.getSizeY() - 1 );
 		}
 
-		for( int cy = yMin ; cy <= xMax ; ++cy )
+		for( int cy = yMin ; cy <= yMax ; ++cy )
 		{
 			for( int cx = xMin ; cx <= xMax ; ++cx )
 			{
@@ -185,19 +185,19 @@ bool CollisionManager::checkCollision( ColBody& body )
 			calcCellPos( body.cachePos , cx , cy );
 			xMin = std::max( cx - 1 , 0 );
 			xMax = std::min( cx + 1 , mCellMap.getSizeX() - 1 );
-			yMin = std::max( cx - 1 , 0 );
-			yMax = std::min( cx + 1 , mCellMap.getSizeY() - 1 );
+			yMin = std::max( cy - 1 , 0 );
+			yMax = std::min( cy + 1 , mCellMap.getSizeY() - 1 );
 		}
 		else
 		{
 			Rect const& bBox = body.boundBox;
-			xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
-			xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) , 0 , mCellMap.getSizeX() - 1 );
-			yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
-			yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
+			xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) - 1 , 0 , mCellMap.getSizeX() - 1 );
+			xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) + 1 , 0 , mCellMap.getSizeX() - 1 );
+			yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) - 1 , 0 , mCellMap.getSizeY() - 1 );
+			yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) + 1 , 0 , mCellMap.getSizeY() - 1 );
 		}
 
-		for( int cy = yMin ; cy <= xMax ; ++cy )
+		for( int cy = yMin ; cy <= yMax ; ++cy )
 		{
 			for( int cx = xMin ; cx <= xMax ; ++cx )
 			{

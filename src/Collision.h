@@ -30,8 +30,6 @@ public:
 	void  removeBody( ColBody& body );
 	bool  updateBodySize( ColBody& body );
 
-
-
 	void  update();
 	bool  testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned maskCheckReplace = 0 );
 	Tile* rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned colMask );
@@ -39,7 +37,6 @@ public:
 	
 	void  findBody( Rect const& bBox , unsigned colMask , ColBodyVec& out );
 	float getCellLength(){ return mCellLength; }
-
 
 private:
 
