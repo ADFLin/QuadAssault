@@ -20,7 +20,7 @@ public:
 enum FireMode
 {
 	FM_ONCE ,
-	FM_ONCE_AND_DESTROY ,
+	FM_DESTROY ,
 	FM_ALWAYS ,
 	//Area Trigger
 	FM_ON_TOUCH ,

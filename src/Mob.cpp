@@ -36,6 +36,9 @@ void Mob::onSpawn( unsigned flag )
 	mBody.setMask( COL_SOILD | COL_RENDER );
 	mBody.setMaskCheck( COL_BULLET | COL_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
+
+	if ( flag & SDF_CAST_EFFECT )
+		spawnEffect();
 }
 
 void Mob::onDestroy( unsigned flag )
@@ -124,19 +127,12 @@ void Mob::tick()
 
 }
 
-
 void Mob::spawnEffect()
 {
 	Explosion* e = getLevel()->createExplosion( getPos(),512 );
 	e->setParam(32,1000,100);
 	e->setColor(Vec3f(0.25,0.5,1.0));
 }
-
-void Mob::DodajMoment(float x)
-{
-	akceleracija=x;
-}
-
 
 bool Mob::testCollision( Vec2f const& offset )
 {

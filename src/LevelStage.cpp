@@ -1,6 +1,7 @@
 #include "LevelStage.h"
 
 #include "GameInterface.h"
+#include "GameInput.h"
 #include "SoundManager.h"
 #include "GUISystem.h"
 #include "RenderSystem.h"
@@ -178,6 +179,8 @@ bool LevelStage::onInit()
 	WorldData::build();
 	mLevel->addListerner( *this );
 
+	unsigned flag = getLevel()->setSpwanDestroyFlag( SDF_LOAD_LEVEL );
+	
 	loadLevel();
 
 	Player* player = mLevel->getPlayer();
@@ -194,8 +197,9 @@ bool LevelStage::onInit()
 		mLevel->spawnObjectByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
 		mLevel->spawnObjectByName( "Mob.Minigun" , Vec2f( 300 + i * 100 , 1200 ) );
 	}
-
 #endif
+	getLevel()->setSpwanDestroyFlag( flag );
+
 	mScreenFade.setColor( 0 );
 	mScreenFade.fadeIn();
 
@@ -270,13 +274,13 @@ void LevelStage::tick()
 
 	float rotateSpeed = Math::toRad( 150 );
 	float moveAcc = 1;
-	if(Platform::isKeyPressed(Keyboard::eLEFT) || Platform::isKeyPressed(Keyboard::eA))
+	if(Input::isKeyPressed(Keyboard::eLEFT) || Input::isKeyPressed(Keyboard::eA))
 		player->rotate(-rotateSpeed*TICK_TIME);
-	if(Platform::isKeyPressed(Keyboard::eRIGHT) || Platform::isKeyPressed(Keyboard::eD))
+	if(Input::isKeyPressed(Keyboard::eRIGHT) || Input::isKeyPressed(Keyboard::eD))
 		player->rotate( rotateSpeed*TICK_TIME);
-	if(Platform::isKeyPressed(Keyboard::eUP) || Platform::isKeyPressed(Keyboard::eW))
+	if(Input::isKeyPressed(Keyboard::eUP) || Input::isKeyPressed(Keyboard::eW))
 		player->addMoment( moveAcc);
-	if(Platform::isKeyPressed(Keyboard::eDOWN) || Platform::isKeyPressed(Keyboard::eS))
+	if(Input::isKeyPressed(Keyboard::eDOWN) || Input::isKeyPressed(Keyboard::eS))
 		player->addMoment(-moveAcc);
 	if(Platform::isButtonPressed( Mouse::eLBUTTON ) )
 		player->shoot( wPosMouse );

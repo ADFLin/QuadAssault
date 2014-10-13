@@ -11,7 +11,7 @@
 TriggerBase::TriggerBase()
 {
 	mEnable = true;
-	mMode   = FM_ONCE_AND_DESTROY;
+	mMode   = FM_DESTROY;
 }
 
 TriggerBase::~TriggerBase()
@@ -87,7 +87,7 @@ void AreaTrigger::tick()
 			case FM_ALWAYS:
 				fireActions( getLevel() );
 				break;
-			case FM_ONCE_AND_DESTROY:
+			case FM_DESTROY:
 				fireActions( getLevel() );
 				destroy();
 				mEnable = false;
@@ -109,15 +109,18 @@ void AreaTrigger::tick()
 						}
 					}
 					if ( needFire )
+					{
 						fireActions( getLevel() );
+						mTouchObjects.push_back( player );
+					}
 				}
 				break;
 			}
 		}
 	}
 
-	for( ObjectList::iterator iter = mTouchObjects.begin() , itEnd = mTouchObjects.end();
-		iter != itEnd ; )
+	for( ObjectList::iterator iter = mTouchObjects.begin();
+		 iter != mTouchObjects.end(); )
 	{
 		LevelObject* obj = *iter;
 
@@ -155,8 +158,8 @@ void AreaTrigger::renderDev( DevDrawMode mode )
 void AreaTrigger::enumProp( IPropEditor& editor )
 {
 	BaseClass::enumProp( editor );
-	int fireModeValue[] = { FM_ONCE , FM_ON_TOUCH , FM_ALWAYS , FM_ONCE_AND_DESTROY };
-	char const* fireModeStr[] = { "Once" , "On Touch" , "Always" , "Once And Destroy" };
+	int fireModeValue[] = { FM_ONCE , FM_ON_TOUCH , FM_ALWAYS , FM_DESTROY };
+	char const* fireModeStr[] = { "Once" , "On Touch" , "Always" , "Destroy" };
 
 	editor.addProp( "AreaSize" , mSize );
 	editor.addEnumProp( "FireMode" , mMode , ARRAY_SIZE( fireModeValue ) , fireModeValue , fireModeStr );
@@ -171,8 +174,6 @@ void AreaTrigger::setupDefault()
 void SpawnAct::fire( Level* level )
 {
 	LevelObject* object = level->spawnObjectByName( className.c_str() , spawnPos );
-	if ( object->getType() == OT_MOB )
-		object->cast< Mob >()->spawnEffect();
 }
 
 void SpawnAct::enumProp( IPropEditor& editor )

@@ -60,6 +60,7 @@ enum SpawnDestroyFlag
 {
 	SDF_SETUP_DEFAULT = BIT(0),
 	SDF_CAST_EFFECT   = BIT(1),
+	SDF_LOAD_LEVEL    = BIT(2),
 };
 
 class LevelObject : public Object

@@ -32,15 +32,14 @@ public:
 	virtual void tick();
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
 
-	virtual void spawnEffect();
 	virtual void shoot( IBulletFactory const& creator );
-	virtual void takeDamage(Bullet* p);
-
-	void DodajMoment(float x);
-	void SudarProjektila();	
-
+	
 
 protected:
+
+	virtual void spawnEffect();
+	virtual void takeDamage(Bullet* p);
+
 	bool testCollision( Vec2f const& offset );
 
 	ColBody mBody;
