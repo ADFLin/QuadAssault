@@ -13,69 +13,23 @@ PorpTextCtrl::PorpTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWid
 	text->setCharSize( 20 );
 	text->setFont( getGame()->getFont(0) );
 	text->setColor( Color( 255 , 255 , 0 ) );
-
-	mTypeData = PROP_NONE;
 }
 
 PorpTextCtrl::~PorpTextCtrl()
 {
-	if ( mTypeData == PROP_CTRL )
-		delete static_cast< IPropCtrl* >( mData );
+
 }
 
 void PorpTextCtrl::inputData()
 {
-	if ( !mData )
-		return;
-
-	FixString< 256 > str;
-	switch( mTypeData )
-	{
-	case PROP_INT:   str.format( "%d" , *((int*)mData) ); setValue( str );break;
-	case PROP_UCHAR: str.format( "%u" , *((unsigned char*)mData) ); setValue( str ); break;
-	case PROP_BOOL:  str = *((bool*)mData) ? "true" : "false"; setValue( str ); break;
-	case PROP_FLOAT: 
-		{
-			str.format( "%f" , *((float*)mData) );
-			//cut zero
-			int len = strlen( str );
-			if ( len )
-			{
-				char* c = &str[0] + len - 1;
-				while( &str[0] != c )
-				{ 
-					if ( *c != '0' )
-					{
-						if ( *c == '.' )
-							*c = 0;
-						break;
-					}
-					--c; 
-				}
-			}
-			setValue( str );
-		}
-		break;
-	case PROP_STRING:setValue( ((string*)mData)->c_str() ); break;
-	case PROP_CTRL:  setValue( static_cast< IPropCtrl* >( mData )->input().c_str() ); break;
-	}
-	
+	FString str;
+	if ( mPorpData.getString( str ) )
+		setValue( str );
 }
 
 void PorpTextCtrl::outputData()
 {
-	if ( !mData )
-		return;
-
-	switch( mTypeData )
-	{
-	case PROP_FLOAT: *((float*)mData) = ::atof( getValue() );break;
-	case PROP_INT:   *((int*)mData) = ::atoi( getValue() );break;
-	case PROP_UCHAR: *((unsigned char*)mData) = ::atoi( getValue() );break;
-	case PROP_BOOL:  *((bool*)mData) = strcmp( getValue() , "true" ) ? true : false; break;
-	case PROP_STRING:*((string*)mData) = getValue();break;
-	case PROP_CTRL:  static_cast< IPropCtrl* >( mData )->output( getValue() );
-	}
+	mPorpData.setValue( getValue() );
 }
 
 IntPropChioce::IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
@@ -382,19 +336,21 @@ void ActionEditFrame::setupActionList( ActionCreator& creator )
 void ActionEditFrame::refreshList()
 {
 	mListCtrl->removeAllItem();
-	ActionList& actions = mTrigger->getActions();
-	for( ActionList::iterator iter = actions.begin() ,itEnd = actions.end();
-		iter != itEnd; ++iter )
+	if ( mTrigger )
 	{
-		Action* act = *iter;
-		unsigned idx = mListCtrl->appendItem( act->getName() );
-		mListCtrl->setItemData( idx , (void*) act );
+		ActionList& actions = mTrigger->getActions();
+		for( ActionList::iterator iter = actions.begin() ,itEnd = actions.end();
+			iter != itEnd; ++iter )
+		{
+			Action* act = *iter;
+			unsigned idx = mListCtrl->appendItem( act->getName() );
+			mListCtrl->setItemData( idx , (void*) act );
+		}
 	}
 }
 
 void ActionEditFrame::setTrigger( TriggerBase* trigger )
 {
 	mTrigger = trigger;
-	if ( mTrigger )
-		refreshList();
+	refreshList();
 }

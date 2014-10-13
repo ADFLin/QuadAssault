@@ -5,7 +5,7 @@ int const MAX_LEVEL_NUM =64;
 
 struct PlayerSetting
 {
-	string name;
+	String name;
 	int    idxCurLevel;
 	bool   levelEnabled[ MAX_LEVEL_NUM ];
 

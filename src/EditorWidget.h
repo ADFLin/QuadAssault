@@ -30,24 +30,6 @@ enum
 	UI_ACTION_LISTCTRL ,
 };
 
-class IPropCtrl
-{
-public:
-	virtual void        output( char const* str ) = 0;
-	virtual std::string input() = 0;
-};
-
-
-enum PropType
-{
-	PROP_NONE ,
-	PROP_FLOAT ,
-	PROP_INT ,
-	PROP_UCHAR ,
-	PROP_BOOL ,
-	PROP_STRING ,
-	PROP_CTRL   ,
-};
 
 
 class PorpTextCtrl : public GTextCtrl
@@ -55,16 +37,12 @@ class PorpTextCtrl : public GTextCtrl
 public:
 	PorpTextCtrl( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
 	~PorpTextCtrl();
-	void     inputData();
-	void     outputData();
-	void     setData( float&  data ){ mData = &data; mTypeData = PROP_FLOAT; }
-	void     setData( int&    data ){ mData = &data; mTypeData = PROP_INT; }
-	void     setData( string& data ){ mData = &data; mTypeData = PROP_STRING;  }
-	void     setData( bool&   data ){ mData = &data; mTypeData = PROP_BOOL; }
-	void     setData( unsigned char& data ){ mData = &data; mTypeData = PROP_UCHAR; }
-	void     setControl( IPropCtrl* propCtrl ){ mData = propCtrl; mTypeData = PROP_CTRL; }
-	void*    mData; 
-	PropType mTypeData;
+	void      inputData();
+	void      outputData();
+	PropData& getProp(){ return mPorpData; }
+
+private:
+	PropData mPorpData;
 };
 
 class IntPropChioce : public GChoice
@@ -111,14 +89,14 @@ public:
 	virtual void addProp( char const* name , TYPE& value )\
 	{\
 		PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );\
-		textCtrl->setData( value );\
+		textCtrl->getProp().setData( value );\
 		addPorpWidget( name , textCtrl );\
 	}
 
 	ADD_TEXT_PROP( int )
 	ADD_TEXT_PROP( unsigned char )
 	ADD_TEXT_PROP( float )
-	ADD_TEXT_PROP( string )
+	ADD_TEXT_PROP( String )
 
 
 	void addPorpWidget( char const* name , GWidget* widget );

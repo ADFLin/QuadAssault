@@ -69,6 +69,18 @@ void AreaTrigger::init()
 	BaseClass::init();
 }
 
+void AreaTrigger::onSpawn( unsigned flag )
+{
+	BaseClass::onSpawn( flag );
+}
+
+void AreaTrigger::onDestroy( unsigned flag )
+{
+	
+	BaseClass::onSpawn( flag );
+}
+
+
 void AreaTrigger::tick()
 {
 	Rect bBox;
@@ -174,6 +186,13 @@ void AreaTrigger::setupDefault()
 void SpawnAct::fire( Level* level )
 {
 	LevelObject* object = level->spawnObjectByName( className.c_str() , spawnPos );
+	//TODO
+	if ( object )
+	{
+
+
+
+	}
 }
 
 void SpawnAct::enumProp( IPropEditor& editor )
@@ -181,6 +200,7 @@ void SpawnAct::enumProp( IPropEditor& editor )
 	BaseClass::enumProp( editor );
 	editor.addProp( "ClassName" , className );
 	editor.addProp( "SpawnPos" , spawnPos );
+	editor.addProp( "SpawnProperty" , spawnProperty );
 }
 
 void SpawnAct::setupDefault()

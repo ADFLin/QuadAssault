@@ -1,6 +1,7 @@
 #include "LevelEditStage.h"
 
 #include "GameInterface.h"
+#include "GameInput.h"
 #include "RenderSystem.h"
 #include "TextureManager.h"
 
@@ -17,6 +18,8 @@
 #include "RenderUtility.h"
 
 #include "FixString.h"
+
+#include <iostream>
 #include <fstream>
 
 
@@ -39,7 +42,7 @@ bool LevelEditStage::onInit()
 	mSDFlagPrev = getLevel()->setSpwanDestroyFlag( EDIT_SPAWNDESTROY_FLAG );
 
 	{
-		GFrame* frame = new GFrame( UI_EDIT_TOOL , Vec2i( 10 , 40 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
+		GFrame* frame = new GFrame( UI_EDIT_TOOL , Vec2i( 10 , 30 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
 		frame->setTile( "Tool" );
 		//"Tools"
 
@@ -119,15 +122,15 @@ void LevelEditStage::onUpdate( float deltaT )
 {	
 	float speed=250;
 
-	if( Platform::isKeyPressed( Keyboard::eLSHIFT ) )
+	if( Input::isKeyPressed( Keyboard::eLSHIFT ) )
 		speed=750;
-	if( Platform::isKeyPressed( Keyboard::eLEFT ) || Platform::isKeyPressed( Keyboard::eA ) )
+	if( Input::isKeyPressed( Keyboard::eLEFT ) || Input::isKeyPressed( Keyboard::eA ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(-speed*deltaT,0));
-	if( Platform::isKeyPressed( Keyboard::eRIGHT ) || Platform::isKeyPressed( Keyboard::eD) )
+	if( Input::isKeyPressed( Keyboard::eRIGHT ) || Input::isKeyPressed( Keyboard::eD) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(speed*deltaT,0));
-	if( Platform::isKeyPressed( Keyboard::eUP ) || Platform::isKeyPressed( Keyboard::eW ) )
+	if( Input::isKeyPressed( Keyboard::eUP ) || Input::isKeyPressed( Keyboard::eW ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(0, -speed*deltaT));
-	if( Platform::isKeyPressed( Keyboard::eDOWN ) || Platform::isKeyPressed( Keyboard::eS ) )
+	if( Input::isKeyPressed( Keyboard::eDOWN ) || Input::isKeyPressed( Keyboard::eS ) )
 		mCamera->setPos(mCamera->getPos()+Vec2f(0, speed*deltaT));
 
 	getGame()->procSystemEvent();
@@ -224,7 +227,7 @@ bool LevelEditStage::onKey( unsigned key , bool isDown )
 			break;
 		case Keyboard::eF6:
 			{
-				string path = LEVEL_DIR;
+				String path = LEVEL_DIR;
 				path += gMapFileName;
 				saveLevel( path.c_str() );				
 			}
@@ -232,8 +235,8 @@ bool LevelEditStage::onKey( unsigned key , bool isDown )
 		case Keyboard::eG:
 			{
 				Vec2f wPos = convertToWorldPos( getGame()->getMousePos() );
-				cout << "X: " << wPos.x << endl;
-				cout << "Y: " << wPos.y << endl;
+				std::cout << "X: " << wPos.x << std::endl;
+				std::cout << "Y: " << wPos.y << std::endl;
 			}
 			break;
 		}
@@ -250,7 +253,7 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 	{
 	case UI_SAVE_MAP:
 		{
-			string path = LEVEL_DIR;
+			String path = LEVEL_DIR;
 			path += gMapFileName;
 			saveLevel( path.c_str() );
 		}
@@ -527,13 +530,17 @@ void ObjectEditMode::onEnable()
 		mObjFrame = new ObjectEditFrame( UI_ANY , Vec2i( 0 , 0 ) , NULL );
 		mObjFrame->setTile( "Object" );
 		mObjFrame->setupObjectList( *getWorld().getObjectCreator() );
-		mObjFrame->setPos( getModeWidgetPos( mObjFrame->getSize() ) );
+		Vec2i pos = getModeWidgetPos( mObjFrame->getSize() );
+		mObjFrame->setPos( pos );
 		GUISystem::getInstance().addWidget( mObjFrame );
 
+		
 		mActFrame = new ActionEditFrame( UI_ANY , Vec2i( 0 , 0 ) , NULL );
 		mActFrame->setupActionList( *getWorld().getActionCreator() );
 		mActFrame->setTile( "Action" );
 		mActFrame->show( false );
+		pos.x -= mActFrame->getSize().x + 4;
+		mActFrame->setPos( pos );
 		GUISystem::getInstance().addWidget( mActFrame );
 	}
 
@@ -573,12 +580,12 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 	{
 		if ( mObject && msg.isLeftDown() )
 		{
-			if ( Platform::isKeyPressed( Keyboard::eLSHIFT ) )
+			if ( Input::isKeyPressed( Keyboard::eLSHIFT ) )
 			{
 				mObject->setPos( wPos );
 				getWorld().mPropFrame->inputData();
 			}
-			else if ( Platform::isKeyPressed( Keyboard::eLCONTROL ) )
+			else if ( Input::isKeyPressed( Keyboard::eLCONTROL ) )
 			{
 				//TODO: Dont use dynamic_cast
 				Actor* actor = dynamic_cast< Actor* >( mObject );
@@ -606,6 +613,7 @@ void ObjectEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 			{
 				getWorld().getLevel()->destroyObject( mObject );
 				getWorld().mPropFrame->removeEdit();
+				mActFrame->setTrigger( NULL );
 				mObject = NULL;
 			}
 		}

@@ -511,7 +511,7 @@ public:
 	}
 	CFont::Data* mData;
 	CFont*       mFont;
-	std::string  mStr;
+	String       mStr;
 
 	LineVec      mLines;
 	Color        mColor;

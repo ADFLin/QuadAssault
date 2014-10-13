@@ -73,7 +73,7 @@ private:
 	Weapon* mWeaponSlot[ NUM_WEAPON_SLOT ];
 	bool    haveShoot;
 
-	Light mHeadLight;
+	Light  mHeadLight;
 
 	float  shiftTrack;
 

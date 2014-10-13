@@ -6,6 +6,7 @@
 
 #include "Singleton.h"
 
+
 class Texture;
 class IText;
 
@@ -176,7 +177,7 @@ public:
 	void onEditText();
 	void onModifyValue();
 	void onPressEnter(){ sendEvent( EVT_TEXTCTRL_ENTER ); }
-
+	virtual void onFocus( bool beF );
 	void onRender();
 
 	IText* text;

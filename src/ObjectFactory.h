@@ -1,6 +1,7 @@
 #ifndef ObjectFactory_h__
 #define ObjectFactory_h__
 
+#include "Base.h"
 #include <map>
 
 
@@ -45,7 +46,7 @@ public:
 			T* obj = new T;
 			return obj;
 		}
-		string name;
+		String name;
 	};
 
 	BaseType* createObject( char const* name )

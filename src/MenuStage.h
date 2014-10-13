@@ -55,8 +55,8 @@ private:
 	struct LevelInfo
 	{
 		int      index;
-		string   levelFile;
-		string   mapFile;
+		String   levelFile;
+		String   mapFile;
 		GTextButton* button;
 	};
 

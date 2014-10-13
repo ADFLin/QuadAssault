@@ -2,6 +2,7 @@
 
 #include "Dependence.h"
 #include "GameInterface.h"
+#include "GameInput.h"
 
 #include "RenderSystem.h"
 #include "RenderUtility.h"
@@ -15,32 +16,28 @@ public:
 
 	struct Rect
 	{
-		Vec2i pos;
-		Vec2i size;
+		Vec2i min;
+		Vec2i max;
 
-		void overlap( Rect const& other )
+		Vec2i getSize(){ return max - min; }
+		bool  overlap( Rect const& other )
 		{
-			int x = std::max( pos.x, other.pos.x );
-			int y = std::max( pos.y, other.pos.y );
+			int xMin = std::max( min.x, other.min.x );
+			int yMin = std::max( min.y, other.min.y );
+			int xMax = std::min( max.x , other.max.x );
+			int yMax = std::min( max.y , other.max.y );
 
-			Vec2i maxThis = pos + size;
-			Vec2i maxOther = other.pos + other.size;
-
-			int xMax = std::min( maxThis.x , maxOther.x );
-			int yMax = std::min( maxThis.y , maxOther.y );
-
-			if ( xMax  >= x && yMax >= y )
+			if ( xMax  >= xMin && yMax >= yMin )
 			{
-				pos.x = x;
-				pos.y = y;
-				size.x = xMax - x;
-				size.y = yMax - y;
+				min.x = xMin;
+				min.y = yMin;
+				max.x = xMax;
+				max.y = yMax;
+				return true;
 			}
-			else
-			{
-				size.x = 0;
-				size.y = 0;
-			}
+
+			max = min;
+			return false;
 		}
 	};
 	bool mPrevEnable;
@@ -52,8 +49,8 @@ ScissorClipStack gClipStack;
 void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size , bool bOverlapPrev )
 {
 	Rect rect;
-	rect.pos = pos;
-	rect.size = size;
+	rect.min = pos;
+	rect.max = pos + size;
 
 	if ( mStack.empty() )
 	{
@@ -65,8 +62,8 @@ void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size , bool bOverla
 	{
 		rect.overlap( mStack.back() );
 	}
-
-	glScissor( rect.pos.x , rect.pos.y , rect.size.x , rect.size.y );
+	Vec2i sizeRect = rect.getSize();
+	glScissor( rect.min.x , rect.min.y , sizeRect.x , sizeRect.y );
 	mStack.push_back( rect );
 }
 
@@ -82,7 +79,8 @@ void ScissorClipStack::pop()
 	else
 	{
 		Rect& rect = mStack.back();
-		glScissor( rect.pos.x , rect.pos.y , rect.size.x , rect.size.y );
+		Vec2i size = rect.getSize();
+		glScissor( rect.min.x , rect.min.y , size.x , size.y );
 	}
 }
 
@@ -480,6 +478,11 @@ void GTextCtrl::onEditText()
 {
 	text->setString( getValue() );
 	sendEvent( EVT_TEXTCTRL_CHANGE );
+}
+
+void GTextCtrl::onFocus( bool beF )
+{
+	Input::sKeyBlocked = beF;
 }
 
 GChoice::GChoice( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 

@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+static int SoundPlayMaxNum = 16;
+
 SoundManager::SoundManager()
 {
 
@@ -34,7 +36,7 @@ bool SoundManager::loadSound(char const* name)
 {
 	sf::SoundBuffer buffer;
 
-	string path = SOUND_DIR;
+	String path = SOUND_DIR;
 	path += name;
 	if ( !buffer.loadFromFile( path.c_str() ) )
 	{
@@ -83,6 +85,9 @@ void SoundManager::update( float dt )
 
 Sound* SoundManager::addSound( char const* name , bool canRepeat )
 {
+	if ( mSounds.size() >= SoundPlayMaxNum )
+		return NULL;
+
 	SoundData* data = getData( name );
 
 	if ( data == NULL )

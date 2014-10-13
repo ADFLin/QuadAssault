@@ -14,7 +14,7 @@ Message::~Message()
 	text->release();
 }
 
-void Message::init( string const& sender, string const& content, float durstion, string const& soundName )
+void Message::init( String const& sender, String const& content, float durstion, String const& soundName )
 {	
 	mPos.x=64;
 	mPos.y=64;
@@ -34,8 +34,9 @@ void Message::init( string const& sender, string const& content, float durstion,
 
 void Message::nodifyShow()
 {
-	sound = getGame()->getSoundMgr()->addSound( mSoundName.c_str() );			
-	sound->play();
+	sound = getGame()->getSoundMgr()->addSound( mSoundName.c_str() );
+	if ( sound )
+		sound->play();
 }
 
 void Message::tick()

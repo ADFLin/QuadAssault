@@ -207,7 +207,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libCore\GameEdit.h"
+				RelativePath=".\src\GameEdit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameInput.h"
 				>
 			</File>
 			<File
@@ -305,6 +309,14 @@
 			</File>
 			<File
 				RelativePath=".\src\Game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameEdit.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GameInput.cpp"
 				>
 			</File>
 			<File

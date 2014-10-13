@@ -158,9 +158,9 @@ void RenderEngine::renderScene( RenderParam& param )
 
 Shader* RenderEngine::createShader( char const* vsName , char const* fsName )
 {
-	string vsPath = SHADER_DIR;
+	String vsPath = SHADER_DIR;
 	vsPath += vsName;
-	string fsPath = SHADER_DIR;
+	String fsPath = SHADER_DIR;
 	fsPath += fsName;
 	Shader* shader = new Shader( vsPath.c_str() , fsPath.c_str() );
 	mShaders.push_back( shader );

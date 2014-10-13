@@ -2,7 +2,11 @@
 #define Base_h__
 
 #include "MathCore.h"
+#include "IntegerType.h"
 #include <cmath>
+
+#include <string>
+typedef std::string String;
 
 #ifndef BIT
 #define BIT( n ) ( 1 << ( n ) )
@@ -53,6 +57,15 @@ struct Rect
 			   min.y < p.y && p.y < max.y ;
 	}
 };
+
+struct Color
+{
+	Color(){}
+	Color( uint8 r , uint8 g , uint8 b , uint8 a = 255 )
+		:r(r),g(g),b(b),a(a){}
+	uint8 r , g , b , a;
+};
+
 
 enum RenderPass
 {

@@ -94,11 +94,11 @@ bool MenuStage::onInit()
 	
 
 	std::ifstream file( LEVEL_DIR "LevelList.gdf" , std::ios::in );
-	string linija;
+	std::string linija;
 	while(getline(file,linija))
 	{
 		std::istringstream stream(linija, std::ios::in);
-		string token;
+		std::string token;
 		while(getline(stream,token,' '))
 		{
 			if(token=="[LEVEL]")

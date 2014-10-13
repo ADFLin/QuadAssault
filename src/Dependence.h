@@ -11,10 +11,9 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 
 #include <vector>
-#include <string>
 
 #include "Win32Header.h"
 
-using std::string;
+
 
 #endif // Dependence_h__

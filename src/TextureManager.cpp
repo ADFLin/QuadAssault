@@ -90,7 +90,7 @@ Texture* TextureManager::loadTexture(char const* name)
 {	
 	GLuint id;
 	sf::Image image;
-	string path = TEXTURE_DIR;
+	String path = TEXTURE_DIR;
 	path += name;
 	if( !image.loadFromFile( path.c_str() ))
 	{

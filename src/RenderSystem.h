@@ -1,18 +1,11 @@
 #ifndef RenderSystem_h__
 #define RenderSystem_h__
 
+#include "Base.h"
 #include "Platform.h"
 
 #include "TVector2.h"
 typedef TVector2< float > Vec2f;
-
-struct Color
-{
-	Color(){}
-	Color( uint8 r , uint8 g , uint8 b , uint8 a = 255 )
-		:r(r),g(g),b(b),a(a){}
-	uint8 r , g , b , a;
-};
 
 class IFont
 {

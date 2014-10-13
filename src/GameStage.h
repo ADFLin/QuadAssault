@@ -1,13 +1,8 @@
 #ifndef GameStage_h__
 #define GameStage_h__
 
+#include "Base.h"
 #include <functional>
-
-namespace sf
-{
-	class Event;
-}
-
 
 class Game;
 class GWidget;
@@ -55,7 +50,6 @@ public:
 	virtual void onUpdate( float deltaT ) = 0;	
 	virtual void onRender() = 0;
 
-	virtual void onSystemEvent( sf::Event const& event ){}
 	virtual bool onMouse( MouseMsg const& msg ){ return true; }
 	virtual bool onKey( unsigned key , bool isDown ){ return true; }
 	virtual void onWidgetEvent( int event , int id , GWidget* sender ){}

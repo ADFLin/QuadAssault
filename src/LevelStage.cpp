@@ -496,7 +496,7 @@ void LevelStage::loadLevel()
 	int mapWidth  = 128;
 	int mapHeight = 128;
 
-	string mapPath = LEVEL_DIR;
+	String mapPath = LEVEL_DIR;
 	mapPath += gMapFileName;
 
 	std::ifstream mapFS( mapPath.c_str() ,ios::in);
@@ -515,11 +515,11 @@ void LevelStage::loadLevel()
 
 	if ( mapFS.good() )
 	{
-		string linija_;
+		String linija_;
 		while(getline(mapFS,linija_))
 		{
 			std::istringstream lstring(linija_,std::ios::in);
-			string token;
+			String token;
 			while( getline(lstring,token,' ') )
 			{
 				if(token=="block")
@@ -572,15 +572,15 @@ void LevelStage::loadLevel()
 
 	Vec2f posPlayer = Vec2f(0,0);
 
-	string levelPath = LEVEL_DIR;
+	String levelPath = LEVEL_DIR;
 	levelPath += gLevelFileName;
 
 	ifstream levelFS( levelPath.c_str() ,ios::in);
-	string linija;
+	std::string linija;
 	while(getline(levelFS,linija))
 	{
 		istringstream lstring(linija,ios::in);
-		string token;
+		std::string token;
 		while(getline(lstring,token,' '))
 		{			
 			if(token=="player")

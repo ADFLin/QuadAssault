@@ -1,7 +1,7 @@
 #ifndef PORUKA_H
 #define PORUKA_H
 
-#include "Dependence.h"
+#include "Base.h"
 #include "Object.h"
 
 class Level;
@@ -13,7 +13,7 @@ class Message
 
 public:
 	~Message();
-	void init( string const& sender, string const& content, float durstion, string const& soundName );
+	void init( String const& sender, String const& content, float durstion, String const& soundName );
 	void nodifyShow();
 	void tick();
 	void updateRender( float dt );
@@ -30,7 +30,7 @@ private:
 
 	float    timer; //pocinje od nule	
 	Texture* portrait;
-	string   mSoundName;	
+	String   mSoundName;	
 	Sound*   sound;
 
 };

@@ -1,7 +1,8 @@
-#ifndef TRIGGER_H
-#define TRIGGER_H
+#ifndef Trigger_h__
+#define Trigger_h__
 
 #include "Object.h"
+#include "ColBody.h"
 
 class Message;
 
@@ -60,15 +61,16 @@ public:
 	~AreaTrigger();
 
 	virtual void init();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual ObjectType getType(){ return OT_TRIGGER; }
 	virtual void tick();
 	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
 	virtual void renderDev( DevDrawMode mode );
 
-	
-
 private:
+	ColBody mBody;
 	typedef std::vector< LevelObject* >  ObjectList;
 	std::vector< LevelObject* > mTouchObjects;
 };
@@ -82,8 +84,9 @@ public:
 	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
 
+	String    className;
 	Vec2f     spawnPos;
-	string    className;
+	String    spawnProperty;
 };
 
 class MessageAct : public Action
@@ -96,9 +99,9 @@ public:
 	virtual void setupDefault();
 
 
-	string sender;
-	string content;
-	string soundName;
+	String sender;
+	String content;
+	String soundName;
 	float  duration;
 	
 };
@@ -119,7 +122,7 @@ public:
 	virtual void fire( Level* level );
 	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
-	string soundName;
+	String soundName;
 };
 
-#endif
+#endif // Trigger_h__

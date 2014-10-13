@@ -10,9 +10,9 @@ public:
 	Texture();
 	Texture(char const* file, GLuint id);
 	~Texture();
-
 	void bind();
-	string file;
+
+	String file;
 	GLuint id;				
 };
 
