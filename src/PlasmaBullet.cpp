@@ -39,9 +39,9 @@ void PlasmaBullet::init()
 	dimTimer=0.0;
 }
 
-void PlasmaBullet::onSpawn()
+void PlasmaBullet::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	mLight.host   = this;
 	mLight.radius = 256;
@@ -51,16 +51,20 @@ void PlasmaBullet::onSpawn()
 	getLevel()->playSound("plazma1.wav");	
 
 }
-void PlasmaBullet::onDestroy()
+void PlasmaBullet::onDestroy( unsigned flag )
 {		
 	mLight.remove();
-	Explosion* e = getLevel()->createExplosion( getPos() , 256 );	
-	e->setParam(20,1000,50);
-	e->setColor(Vec3f(1.0, 0.75, 0.5));
 
-	getLevel()->playSound("explosion1.wav");	
+	if ( flag & SDF_CAST_EFFECT )
+	{
+		Explosion* e = getLevel()->createExplosion( getPos() , 256 );	
+		e->setParam(20,1000,50);
+		e->setColor(Vec3f(1.0, 0.75, 0.5));
 
-	BaseClass::onDestroy();
+		getLevel()->playSound("explosion1.wav");	
+	}
+
+	BaseClass::onDestroy( flag );
 }
 
 void PlasmaBullet::tick()

@@ -20,9 +20,15 @@ class WorldData
 {
 public:
 
+	Vec2f  convertToScreenPos( Vec2i const& wPos )
+	{
+		Vec2f offset = wPos - mCamera->getPos();
+		return Vec2f( offset.x / mWorldScaleFactor  , offset.y  / mWorldScaleFactor );
+	}
+
 	Vec2f  convertToWorldPos( Vec2i const& sPos )
 	{
-		return mCamera->getPos() + mWorldScaleFactor * Vec2f( sPos.x  , sPos.y  );
+		return mCamera->getPos() + mWorldScaleFactor * Vec2f( sPos );
 	}
 
 	Vec2i convertToTilePos( Vec2i const& sPos )

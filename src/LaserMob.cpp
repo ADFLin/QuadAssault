@@ -34,15 +34,18 @@ void LaserMob::init()
 	mHP=40;
 }
 
-void LaserMob::onSpawn()
+void LaserMob::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 }
 
-void LaserMob::onDestroy()
+void LaserMob::onDestroy( unsigned flag )
 {
-	getLevel()->playSound("explosion1.wav");		
-	BaseClass::onDestroy();
+	if ( flag & SDF_CAST_EFFECT )
+	{
+		getLevel()->playSound("explosion1.wav");	
+	}	
+	BaseClass::onDestroy( flag );
 }
 
 void LaserMob::tick()

@@ -37,6 +37,7 @@ void PorpTextCtrl::inputData()
 	case PROP_FLOAT: 
 		{
 			str.format( "%f" , *((float*)mData) );
+			//cut zero
 			int len = strlen( str );
 			if ( len )
 			{
@@ -49,7 +50,6 @@ void PorpTextCtrl::inputData()
 							*c = 0;
 						break;
 					}
-					*c = 0; 
 					--c; 
 				}
 			}
@@ -177,13 +177,13 @@ bool PropFrame::onChildEvent( int event , int id , GWidget* ui )
 
 void PropFrame::changeEdit( IEditable& obj )
 {
-	cleanAllPorp();
+	cleanupAllPorp();
 	mEditObj = &obj;
 	mEditObj->enumProp( *this );
 	inputData();
 }
 
-void PropFrame::cleanAllPorp()
+void PropFrame::cleanupAllPorp()
 {
 	for( PropDataVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
 		iter != itEnd ; ++iter )
@@ -274,6 +274,22 @@ void PropFrame::addProp( char const* name , Vec3f& value )
 	addProp( fullName , value.z );
 }
 
+void PropFrame::addProp( char const* name , bool& value )
+{
+	int valueSet[] = { 1 , 0 };
+	char const* strSet[] = { "True" , "False" };
+	addEnumProp( name , value , 2 , valueSet , strSet );
+}
+
+void PropFrame::removeEdit()
+{
+	if ( mEditObj )
+	{
+		cleanupAllPorp();
+		mEditObj = NULL;
+	}
+}
+
 TileEditFrame::TileEditFrame( int id , Vec2f const& pos , GWidget* parent ) 
 	:BaseClass( id , pos , Vec2f(  4 + 2 * ButtonLength + 2 ,  4 + NUM_BLOCK_TYPE * ( ButtonLength + 2 ) + TopSideHeight ) , parent )
 {
@@ -299,31 +315,40 @@ ObjectEditFrame::ObjectEditFrame( int id , Vec2f const& pos , GWidget* parent )
 	:BaseClass( id , pos , Vec2i( 4 , 4 ) + Vec2i( 0 , 0 ) , parent )
 {
 
+	Vec2i posCur = Vec2i( 2 , 2 + TopSideHeight );
+
+	GTextButton* button = new GTextButton( UI_OBJECT_DESTROY , posCur , ButtonSize() , this );
+	button->text->setFont( getGame()->getFont(0) );
+	button->text->setCharSize( 20 );
+	button->text->setString( "Destroy" );
+	posCur.y += ButtonSize().y + 2;
+
+	mObjectListCtrl = new GListCtrl( UI_OBJECT_LISTCTRL , posCur , Vec2i(0,0) , this );
 }
 
 void ObjectEditFrame::setupObjectList( ObjectCreator& creator )
 {
 	ObjectFactoryMap& of = creator.getFactoryMap();
-
+	mObjectListCtrl->removeAllItem();
 
 	int num = 0;
 	for( ObjectFactoryMap::iterator iter = of.begin() , itEnd = of.end();
 		iter != itEnd ; ++iter )
 	{
-		Vec2i pos;
-		pos.x = 2;
-		pos.y = TopSideHeight + 2 + ( num ) * ( ButtonSize().y + 2 );
-		GTextButton* button = new GTextButton( UI_OBJECT_SELECT , pos , ButtonSize() , this );
-		button->text->setFont( getGame()->getFont(0) );
-		button->text->setCharSize( 20 );
-		button->text->setString( iter->first );
-		button->setUserData( (void*)iter->first );
 
+		unsigned idx = mObjectListCtrl->appendItem( iter->first );
+		mObjectListCtrl->setItemData( idx , (void*)iter->first );
 		++num;
 	}
+
+
 	Vec2i size;
-	size.x = 4 + ButtonSize().x;
-	size.y = TopSideHeight + 4 + num * ( ButtonSize().y + 2 );
+	size.x = ButtonSize().x;
+	size.y = num * mObjectListCtrl->getItemHeight();
+	mObjectListCtrl->setSize( size );
+	
+	size.x += 4;
+	size.y += TopSideHeight + 4 + ButtonSize().y;
 	setSize( size );
 
 }

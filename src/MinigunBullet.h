@@ -11,8 +11,8 @@ class MinigunBullet : public Bullet
 public:	
 	virtual void init();
 	virtual void tick();
-	virtual void onDestroy();
-	virtual void onSpawn();
+	virtual void onDestroy( unsigned flag );
+	virtual void onSpawn( unsigned flag );
 	virtual IRenderer* getRenderer();
 
 private:

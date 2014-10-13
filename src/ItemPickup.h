@@ -16,8 +16,8 @@ public:
 	virtual void init();
 	virtual ObjectType getType(){ return OT_ITEM; }
 	virtual void tick();
-	virtual void onSpawn();
-	virtual void onDestroy();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual void onPick(Player* player);
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
 

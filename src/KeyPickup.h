@@ -16,9 +16,9 @@ public:
 
 	virtual void init();
 	virtual void tick();
-	virtual void onDestroy();
+	virtual void onDestroy( unsigned flag );
 	virtual void onPick( Player* player );
-	virtual void onSpawn();
+	virtual void onSpawn( unsigned flag );
 	virtual IRenderer* getRenderer();
 
 	virtual void enumProp( IPropEditor& editor );

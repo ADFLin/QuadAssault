@@ -25,8 +25,8 @@ public:
 	void setup( Vec2f const& poz, Vec2f const& dir, int team );
 
 	virtual ObjectType getType() { return OT_BULLET; }
-	virtual void onSpawn();
-	virtual void onDestroy();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual void tick();
 	virtual void onTileCollision( ColBody& self , Tile& tile );
 

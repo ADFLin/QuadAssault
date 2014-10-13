@@ -90,8 +90,8 @@ public:
 	Mob*              addMob( Mob* mob );
 	Particle*         addParticle(Particle* particle );
 	void              addObject( LevelObject* object );
-
-	LevelObject*      spawnObjectByName( char const* name , Vec2f const& pos , bool bSetDefalut = false );
+	LevelObject*      spawnObjectByName( char const* name , Vec2f const& pos );
+	void              destroyObject( LevelObject* object );
 
 	Sound*            playSound( char const* name , bool canRepeat = false );
 	Message*          addMessage(Message* msg );
@@ -110,11 +110,12 @@ public:
 	Tile*             getTile( Vec2f const& pos );
 	LevelObject*      hitObjectTest( Vec2f const& pos );
 
+	unsigned          setSpwanDestroyFlag( unsigned flag );
+
 	
 public:
 
-	void       addOjectInternal( LevelObject* obj );
-
+	
 
 	typedef MemberHook< LevelObject , &LevelObject::baseHook > ObjHook;
 	typedef MemberHook< LevelObject , &LevelObject::typeHook > TypeHook;
@@ -135,14 +136,10 @@ protected:
 	typedef IntrList< ItemPickup  , TypeHook , PointerType > ItemList;
 	typedef IntrList< Particle , TypeHook , PointerType > ParticleList;
 
+	void       addObjectInternal( LevelObject* obj );
+	void       destroyAllObjectImpl();
 
-	void              destroyAllObjectImpl();
-
-	
 	RenderLightList mRenderLights;
-
-	void       destroyObject( LevelObject* object );
-	
 
 	typedef std::vector< Message* > MessageVec;
 
@@ -162,6 +159,8 @@ protected:
 	PlayerVec        mPlayers;
 	TileMap          mTerrain;
 	CollisionManager mColManager;
+
+	unsigned         mSpwanDestroyFlag;
 
 
 	typedef std::vector< EventListener* > ListenerList;

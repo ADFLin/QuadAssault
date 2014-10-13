@@ -188,13 +188,14 @@ bool LevelStage::onInit()
 	player->addWeapon(new Minigun());
 	player->addWeapon(new Minigun());
 
+#if 1
 	for ( int i = 0 ; i < 20 ; ++i )
 	{
 		mLevel->spawnObjectByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1000 ) );
-		mLevel->spawnObjectByName( "Mob.Laser" , Vec2f( 300 + i * 100 , 1200 ) );
+		mLevel->spawnObjectByName( "Mob.Minigun" , Vec2f( 300 + i * 100 , 1200 ) );
 	}
 
-
+#endif
 	mScreenFade.setColor( 0 );
 	mScreenFade.fadeIn();
 
@@ -662,7 +663,7 @@ void LevelStage::loadLevel()
 				act->className = token;
 				trigger->addAction( act );
 
-				mLevel->addOjectInternal( trigger );
+				mLevel->addObject( trigger );
 			}
 			else if(token=="goal_trigger")
 			{
@@ -681,7 +682,7 @@ void LevelStage::loadLevel()
 
 				trigger->addAction( new GoalAct );
 
-				mLevel->addOjectInternal( trigger );
+				mLevel->addObject( trigger );
 			}
 			else if(token=="msg_trigger")
 			{				
@@ -709,7 +710,7 @@ void LevelStage::loadLevel()
 				act->soundName = token;
 				trigger->addAction( act );
 
-				mLevel->addOjectInternal( trigger );
+				mLevel->addObject( trigger );
 			}
 		}
 	}

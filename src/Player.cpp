@@ -13,7 +13,7 @@
 #include "RenderUtility.h"
 #include "Texture.h"
 
-bool gPlayerGodPower = false;
+bool gPlayerGodPower = true;
 
 Vec2f const gWeaponSlotOffset[] = 
 {
@@ -217,9 +217,9 @@ void Player::init()
 	mBody.setMaskCheck( COL_TERRAIN | COL_OBJECT );
 }
 
-void Player::onSpawn()
+void Player::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	getLevel()->getColManager().addBody( *this , mBody );
 
@@ -231,11 +231,11 @@ void Player::onSpawn()
 	getLevel()->addLight( mHeadLight );
 }
 
-void Player::onDestroy()
+void Player::onDestroy( unsigned flag )
 {
 	getLevel()->getColManager().removeBody( mBody );
 	clearWeapons();
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
 
 void Player::update( Vec2f const& aimPos )

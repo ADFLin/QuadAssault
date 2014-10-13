@@ -9,9 +9,9 @@ class LaserBullet : public Bullet
 	typedef Bullet BaseClass;
 public:	
 	virtual void init();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual void tick();
-	virtual void onDestroy();
-	virtual void onSpawn();
 
 	virtual IRenderer* getRenderer();
 

@@ -74,7 +74,7 @@ void  TItemOwnerUI<Impl, CoreImpl>::removeItem( unsigned pos )
 template < class Impl, class CoreImpl >
 void  TItemOwnerUI<Impl, CoreImpl>::removeAllItem()
 {
-	for( int i = 0 ; i < mItemList.size() ; ++i )
+	for( int i = 0 ; i < (int)mItemList.size() ; ++i )
 	{
 		_this()->onRemoveItem( mItemList[i] );
 	}

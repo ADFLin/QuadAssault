@@ -12,7 +12,7 @@ public:
 	virtual ObjectType getType(){ return OT_PARTICLE; }
 	virtual void init();
 	virtual void tick();
-	virtual void onSpawn();
+	virtual void onSpawn( unsigned flag );
 
 protected:
 	float zivot; //smanjuje se postepeno	

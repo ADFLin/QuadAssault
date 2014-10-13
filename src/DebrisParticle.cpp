@@ -56,9 +56,9 @@ void DebrisParticle::init()
 	zivot=maxZivot;	
 }
 
-void DebrisParticle::onSpawn()
+void DebrisParticle::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 }
 

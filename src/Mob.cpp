@@ -29,28 +29,32 @@ void Mob::init()
 	mHP=100;	
 }
 
-void Mob::onSpawn()
+void Mob::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 	mBody.setSize( getSize()- Vec2f(4,4) );
 	mBody.setMask( COL_SOILD | COL_RENDER );
 	mBody.setMaskCheck( COL_BULLET | COL_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
 }
 
-void Mob::onDestroy()
+void Mob::onDestroy( unsigned flag )
 {
 	getLevel()->getColManager().removeBody( mBody );
 
-	Explosion* e = getLevel()->createExplosion( getPos(), 128 );
-	e->setParam(128,3000,200);
-	for(int i=0; i<4; i++)
+	if ( flag & SDF_CAST_EFFECT )
 	{
-		DebrisPickup* c = new DebrisPickup( getPos() );
-		c->init();
-		getLevel()->addItem( c );
+		Explosion* e = getLevel()->createExplosion( getPos(), 128 );
+		e->setParam(128,3000,200);
+		for(int i=0; i<4; i++)
+		{
+			DebrisPickup* c = new DebrisPickup( getPos() );
+			c->init();
+			getLevel()->addItem( c );
+		}
 	}
-	BaseClass::onDestroy();
+
+	BaseClass::onDestroy( flag );
 }
 
 void Mob::tick()

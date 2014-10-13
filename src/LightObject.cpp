@@ -28,15 +28,16 @@ void LightObject::enumProp( IPropEditor& editor )
 	editor.addProp( "Radius" , radius );
 	editor.addProp( "Color" , color );
 	editor.addProp( "Intensity" , intensity );
+	editor.addProp( "DrawShadow" , drawShadow );
 }
 
-void LightObject::onSpawn()
+void LightObject::onSpawn( unsigned flag )
 {
 	host = this;
 	getLevel()->addLight( *this );
 }
 
-void LightObject::onDestroy()
+void LightObject::onDestroy( unsigned flag )
 {
 	Light::remove();
 }

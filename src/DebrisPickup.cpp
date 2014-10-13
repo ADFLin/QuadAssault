@@ -56,9 +56,9 @@ void DebrisPickup::init()
 	cesticaTimer=1.0;
 }
 
-void DebrisPickup::onSpawn()
+void DebrisPickup::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	dir.x=getLevel()->random(1,10)-5;
 	dir.x/=5;
@@ -72,10 +72,10 @@ void DebrisPickup::onSpawn()
 	getLevel()->addLight( mLight );
 }
 
-void DebrisPickup::onDestroy()
+void DebrisPickup::onDestroy( unsigned flag )
 {
 	mLight.remove();
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
 
 void DebrisPickup::tick()

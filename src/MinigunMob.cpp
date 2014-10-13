@@ -36,16 +36,19 @@ void MinigunMob::init()
 
 }
 
-void MinigunMob::onSpawn()
+void MinigunMob::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 	
 }
 
-void MinigunMob::onDestroy()
+void MinigunMob::onDestroy( unsigned flag )
 {
-	getLevel()->playSound( "explosion1.wav" , true );		
-	BaseClass::onDestroy();
+	if ( flag & SDF_CAST_EFFECT )
+	{
+		getLevel()->playSound( "explosion1.wav" , true );	
+	}
+	BaseClass::onDestroy( flag );
 }
 
 void MinigunMob::tick()

@@ -21,16 +21,16 @@ void ItemPickup::init()
 	mBody.setMaskCheck( COL_PLAYER );
 }
 
-void ItemPickup::onSpawn()
+void ItemPickup::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 	getLevel()->getColManager().addBody( *this , mBody );
 }
 
-void ItemPickup::onDestroy()
+void ItemPickup::onDestroy( unsigned flag )
 {
 	getLevel()->getColManager().removeBody( mBody );
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
 
 void ItemPickup::tick()

@@ -490,7 +490,7 @@ GChoice::GChoice( int id , Vec2i const& pos , Vec2i const& size , GWidget* paren
 
 void GChoice::onAddItem( Item& item )
 {
-	item.text = IText::create( getGame()->getFont( 0 ) , 20 , Color( 255 , 255 , 255 ) );
+	item.text = IText::create( getGame()->getFont( 0 ) , 20 , Color( 150,150,150 ) );
 	item.text->setString( item.value.c_str() );
 }
 

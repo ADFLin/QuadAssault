@@ -15,8 +15,8 @@ public:
 	~LightObject();
 
 	void init();
-	virtual void onSpawn();
-	virtual void onDestroy();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual void tick();
 	virtual void setupDefault();
 	virtual ObjectType getType(){ return OT_LIGHT; }

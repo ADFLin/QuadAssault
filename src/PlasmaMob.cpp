@@ -35,9 +35,9 @@ void PlasmaMob::init()
 
 }
 
-void PlasmaMob::onSpawn()
+void PlasmaMob::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 }
 
 void PlasmaMob::tick()
@@ -62,10 +62,13 @@ void PlasmaMob::tick()
 	}
 }
 
-void PlasmaMob::onDestroy()
+void PlasmaMob::onDestroy( unsigned flag )
 {
-	getLevel()->playSound("explosion1.wav");
-	BaseClass::onDestroy();
+	if ( flag & SDF_CAST_EFFECT )
+	{
+		getLevel()->playSound("explosion1.wav");
+	}
+	BaseClass::onDestroy( flag );
 }
 
 void PlasmaMob::takeDamage(Bullet* bullet)

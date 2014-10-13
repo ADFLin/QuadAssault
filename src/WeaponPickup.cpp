@@ -62,9 +62,9 @@ void WeaponPickup::init()
 	mRotation=0;
 }
 
-void WeaponPickup::onSpawn()
+void WeaponPickup::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	mLight.host   = this;
 	mLight.radius = 256;
@@ -78,10 +78,10 @@ void WeaponPickup::onSpawn()
 	
 }
 
-void WeaponPickup::onDestroy()
+void WeaponPickup::onDestroy( unsigned flag )
 {
 	mLight.remove();
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
 
 void WeaponPickup::tick()

@@ -20,6 +20,7 @@ public:
 	GFrame*    mEditToolFrame;
 };
 
+
 class EditMode
 {
 public:
@@ -82,6 +83,7 @@ public:
 
 	TileEditFrame* mFrame;
 
+	void  setEditType( BlockType type );
 	virtual void onEnable();
 	virtual void onDisable();
 	virtual void cleanup();
@@ -128,6 +130,7 @@ protected:
 
 	friend class LevelStage;
 
+	unsigned     mSDFlagPrev;
 	EditMode*    mMode;
 
 };

@@ -9,8 +9,8 @@ class PlasmaMob : public Mob
 private:
 public:
 	virtual void init();
-	virtual void onDestroy();
-	virtual void onSpawn();
+	virtual void onDestroy( unsigned flag );
+	virtual void onSpawn( unsigned flag );
 	virtual void tick();
 
 	void takeDamage(Bullet* p);

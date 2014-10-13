@@ -82,9 +82,9 @@ void SmokeParticle::init()
 	zivot=maxZivot;
 }
 
-void SmokeParticle::onSpawn()
+void SmokeParticle::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	mPos.x += getLevel()->random(8,16)-8;
 	mPos.y += getLevel()->random(8,16)-8;

@@ -21,8 +21,8 @@ public:
 	int getPlayerId(){ return mPlayerId; }
 
 	virtual ObjectType getType(){ return OT_PLAYER; }
-	virtual void onSpawn();
-	virtual void onDestroy();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
 	virtual IRenderer* getRenderer();
 

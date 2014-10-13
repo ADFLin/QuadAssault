@@ -34,6 +34,9 @@ bool LevelEditStage::onInit()
 
 	EditMode::mWorldData = this;
 
+	unsigned const EDIT_SPAWNDESTROY_FLAG = SDF_SETUP_DEFAULT;
+
+	mSDFlagPrev = getLevel()->setSpwanDestroyFlag( EDIT_SPAWNDESTROY_FLAG );
 
 	{
 		GFrame* frame = new GFrame( UI_EDIT_TOOL , Vec2i( 10 , 40 ), Vec2i( 320 , GFrame::TopSideHeight + 32 + 8 ) , NULL );
@@ -97,8 +100,6 @@ bool LevelEditStage::onInit()
 	mPropFrame->setTile( "Property" );
 	GUISystem::getInstance().addWidget( mPropFrame );
 
-	mPropFrame->changeEdit( *mLevel->getPlayer() );
-
 	changeMode( TileEditMode::getInstance() );
 	return true;
 }
@@ -109,6 +110,8 @@ void LevelEditStage::onExit()
 
 	mPropFrame->destroy();
 	mEditToolFrame->destroy();
+
+	getLevel()->setSpwanDestroyFlag( mSDFlagPrev );
 	BaseClass::onExit();
 }
 
@@ -149,9 +152,12 @@ void LevelEditStage::onRender()
 	renderEngine->renderScene( mRenderParam );
 
 
+	float factor = 1.0 / mWorldScaleFactor;
 	Vec2f camPos = getCamera()->getPos();
 	glPushMatrix();
+	glScalef( factor , factor , factor );
 	glTranslatef( -camPos.x , -camPos.y , 0 );
+	
 	getLevel()->renderDev( DDM_EDIT );
 	mMode->render();
 	glPopMatrix();
@@ -254,7 +260,7 @@ void LevelEditStage::onWidgetEvent( int event , int id , GWidget* sender )
 			cleanupEditMode();
 			mMode = NULL;
 			changeMode( TileEditMode::getInstance() );
-			mPropFrame->cleanAllPorp();
+			mPropFrame->removeEdit();
 			
 			generateEmptyLevel();
 		}
@@ -365,6 +371,56 @@ TileEditMode::TileEditMode()
 	mEditTileType = BID_FLAT;
 }
 
+void TileEditMode::cleanup()
+{
+	if ( mFrame )
+	{
+		mFrame->destroy();
+		mFrame = NULL;
+	}
+	mTile = NULL;
+
+}
+
+void TileEditMode::setEditType( BlockType type )
+{
+	mEditTileType = type;
+	switch( type )
+	{
+	case BID_FLAT:  mEditTileMeta = 0; break;
+	case BID_WALL:  mEditTileMeta = 0; break;
+	case BID_GAP:   mEditTileMeta = 0; break;
+	case BID_DOOR:  mEditTileMeta = DOOR_RED; break;
+	case BID_ROCK:  mEditTileMeta = 2000; break;
+	}
+}
+
+void TileEditMode::render()
+{
+	if (  mTile  )
+	{
+		glColor3f( 0 , 1 , 0 );
+		drawRectLine( mTile->pos , gSimpleBlockSize );
+		glColor3f( 1 , 1 , 1 );
+	}
+}
+
+void TileEditMode::enumProp( IPropEditor& editor )
+{
+	int tileValue[] = 
+	{ 
+#define BLOCK_INFO( ID , NAME ) ID ,
+#include "BlockType.h"
+	};
+	char const* tileStr[] = 
+	{
+#define BLOCK_INFO( ID , NAME ) NAME ,
+#include "BlockType.h"
+	};
+	editor.addEnumProp( "Block Type" , mTile->type , ARRAY_SIZE( tileValue ) , tileValue , tileStr );
+	editor.addProp( "Meta" , mTile->meta );
+}
+
 bool TileEditMode::onKey( unsigned key , bool isDown )
 {
 	if ( !isDown )
@@ -372,34 +428,11 @@ bool TileEditMode::onKey( unsigned key , bool isDown )
 
 	switch( key )
 	{
-	case Keyboard::eNUM1:
-		mEditTileType = BID_FLAT;
-		mEditTileMeta = 0;
-		return false;
-	case Keyboard::eNUM2:		
-		mEditTileType = BID_WALL;
-		mEditTileMeta = 0;
-		return false;
-	case Keyboard::eNUM3:			
-		mEditTileType = BID_GAP;
-		mEditTileMeta = 0;
-		return false;
-	case Keyboard::eNUM4:
-		mEditTileType = BID_DOOR;
-		mEditTileMeta = DOOR_RED;
-		return false;
-	case Keyboard::eNUM5:	
-		mEditTileType = BID_DOOR;
-		mEditTileMeta = DOOR_GREEN;
-		return false;
-	case Keyboard::eNUM6:	
-		mEditTileType = BID_DOOR;
-		mEditTileMeta = DOOR_BLUE;
-		return false;
-	case Keyboard::eNUM7:
-		mEditTileType = BID_ROCK;
-		mEditTileMeta = 2000;
-		return false;
+	case Keyboard::eNUM1: setEditType( BID_FLAT ); return false;
+	case Keyboard::eNUM2: setEditType( BID_WALL ); return false;
+	case Keyboard::eNUM3: setEditType( BID_GAP );  return false;
+	case Keyboard::eNUM4: setEditType( BID_DOOR ); return false;
+	case Keyboard::eNUM7: setEditType( BID_ROCK ); return false;
 	}
 	return true;
 }
@@ -458,46 +491,9 @@ void TileEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 	{
 	case UI_TILE_SELECT:
 		int id = (int)sender->getUserData();
-		mEditTileType = id;
+		setEditType( id );
 		break;
 	}
-}
-
-void TileEditMode::cleanup()
-{
-	if ( mFrame )
-	{
-		mFrame->destroy();
-		mFrame = NULL;
-	}
-	mTile = NULL;
-
-}
-
-void TileEditMode::render()
-{
-	if (  mTile  )
-	{
-		glColor3f( 0 , 1 , 0 );
-		drawRectLine( mTile->pos , gSimpleBlockSize );
-		glColor3f( 1 , 1 , 1 );
-	}
-}
-
-void TileEditMode::enumProp( IPropEditor& editor )
-{
-	int tileValue[] = 
-	{ 
-#define BLOCK_INFO( ID , NAME ) ID ,
-#include "BlockType.h"
-	};
-	char const* tileStr[] = 
-	{
-#define BLOCK_INFO( ID , NAME ) NAME ,
-#include "BlockType.h"
-	};
-	editor.addEnumProp( "Block Type" , mTile->type , ARRAY_SIZE( tileValue ) , tileValue , tileStr );
-	editor.addProp( "Meta" , mTile->meta );
 }
 
 ObjectEditMode::ObjectEditMode()
@@ -558,7 +554,7 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 	{
 		if ( mObjectName )
 		{
-			LevelObject* obj = getWorld().getLevel()->spawnObjectByName( mObjectName , wPos , true );
+			LevelObject* obj = getWorld().getLevel()->spawnObjectByName( mObjectName , wPos );
 			changeObject( obj );
 
 			return false;
@@ -604,8 +600,22 @@ void ObjectEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 {
 	switch( id )
 	{
-	case UI_OBJECT_SELECT:
-		mObjectName = static_cast< char const* >( sender->getUserData() );
+	case UI_OBJECT_DESTROY:
+		{
+			if ( mObject && mObject->getType() != OT_PLAYER )
+			{
+				getWorld().getLevel()->destroyObject( mObject );
+				getWorld().mPropFrame->removeEdit();
+				mObject = NULL;
+			}
+		}
+		break;
+	case UI_OBJECT_LISTCTRL:
+		if ( event == EVT_LISTCTRL_SELECT )
+		{
+			GListCtrl* listCtrl = static_cast< GListCtrl* >( sender );
+			mObjectName = static_cast< char const* >( listCtrl->getSelectedItemData() );
+		}
 		break;
 	case UI_ACTION_SELECT:
 		{
@@ -661,7 +671,7 @@ void ObjectEditMode::changeObject( LevelObject* object )
 	}
 	else
 	{
-		getWorld().mPropFrame->cleanAllPorp();
+		getWorld().mPropFrame->removeEdit();
 	}
 
 }

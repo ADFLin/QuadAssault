@@ -61,9 +61,9 @@ void KeyPickup::init()
 	mRotation=0;
 }
 
-void KeyPickup::onSpawn()
+void KeyPickup::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	mLight.host = this;
 	mLight.radius = 128;
@@ -76,10 +76,10 @@ void KeyPickup::onSpawn()
 	getLevel()->addLight( mLight );
 }
 
-void KeyPickup::onDestroy()
+void KeyPickup::onDestroy( unsigned flag )
 {
 	mLight.remove();
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
 
 void KeyPickup::tick()

@@ -23,6 +23,7 @@
 Level::Level() 
 {
 	mTopMessage = NULL;
+	mSpwanDestroyFlag = SDF_CAST_EFFECT;
 }
 
 
@@ -71,7 +72,7 @@ void Level::tick()
 
 		if( obj->mNeedDestroy )
 		{
-			obj->onDestroy();
+			obj->onDestroy( mSpwanDestroyFlag );
 			delete obj;
 		}
 		else
@@ -142,13 +143,13 @@ void Level::updateRender( float dt )
 		mTopMessage->updateRender( dt );
 }
 
-void Level::addOjectInternal( LevelObject* obj )
+void Level::addObjectInternal( LevelObject* obj )
 {
 	assert( obj && obj->mLevel == NULL );
 	mObjects.push_front( obj );
 
 	obj->mLevel = this;
-	obj->onSpawn();
+	obj->onSpawn( mSpwanDestroyFlag );
 }
 
 Player* Level::createPlayer()
@@ -157,7 +158,7 @@ Player* Level::createPlayer()
 	player->init();
 	player->mPlayerId = mPlayers.size();
 	mPlayers.push_back( player );
-	addOjectInternal( player );
+	addObjectInternal( player );
 
 	return player;
 }
@@ -166,7 +167,7 @@ Explosion* Level::createExplosion( Vec2f const& pos , float raidus )
 {
 	Explosion* e = new Explosion( pos , raidus );
 	e->init();
-	addOjectInternal( e );
+	addObjectInternal( e );
 	return e;
 }
 
@@ -177,35 +178,35 @@ LightObject* Level::createLight( Vec2f const& pos ,float radius )
 	light->setPos( pos );
 	light->radius = radius;
 	mLights.push_back( light );
-	addOjectInternal( light );
+	addObjectInternal( light );
 	return light;
 }
 
 Bullet* Level::addBullet( Bullet* bullet )
 {
 	mBullets.push_back( bullet );
-	addOjectInternal( bullet );
+	addObjectInternal( bullet );
 	return bullet;
 }
 
 ItemPickup* Level::addItem( ItemPickup* item )
 {
 	mItems.push_back( item );
-	addOjectInternal( item );
+	addObjectInternal( item );
 	return item;
 }
 
 Mob* Level::addMob( Mob* mob )
 {
 	mMobs.push_back( mob );
-	addOjectInternal( mob );
+	addObjectInternal( mob );
 	return mob;
 }
 
 Particle* Level::addParticle( Particle* particle )
 {
 	mParticles.push_back( particle );
-	addOjectInternal( particle );
+	addObjectInternal( particle );
 	return particle;
 }
 
@@ -268,7 +269,7 @@ Sound* Level::playSound( char const* name , bool canRepeat /*= false */ )
 
 void Level::destroyObject( LevelObject* object )
 {
-	object->onDestroy();
+	object->onDestroy( mSpwanDestroyFlag );
 	delete object;
 }
 
@@ -376,11 +377,11 @@ void Level::addObject( LevelObject* object )
 		}
 		break;
 	}
-	addOjectInternal( object );
+	addObjectInternal( object );
 	
 }
 
-LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos , bool bSetDefault )
+LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos  )
 {
 	LevelObject* obj = mObjectCreator->createObject( name );
 	if ( !obj )
@@ -388,7 +389,7 @@ LevelObject* Level::spawnObjectByName( char const* name , Vec2f const& pos , boo
 
 	obj->init();
 	obj->setPos( pos );
-	if ( bSetDefault )
+	if ( mSpwanDestroyFlag & SDF_SETUP_DEFAULT )
 		obj->setupDefault();
 	addObject( obj );
 	return obj;
@@ -419,4 +420,11 @@ void Level::renderDev( DevDrawMode mode )
 		LevelObject* obj = *iter;
 		obj->renderDev( mode );
 	}
+}
+
+unsigned Level::setSpwanDestroyFlag( unsigned flag )
+{
+	unsigned prevFlag = mSpwanDestroyFlag;
+	mSpwanDestroyFlag = flag;
+	return prevFlag;
 }

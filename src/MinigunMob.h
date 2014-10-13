@@ -11,8 +11,8 @@ public:
 	virtual void tick();
 	virtual void takeDamage(Bullet* p);
 	virtual IRenderer* getRenderer();
-	void onSpawn();
-	void onDestroy();
+	void onSpawn( unsigned flag );
+	void onDestroy( unsigned flag );
 	void shoot( IBulletFactory const& creator );
 };
 

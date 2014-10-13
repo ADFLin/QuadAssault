@@ -26,8 +26,8 @@ public:
 
 	virtual void tick();
 	virtual void onPick(Player* player);
-	virtual void onSpawn();
-	virtual void onDestroy();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 
 	virtual IRenderer* getRenderer();
 

@@ -22,9 +22,11 @@ enum
 	UI_TILE_EDIT ,
 
 	UI_TILE_SELECT ,
-	UI_OBJECT_SELECT ,
 	UI_ACTION_SELECT ,
 
+	UI_OBJECT_DESTROY ,
+
+	UI_OBJECT_LISTCTRL ,
 	UI_ACTION_LISTCTRL ,
 };
 
@@ -94,12 +96,17 @@ public:
 		UI_INT_PROP_CHIOCE ,
 	};
 
-	void  changeEdit( IEditable& obj );
-	Vec2i getWidgetSize(){ return Vec2i( 130 , 20 ); }
-	Vec2i calcWidgetPos();
+	void   changeEdit( IEditable& obj );
+	void   removeEdit();
+
+	void     inputData();
+	void     outputData();
 
 	virtual void addProp( char const* name , Vec2f& value );
 	virtual void addProp( char const* name , Vec3f& value );
+	virtual void addProp( char const* name , bool& value );
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] );
+
 #define ADD_TEXT_PROP( TYPE )\
 	virtual void addProp( char const* name , TYPE& value )\
 	{\
@@ -112,20 +119,19 @@ public:
 	ADD_TEXT_PROP( unsigned char )
 	ADD_TEXT_PROP( float )
 	ADD_TEXT_PROP( string )
-	ADD_TEXT_PROP( bool )
-
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] );
 
 
 	void addPorpWidget( char const* name , GWidget* widget );
 
 
+	Vec2i getWidgetSize(){ return Vec2i( 130 , 20 ); }
+	Vec2i calcWidgetPos();
+
 	virtual bool onChildEvent( int event , int id , GWidget* ui );
 	virtual void onRender();
 
-	void     inputData();
-	void     outputData();
-	void     cleanAllPorp();
+private:
+	void     cleanupAllPorp();
 
 	struct PropData
 	{
@@ -164,6 +170,8 @@ public:
 	ObjectEditFrame( int id , Vec2f const& pos , GWidget* parent );
 	static Vec2i ButtonSize(){ return Vec2i( 90 , 20 ); }
 	void setupObjectList( ObjectCreator& creator );
+
+	GListCtrl* mObjectListCtrl;
 };
 
 

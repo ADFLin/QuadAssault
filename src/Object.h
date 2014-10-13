@@ -56,6 +56,12 @@ enum DevDrawMode
 	DDM_COLLISION ,
 };
 
+enum SpawnDestroyFlag
+{
+	SDF_SETUP_DEFAULT = BIT(0),
+	SDF_CAST_EFFECT   = BIT(1),
+};
+
 class LevelObject : public Object
 {
 	typedef Object BaseClass;
@@ -65,8 +71,8 @@ public:
 	
 	virtual ObjectType getType() = 0;
 	virtual void init(){}
-	virtual void onSpawn(){}
-	virtual void onDestroy(){}
+	virtual void onSpawn( unsigned flag ){}
+	virtual void onDestroy( unsigned flag ){}
 	virtual void tick(){}
 	virtual void postTick(){}
 	virtual void updateRender( float dt ){}

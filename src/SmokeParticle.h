@@ -10,7 +10,7 @@ public:
 	SmokeParticle( Vec2f const& pos );
 	virtual void init();
 	virtual void tick();
-	virtual void onSpawn();
+	virtual void onSpawn( unsigned flag );
 	virtual IRenderer* getRenderer();
 
 };

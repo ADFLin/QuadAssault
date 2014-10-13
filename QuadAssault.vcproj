@@ -243,6 +243,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Movement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ObjectFactory.h"
 				>
 			</File>
@@ -592,14 +596,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\LaserBullet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\LaserBullet.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\LaserMob.cpp"
 				>
 			</File>
@@ -672,6 +668,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Bullet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LaserBullet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LaserBullet.h"
 					>
 				</File>
 				<File

@@ -38,9 +38,9 @@ void LaserBullet::init()
 	mDamage=4;
 }
 
-void LaserBullet::onSpawn()
+void LaserBullet::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	mLight.host = this;
 	mLight.radius = 128;
@@ -56,12 +56,15 @@ void LaserBullet::tick()
 	BaseClass::tick();
 }
 
-
-void LaserBullet::onDestroy()
+void LaserBullet::onDestroy( unsigned flag )
 {
 	mLight.remove();
-	Explosion* e = getLevel()->createExplosion( getPos() , 128 );
-	e->setParam(8,100,80);
-	e->setColor(Vec3f(1.0, 0.75, 0.5));	
+	if ( flag & SDF_CAST_EFFECT )
+	{
+		Explosion* e = getLevel()->createExplosion( getPos() , 128 );
+		e->setParam(8,100,80);
+		e->setColor(Vec3f(1.0, 0.75, 0.5));	
+	}
+	BaseClass::onDestroy( flag );
 }
 

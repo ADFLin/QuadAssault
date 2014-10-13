@@ -28,26 +28,21 @@ void Bullet::setup( Vec2f const& poz, Vec2f const& dir, int team )
 	this->team = team;	
 }
 
-void Bullet::onSpawn()
+void Bullet::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 	mBody.setSize( Vec2f( 2 , 2 ) );
 	mBody.setMask( COL_BULLET | COL_RENDER );
 	mBody.setMaskCheck( COL_SOILD | COL_FLY_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
 }
 
-void Bullet::onDestroy()
+void Bullet::onDestroy( unsigned flag )
 {
 	getLevel()->getColManager().removeBody( mBody );
-
-
-	Explosion* e = getLevel()->createExplosion( getPos() , 128 );
-	e->setParam(4,100,20);
-	e->setColor(Vec3f(0.25, 0.5, 1.0));	
-
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
+
 void Bullet::tick()
 {
 	if ( mNeedDestroy )

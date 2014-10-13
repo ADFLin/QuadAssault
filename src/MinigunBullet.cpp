@@ -42,9 +42,9 @@ void MinigunBullet::init()
 	mDamage   = 0.5;
 }
 
-void MinigunBullet::onSpawn()
+void MinigunBullet::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	light.radius = 128;
 	light.host   = this;
@@ -54,13 +54,18 @@ void MinigunBullet::onSpawn()
 	getLevel()->playSound("minigun1.wav");		
 }
 
-void MinigunBullet::onDestroy()
+void MinigunBullet::onDestroy( unsigned flag )
 {
 	light.remove();
 
-	Explosion* e = getLevel()->createExplosion( getPos() , 64 );
-	e->setParam(4,100,80);
-	e->setColor(Vec3f(1.0, 0.75, 0.5));	
+	if ( flag & SDF_CAST_EFFECT )
+	{
+		Explosion* e = getLevel()->createExplosion( getPos() , 64 );
+		e->setParam(4,100,80);
+		e->setColor(Vec3f(1.0, 0.75, 0.5));	
+	}
+
+	BaseClass::onDestroy( flag );
 }
 
 void MinigunBullet::tick()

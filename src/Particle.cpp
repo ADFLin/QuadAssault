@@ -14,9 +14,9 @@ void Particle::init()
 	maxZivot=zivot;	
 }
 
-void Particle::onSpawn()
+void Particle::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 	int xof= getLevel()->random(2,4)-2;
 	int yof= getLevel()->random(2,4)-2;
 	mSize = Vec2f(16+xof,16+yof);

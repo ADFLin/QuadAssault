@@ -32,9 +32,9 @@ void Explosion::init()
 	color=Vec3f(1.0, 0.75, 0.5);
 }
 
-void Explosion::onSpawn()
+void Explosion::onSpawn( unsigned flag )
 {
-	BaseClass::onSpawn();
+	BaseClass::onSpawn( flag );
 
 	mLight.host   = this;
 	mLight.radius = radius;
@@ -43,10 +43,10 @@ void Explosion::onSpawn()
 	getLevel()->addLight( mLight );
 }
 
-void Explosion::onDestroy()
+void Explosion::onDestroy( unsigned flag )
 {
 	mLight.remove();
-	BaseClass::onDestroy();
+	BaseClass::onDestroy( flag );
 }
 
 void Explosion::setParam(float intensity, float brzinaRasta, float brzinaUmiranja)
