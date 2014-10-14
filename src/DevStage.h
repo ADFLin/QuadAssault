@@ -46,6 +46,8 @@ public:
 		listCtrl->appendItem( "Test" );
 		GUISystem::getInstance().addWidget( listCtrl );
 
+		shader = getRenderSystem()->createShader( "SpriteVS.glsl" , "SpriteFS.glsl" );
+
 
 		frame->inputData();
 		return true;
@@ -94,8 +96,9 @@ public:
 		}
 	}
 
-	int val;
-	float val2;
+	Shader*   shader;
+	int       val;
+	float     val2;
 	Texture*  mTexCursor;
 	IText*    mDevMsg;
 };

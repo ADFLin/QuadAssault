@@ -59,12 +59,10 @@ IRenderer::IRenderer()
 
 void IRenderer::renderGroup( RenderPass pass , int numObj, LevelObject* object )
 {
-	do 
+	for( ; object ; object = nextObject( object ) )
 	{
 		render( pass , object );
-		object = object->renderLink;
 	} 
-	while ( object );
 }
 
 void IRenderer::cleanup()

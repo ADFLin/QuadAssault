@@ -8,12 +8,10 @@ class Shader
 {
 public:
 	Shader();
-	Shader(char const* vertex_program_file, char const* fragment_program_file);
 	~Shader();
 
-	void Log(GLuint obj);
-		
-	const char* readFile(char const* path);
+	bool create( char const* vertex_program_file, char const* fragment_program_file );
+
 	void bind();
 	void unbind();
 
@@ -53,7 +51,11 @@ public:
 		setParam( name , idx );
 	}
 
-private:	
+private:
+
+	void Log(GLuint obj);
+	bool compileShader( GLuint shader , char const* path);
+
 	GLuint ID;
 	GLuint vertex_program;
 	GLuint fragment_program;

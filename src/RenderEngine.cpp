@@ -1,17 +1,18 @@
 #include "RenderEngine.h"
 
+#include "RenderSystem.h"
 #include "Shader.h"
 #include "Level.h"
 #include "Light.h"
 #include "Block.h"
-
-#include "DataPath.h"
 
 bool gUseGroupRender = true;
 
 RenderEngine::RenderEngine()
 	:mAllocator( 512 )
 {
+	mShaderLighting = NULL;
+	std::fill_n( mShaderScene , NumMode , (Shader*)NULL );
 
 }
 
@@ -25,24 +26,20 @@ bool RenderEngine::init( int width , int height )
 	if ( !setupFBO( width , height ) )
 		return false;
 
-	mShaderLighting = createShader( "LightVS.glsl", "LightFS.glsl" );
-	mShaderScene[ RM_ALL ]       = createShader( "SceneVS.glsl", "SceneFS.glsl" );
-	mShaderScene[ RM_GEOMETRY  ] = createShader( "SceneVS.glsl", "SceneGeometryFS.glsl" );
-	mShaderScene[ RM_LINGHTING ] = createShader( "SceneVS.glsl", "SceneLightingFS.glsl" );
-
+	RenderSystem* system = getRenderSystem();
+	mShaderLighting = system->createShader( "LightVS.glsl", "LightFS.glsl" );
+	mShaderScene[ RM_ALL ]       = system->createShader( "SceneVS.glsl", "SceneFS.glsl" );
+	mShaderScene[ RM_GEOMETRY  ] = system->createShader( "SceneVS.glsl", "SceneGeometryFS.glsl" );
+	mShaderScene[ RM_LINGHTING ] = system->createShader( "SceneVS.glsl", "SceneLightingFS.glsl" );
 
 	return true;
 }
 
 void RenderEngine::cleanup()
 {
-	for(int i=0; i<mShaders.size(); i++)
-		delete mShaders[i];
-
-	mShaderLighting = NULL;
+	delete mShaderLighting;
 	for( int i = 0 ; i < NumMode ; ++i )
-		mShaderScene[i] = NULL;
-	mShaders.clear();	
+		delete mShaderScene[i];	
 
 	glDeleteFramebuffers(1,&mFBOColor);
 	glDeleteTextures(1,&mTexLightmap);
@@ -168,18 +165,6 @@ void RenderEngine::renderScene( RenderParam& param )
 
 	renderSceneFinal( param );
 }
-
-Shader* RenderEngine::createShader( char const* vsName , char const* fsName )
-{
-	String vsPath = SHADER_DIR;
-	vsPath += vsName;
-	String fsPath = SHADER_DIR;
-	fsPath += fsName;
-	Shader* shader = new Shader( vsPath.c_str() , fsPath.c_str() );
-	mShaders.push_back( shader );
-	return shader;
-}
-
 
 void RenderEngine::renderSceneFinal( RenderParam& param )
 {

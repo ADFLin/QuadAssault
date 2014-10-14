@@ -2,32 +2,48 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 Shader::Shader()
 {
-
+	ID = -1;
+	vertex_program = -1;
+	fragment_program = -1;
 }
 
-Shader::Shader(char const* vertex_program_file, char const* fragment_program_file)
+Shader::~Shader()
 {
-	vertex_program=glCreateShader(GL_VERTEX_SHADER);
-	fragment_program=glCreateShader(GL_FRAGMENT_SHADER);
+	if ( ID != -1 )
+	{
+		glDetachShader(ID,vertex_program);
+		glDetachShader(ID,fragment_program);
+		glDeleteProgram(ID);
+	}
 
-	const char* vs=readFile(vertex_program_file);
-	const char* fs=readFile(fragment_program_file);
+	if ( vertex_program != -1 )
+		glDeleteShader(vertex_program);
+	if ( fragment_program != -1 )
+		glDeleteShader(fragment_program);
+}
 
-	glShaderSource(vertex_program,1,&vs,0);
-	glShaderSource(fragment_program,1,&fs,0);
+bool Shader::create( char const* vertex_program_file, char const* fragment_program_file )
+{
+	vertex_program  = glCreateShader(GL_VERTEX_SHADER);
+	if ( !compileShader( vertex_program , vertex_program_file) )
+		return false;
 
-	glCompileShader(vertex_program);	
-	glCompileShader(fragment_program);
+	fragment_program = glCreateShader(GL_FRAGMENT_SHADER);
+	if ( !compileShader( fragment_program , fragment_program_file )) 
+		return false;
 
 	ID=glCreateProgram();
+
 	glAttachShader(ID,vertex_program);
 	glAttachShader(ID,fragment_program);
 	glLinkProgram(ID);
 
 	Log(ID);	
+	return true;
 }
 
 void Shader::bind()
@@ -40,29 +56,26 @@ void Shader::unbind()
 	glUseProgram(0);
 }
 
-Shader::~Shader()
+bool Shader::compileShader( GLuint shader , char const* path)
 {
-	glDetachShader(ID,vertex_program);
-	glDetachShader(ID,fragment_program);
+	std::ifstream fs( path );
+	if ( !fs.is_open() )
+		return false;
 
-	glDeleteShader(vertex_program);
-	glDeleteShader(fragment_program);
-	glDeleteProgram(ID);
-}
+	std::string contents((std::istreambuf_iterator<char>(fs)),
+		std::istreambuf_iterator<char>());
 
-const char* Shader::readFile(char const* path)
-{
-	FILE* f=fopen(path,"rt");
-	fseek(f,0,SEEK_END);
-	int broj=ftell(f);
-	rewind(f);
+	GLchar const * source = (GLchar const*)contents.c_str();
+	glShaderSource(shader, 1, &source, NULL);
+	glCompileShader(shader);
 
-	char* output=(char*)malloc(sizeof(char)*(broj+1));
-	broj=fread(output,sizeof(char),broj,f);
-	output[broj]='\0';
-	fclose(f);
+	GLint status;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 
-	return output;
+	if ( !status )
+		return false;
+
+	return true;
 }
 
 void Shader::Log(GLuint obj)

@@ -1,6 +1,8 @@
 #include "RenderSystem.h"
 
+#include "Shader.h"
 
+#include "DataPath.h"
 #include "Dependence.h"
 
 #include <cassert>
@@ -635,4 +637,19 @@ void RenderSystem::postRender()
 void RenderSystem::cleanup()
 {
 	mContext->release();
+}
+
+Shader* RenderSystem::createShader( char const* vsName , char const* fsName )
+{
+	String vsPath = SHADER_DIR;
+	vsPath += vsName;
+	String fsPath = SHADER_DIR;
+	fsPath += fsName;
+	Shader* shader = new Shader;
+	if ( !shader->create( vsPath.c_str() , fsPath.c_str() ) )
+	{
+		delete shader;
+		return NULL;
+	}
+	return shader;
 }

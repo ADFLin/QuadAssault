@@ -428,7 +428,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\out\shader\SpritePS.glsl"
+				RelativePath=".\out\shader\SpriteFS.glsl"
 				>
 			</File>
 			<File

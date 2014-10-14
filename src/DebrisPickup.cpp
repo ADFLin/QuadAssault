@@ -29,6 +29,7 @@ public:
 		else if(pass==RP_NORMAL)
 			t=texN;
 
+		glColor3f(1.0, 1.0, 1.0);
 		drawSprite( object->getRenderPos() , object->getSize() , 0 , t );
 		glColor3f(1.0, 1.0, 1.0);
 	}
@@ -68,13 +69,14 @@ void DebrisPickup::onSpawn( unsigned flag )
 
 	mLight.host = this;
 	mLight.isExplosion = true;
+	mLight.radius = 64;
 	mLight.setColorParam(Vec3f(1.0, 0.75, 0.5),4);
 	getLevel()->addLight( mLight );
 }
 
 void DebrisPickup::onDestroy( unsigned flag )
 {
-	mLight.remove();
+	//mLight.remove();
 	BaseClass::onDestroy( flag );
 }
 

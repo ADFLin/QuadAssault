@@ -5,6 +5,8 @@
 #include "Platform.h"
 
 #include "TVector2.h"
+
+class Shader;
 typedef TVector2< float > Vec2f;
 
 class IFont
@@ -46,9 +48,15 @@ public:
 	void cleanup();
 	bool prevRender();
 	void postRender();
+
+	Shader* createShader( char const* vsName , char const* fsName );
+
 	void drawText(  IText* text , Vec2f const& pos ,unsigned sideFlag = 0 );
 
 private:
+
+	std::vector<Shader*> mShaders;
+
 #if USE_SFML_WINDOW
 	sf::RenderWindow* mRenderWindow;
 #else

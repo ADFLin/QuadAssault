@@ -78,6 +78,7 @@ float3   normalize( float3 );
 
 float4   lerp( float4 , float4 , float );
 float4x4 transpose( float4x4 );
+float    clamp( float , float , float );
 
 
 typedef float  half;

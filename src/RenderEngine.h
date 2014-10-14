@@ -61,7 +61,7 @@ public:
 	RenderEngine();
 	bool         init( int width , int height );
 	void         cleanup();
-	Shader*      createShader( char const* vsName , char const* fsName );
+
 	void         renderScene( RenderParam& param );
 	Vec3f const& getAmbientLight() const { return mAmbientLight; }
 	void         setAmbientLight( Vec3f const& color ) { mAmbientLight = color; }
@@ -91,8 +91,7 @@ private:
 
 	void   renderObjects( RenderPass pass , Level* level );
 
-	std::vector<Shader*> mShaders;
-
+	
 	typedef std::vector< RenderGroup* > RenderGroupVec;
 	RenderGroupVec mRenderGroups;
 	FrameAllocator mAllocator;
