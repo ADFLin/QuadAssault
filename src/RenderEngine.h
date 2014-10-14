@@ -5,6 +5,9 @@
 #include "Dependence.h"
 #include "FrameAllocator.h"
 
+class ColBody;
+typedef std::vector< ColBody* > ColBodyVec;
+
 class Level;
 class Object;
 class Shader;
@@ -41,7 +44,6 @@ struct RenderParam
 	TileRange  terrainRange;
 	float      renderWidth;
 	float      renderHeight;
-	bool       updateObjects;
 };
 
 
@@ -94,6 +96,7 @@ private:
 	typedef std::vector< RenderGroup* > RenderGroupVec;
 	RenderGroupVec mRenderGroups;
 	FrameAllocator mAllocator;
+	ColBodyVec     mBodyList;
 
 	float   mFrameWidth;
 	float   mFrameHeight;
