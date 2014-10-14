@@ -23,8 +23,6 @@ public:
 	virtual bool onKey( unsigned key , bool isDown );
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
 
-	void renderLoading();
-
 private:
 	enum State
 	{

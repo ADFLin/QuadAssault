@@ -38,6 +38,8 @@ public:
 
 private:
 
+	GameStage* mStageAdd;
+	bool       mbRemovePrevStage;
 
 	float    mFPS;
 	unsigned mMouseState;

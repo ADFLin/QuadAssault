@@ -103,6 +103,8 @@ public:
 	virtual bool onMouse( MouseMsg const& msg );
 	virtual bool onKey( unsigned key , bool isDown );
 
+	void renderLoading();
+
 	void tick();
 	void updateRender( float dt );
 

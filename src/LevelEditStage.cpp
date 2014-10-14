@@ -204,6 +204,8 @@ bool LevelEditStage::onMouse( MouseMsg const& msg )
 	return false;
 }
 
+
+
 bool LevelEditStage::onKey( unsigned key , bool isDown )
 {
 	if ( !mMode->onKey( key , isDown ) )
@@ -374,6 +376,27 @@ TileEditMode::TileEditMode()
 	mEditTileType = BID_FLAT;
 }
 
+void TileEditMode::onEnable()
+{
+	if ( mFrame == NULL )
+	{
+		mFrame = new TileEditFrame( UI_ANY , Vec2i( 10 , 10 ) , NULL );
+		mFrame->setTile( "Block" );
+		mFrame->setPos( getModeWidgetPos( mFrame->getSize() ) );
+		GUISystem::getInstance().addWidget( mFrame );
+	}
+	mFrame->show( true );
+	if ( mTile )
+	{
+		getWorld().mPropFrame->changeEdit( *this );
+	}
+}
+
+void TileEditMode::onDisable()
+{
+	mFrame->show( false );
+}
+
 void TileEditMode::cleanup()
 {
 	if ( mFrame )
@@ -471,23 +494,6 @@ bool TileEditMode::onMouse( MouseMsg const& msg )
 	return true;
 }
 
-void TileEditMode::onEnable()
-{
-	if ( mFrame == NULL )
-	{
-		mFrame = new TileEditFrame( UI_ANY , Vec2i( 10 , 10 ) , NULL );
-		mFrame->setTile( "Block" );
-		mFrame->setPos( getModeWidgetPos( mFrame->getSize() ) );
-		GUISystem::getInstance().addWidget( mFrame );
-	}
-	mFrame->show( true );
-}
-
-void TileEditMode::onDisable()
-{
-	mFrame->show( false );
-}
-
 void TileEditMode::onWidgetEvent( int event , int id , GWidget* sender )
 {
 	switch( id )
@@ -545,6 +551,10 @@ void ObjectEditMode::onEnable()
 	}
 
 	mObjFrame->show( true );
+	if ( mObject )
+	{
+		getWorld().mPropFrame->changeEdit( *mObject );
+	}
 }
 
 void ObjectEditMode::onDisable()

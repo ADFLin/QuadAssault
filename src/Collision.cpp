@@ -239,8 +239,7 @@ void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 {
 	assert( body.idxCell = -1 );
 	body.object = &obj;
-
-	Vec2f posBody = body.object->getPos() + body.getOffset();
+	body.updateCache();
 
 	float halfLen = mCellLength / 2;
 	if ( body.halfSize.x > halfLen || body.halfSize.y > halfLen )
@@ -251,7 +250,7 @@ void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 	else
 	{
 		int cx , cy;
-		calcCellPos( posBody , cx , cy );
+		calcCellPos( body.cachePos , cx , cy );
 		int idxCell = mCellMap.toIndex( cx , cy );
 
 		body.idxCell = idxCell;
@@ -260,6 +259,7 @@ void CollisionManager::addBody( LevelObject& obj , ColBody& body )
 
 	body.bUpdateSize = false;
 	mBodies.push_back( body );
+	
 }
 
 void CollisionManager::removeBody( ColBody& body )
@@ -496,13 +496,30 @@ Tile* CollisionManager::testTerrainCollision( Rect const& bBox , unsigned colMas
 
 void CollisionManager::findBody( Rect const& bBox , unsigned colMask , ColBodyVec& out )
 {
-	Vec2i cMin , cMax;
-	calcCellPos( bBox.min , cMin.x , cMin.y );
-	calcCellPos( bBox.max , cMax.x , cMax.y );
-
-	for( int i = cMin.x ; i <= cMax.x ; ++i )
+	for ( CellBodyList::iterator iter = mGlobalBodies.begin() , itEnd = mGlobalBodies.end();
+		iter != itEnd ; ++iter )
 	{
-		for( int j = cMin.y ; j <= cMax.y ; ++j )
+		ColBody& bodyTest = *iter;
+
+		if ( ( colMask & bodyTest.colMask ) == 0 )
+			continue;
+
+		if ( !bBox.hitTest( bodyTest.cachePos ) )
+			continue;
+
+		out.push_back( &bodyTest );
+
+	}
+
+	int xMin , xMax , yMin , yMax;
+	xMin = Math::clamp( Math::floor( bBox.min.x / mCellLength ) - 1 , 0 , mCellMap.getSizeX() - 1 );
+	xMax = Math::clamp( Math::floor( bBox.max.x / mCellLength ) + 1 , 0 , mCellMap.getSizeX() - 1 );
+	yMin = Math::clamp( Math::floor( bBox.min.y / mCellLength ) - 1 , 0 , mCellMap.getSizeY() - 1 );
+	yMax = Math::clamp( Math::floor( bBox.max.y / mCellLength ) + 1 , 0 , mCellMap.getSizeY() - 1 );
+
+	for( int i = xMin ; i <= xMax ; ++i )
+	{
+		for( int j = yMin ; j <= yMax ; ++j )
 		{
 			Cell& cell = mCellMap.getData( i , j );
 
@@ -513,13 +530,9 @@ void CollisionManager::findBody( Rect const& bBox , unsigned colMask , ColBodyVe
 
 				if ( ( colMask & bodyTest.colMask ) == 0 )
 					continue;
-	
-				if ( i == cMin.x || i == cMax.x || 
-					 i == cMin.x || i == cMax.x )
-				{
-					if ( !bBox.hitTest( bodyTest.cachePos ) )
-						continue;
-				}
+
+				if ( !bBox.hitTest( bodyTest.cachePos ) )
+					continue;
 
 				out.push_back( &bodyTest );
 			}

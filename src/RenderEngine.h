@@ -3,6 +3,7 @@
 
 #include "Base.h"
 #include "Dependence.h"
+#include "FrameAllocator.h"
 
 class Level;
 class Object;
@@ -48,12 +49,14 @@ struct RenderGroup
 {
 	int          order;
 	IRenderer*   renderer;
+	int          numObject;
 	LevelObject* objectLists;
 };
 
 class RenderEngine
 {
 public:
+	RenderEngine();
 	bool         init( int width , int height );
 	void         cleanup();
 	Shader*      createShader( char const* vsName , char const* fsName );
@@ -80,13 +83,7 @@ private:
 	void   renderLighting( RenderParam& param , Vec2f const& lightPos , Light* light );
 	bool   setupFBO( int width , int height );
 	void   setupLightShaderParam( Shader* shader , Light* light );
-	struct GroupCompFun
-	{
-		bool operator()( RenderGroup* a , RenderGroup* b ) const 
-		{
-			return a->order > b->order;
-		}
-	};
+
 	void   updateRenderGroup( RenderParam& param );
 
 
@@ -96,6 +93,7 @@ private:
 
 	typedef std::vector< RenderGroup* > RenderGroupVec;
 	RenderGroupVec mRenderGroups;
+	FrameAllocator mAllocator;
 
 	float   mFrameWidth;
 	float   mFrameHeight;

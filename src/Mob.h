@@ -15,6 +15,8 @@ class MobRenderer : public IRenderer
 {
 public:
 	virtual void render( RenderPass pass , LevelObject* object );
+	virtual void renderGroup( RenderPass pass , int numObj, LevelObject* object );
+	
 protected:
 	Texture* mTextures[ NUM_RENDER_PASS ];
 };

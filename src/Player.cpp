@@ -87,21 +87,6 @@ public:
 			}
 		}
 
-		if ( pass == RP_GLOW && gShowBoundBox )
-		{
-			Vec2f size = player->getSize();
-			glPushMatrix();
-			glTranslatef( player->getRenderPos().x , player->getRenderPos().y , 0 );
-			glColor3f( 0 , 1 , 0 );
-			glBegin( GL_LINE_LOOP );
-			glVertex3f( 0 , 0 , 0 );
-			glVertex3f( size.x , 0 , 0 );
-			glVertex3f( size.x , size.y , 0 );
-			glVertex3f( 0 , size.y , 0 );
-			glEnd();
-			glColor3f(1.0, 1.0, 1.0 );
-			glPopMatrix();
-		}
 	}
 
 	void RenderPodlogu( RenderPass pass , Player* player )

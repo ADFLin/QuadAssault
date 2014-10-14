@@ -111,6 +111,7 @@ public:
 	LevelObject*      hitObjectTest( Vec2f const& pos );
 
 	unsigned          setSpwanDestroyFlag( unsigned flag );
+	unsigned          getSpawnDestroyFlag(){ return mSpwanDestroyFlag; }
 
 	
 public:

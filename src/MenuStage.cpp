@@ -180,7 +180,6 @@ void MenuStage::onWidgetEvent( int event , int id , GWidget* sender )
 	case UI_LEVEL:
 		{
 			LevelInfo* info = static_cast< LevelInfo* >( sender->getUserData() );
-			renderLoading();
 			gLevelFileName   = info->levelFile;
 			gMapFileName     = info->mapFile;
 			gIdxCurLevel     = info->index;
@@ -266,24 +265,6 @@ void MenuStage::onRender()
 	glDisable(GL_BLEND);
 
 	mScreenFade.render();
-}
-
-void MenuStage::renderLoading()
-{
-	getRenderSystem()->prevRender();
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glLoadIdentity();
-	drawSprite(Vec2f(0.0, 0.0), Vec2f(getGame()->getScreenSize().x, getGame()->getScreenSize().y), texBG2 );	
-
-	IText* t = IText::create( getGame()->getFont(0) , 35 , Color(50,255,50) );
-	t->setString( "Loading Data..." );
-	Vec2i pos = getGame()->getScreenSize() / 2;
-	getRenderSystem()->drawText( t , pos );
-	t->release();
-
-	getRenderSystem()->postRender();
 }
 
 bool MenuStage::onKey( unsigned key , bool isDown )

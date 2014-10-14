@@ -12,6 +12,7 @@ class MinigunBulletRenderer : public IRenderer
 public:
 	virtual void init()
 	{
+		mRenderOrder = 1;
 		texG = getGame()->getTextureMgr()->getTexture("minigun1Glow.tga");
 	}
 

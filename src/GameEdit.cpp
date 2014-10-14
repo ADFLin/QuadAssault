@@ -56,7 +56,7 @@ bool PropData::getString( FString& str )
 				}
 			}
 		}
-		break;
+		return true;
 	case PROP_STRING: 
 		str = castValueT< String >().c_str();
 		return true;
@@ -94,12 +94,14 @@ bool PropData::setValue( char const* str )
 			case 1: castValueT< uint8  >() = value;
 			case 2: castValueT< uint16 >() = value;
 			case 4: castValueT< uint32 >() = value;
-			}
-			
+			}	
 		}
 		return true;
 	case PROP_FLOAT: 
 		castValueT< float >() = ::atof( str ); 
+		return true;
+	case PROP_DOUBLE: 
+		castValueT< double >() = ::atof( str ); 
 		return true;
 	case PROP_BOOL:  
 		castValueT< bool >() = strcmp( str , "true" ) ? true : false; 

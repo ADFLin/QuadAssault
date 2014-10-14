@@ -211,19 +211,38 @@ void MobRenderer::render( RenderPass pass , LevelObject* object )
 	glPopMatrix();
 
 
-	if ( pass == RP_GLOW && gShowBoundBox )
+}
+
+void MobRenderer::renderGroup( RenderPass pass , int numObj, LevelObject* object )
+{
+
+	Texture* tex = mTextures[ pass ];
+
+	switch( pass )
 	{
-		Vec2f size = mob->getSize();
-		glPushMatrix();
-		glTranslatef( mob->getRenderPos().x , mob->getRenderPos().y , 0 );
-		glColor3f( 0 , 1 , 0 );
-		glBegin( GL_LINE_LOOP );
-		glVertex3f( 0 , 0 , 0 );
-		glVertex3f( size.x , 0 , 0 );
-		glVertex3f( size.x , size.y , 0 );
-		glVertex3f( 0 , size.y , 0 );
-		glEnd();
-		glColor3f(1.0, 1.0, 1.0 );
+	case RP_DIFFUSE: 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glPushMatrix();		
+		glColor4f(0.0, 0.0, 0.0, 0.6);
+
+		for( LevelObject* cur = object; cur ; cur = nextObject( cur ) )
+		{
+			Mob* mob = static_cast< Mob* >( cur );
+			drawSprite( mob->getRenderPos() + Vec2f(5,5), mob->getSize() , mob->getRotation() , tex );	
+		}
+
+		glColor4f(1.0, 1.0, 1.0, 1.0);
 		glPopMatrix();
+		glDisable(GL_BLEND);
+		break;
 	}
+
+	glPushMatrix();	
+	for( LevelObject* cur = object; cur ; cur = nextObject( cur ) )
+	{
+		Mob* mob = static_cast< Mob* >( cur );
+		drawSprite( mob->getRenderPos() , mob->getSize() , mob->getRotation() , tex );	
+	}
+	glPopMatrix();
 }

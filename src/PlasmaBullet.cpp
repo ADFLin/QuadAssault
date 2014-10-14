@@ -13,6 +13,7 @@ class PlasmaBulletRenderer : public IRenderer
 public:
 	virtual void init()
 	{
+		mRenderOrder = 1;
 		tex = getGame()->getTextureMgr()->getTexture("granata1.tga");
 	}
 

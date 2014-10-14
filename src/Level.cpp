@@ -103,7 +103,7 @@ void Level::tick()
 
 void Level::setupTerrain( int w , int h )
 {
-	mColManager.setup( w * BLOCK_SIZE ,  h * BLOCK_SIZE ,  10 * BLOCK_SIZE );
+	mColManager.setup( w * BLOCK_SIZE ,  h * BLOCK_SIZE ,  5 * BLOCK_SIZE );
 
 	mTerrain.resize( w ,  h );
 	for(int i=0; i< w ; i++)
@@ -233,6 +233,14 @@ void Level::renderObjects( RenderPass pass )
 		renderer->render( pass , obj );
 	}
 
+	for( PlayerVec::iterator iter = mPlayers.begin() , itEnd = mPlayers.end();
+		 iter != itEnd ; ++iter )
+	{
+		Player* player = *iter;
+		IRenderer* renderer = player->getRenderer();
+		renderer->render( pass , player );
+	}
+
 	for( BulletList::iterator iter = mBullets.begin() , itEnd = mBullets.end(); 
 		iter != itEnd ; ++iter )
 	{
@@ -249,13 +257,6 @@ void Level::renderObjects( RenderPass pass )
 		renderer->render( pass , obj );
 	}
 
-	for( PlayerVec::iterator iter = mPlayers.begin() , itEnd = mPlayers.end();
-		 iter != itEnd ; ++iter )
-	{
-		Player* player = *iter;
-		IRenderer* renderer = player->getRenderer();
-		renderer->render( pass , player );
-	}
 }
 
 Sound* Level::playSound( char const* name , bool canRepeat /*= false */ )

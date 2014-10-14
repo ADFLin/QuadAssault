@@ -81,6 +81,19 @@ public:
 		getRenderSystem()->drawText( mDevMsg , Vec2f( 5 ,5 ) , TEXT_SIDE_LEFT | TEXT_SIDE_TOP );
 	}
 
+	virtual bool onKey( unsigned key , bool isDown )
+	{
+		if ( !isDown )
+			return false;
+
+		switch( key )
+		{
+		case Keyboard::eESCAPE:
+			getGame()->addStage( new MenuStage , true );
+			break;
+		}
+	}
+
 	int val;
 	float val2;
 	Texture*  mTexCursor;

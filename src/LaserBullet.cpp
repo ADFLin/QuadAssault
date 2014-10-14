@@ -11,7 +11,9 @@ class LaserBulletRenderer : public IRenderer
 public:
 	virtual void init()
 	{
+		mRenderOrder = 1;
 		texG = getGame()->getTextureMgr()->getTexture("laser1Glow.tga");
+		
 	}
 
 	virtual void render( RenderPass pass , LevelObject* object )

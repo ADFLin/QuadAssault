@@ -129,6 +129,8 @@ bool LevelStageBase::onKey( unsigned key , bool isDown )
 
 bool LevelStage::onInit()
 {
+	renderLoading();
+
 	if ( !BaseClass::onInit() )
 		return false;
 
@@ -415,6 +417,9 @@ bool LevelStage::onMouse( MouseMsg const& msg )
 	return true;
 }
 
+extern bool gUseGroupRender;
+#include <iostream>
+
 bool LevelStage::onKey( unsigned key , bool isDown )
 {
 	if ( !isDown )
@@ -435,6 +440,11 @@ bool LevelStage::onKey( unsigned key , bool isDown )
 		}
 		break;
 	case Keyboard::eF2:
+		{
+			gUseGroupRender = !gUseGroupRender;
+			std::cout << "gUseGroupRender =" << gUseGroupRender << std::endl;
+		}
+		
 		break;
 	case Keyboard::eQ:
 		mTweener.tweenValue< Easing::OQuad >( mWorldScaleFactor , mWorldScaleFactor , std::max( mWorldScaleFactor + 0.25f , 0.25f ) , 1.0f );
@@ -720,4 +730,24 @@ void LevelStage::loadLevel()
 	}
 	levelFS.close();
 
+}
+
+void LevelStage::renderLoading()
+{
+	Texture* texBG2 = getGame()->getTextureMgr()->getTexture("MenuLoading1.tga");		
+
+	getRenderSystem()->prevRender();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glLoadIdentity();
+	drawSprite(Vec2f(0.0, 0.0), Vec2f(getGame()->getScreenSize().x, getGame()->getScreenSize().y), texBG2 );	
+
+	IText* t = IText::create( getGame()->getFont(0) , 35 , Color(50,255,50) );
+	t->setString( "Loading Data..." );
+	Vec2i pos = getGame()->getScreenSize() / 2;
+	getRenderSystem()->drawText( t , pos );
+	t->release();
+
+	getRenderSystem()->postRender();
 }

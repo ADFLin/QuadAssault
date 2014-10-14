@@ -86,6 +86,12 @@ public:
 	void     setData( String& data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_STRING; }
 	void     setData( bool&   data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_BOOL; }
 
+	void     setEnumData( void* data , int dataSize )
+	{
+		mData = data;
+		mDataSize = dataSize;
+		mType = PROP_INT;
+	}
 	void     setControl( IPropCtrl* propCtrl ){ mData = propCtrl; mType = PROP_CTRL; }
 
 	template< class T >
@@ -109,17 +115,46 @@ public:
 	};
 	Prop* findProp( char const* name );
 
+#define ADD_PROP( TYPE )\
+	virtual void addProp( char const* name , TYPE& value )\
+	{\
+		Prop prop;\
+		prop.name = name;\
+		prop.data.setData( value );\
+		mProps.push_back( prop );\
+	}
+
+	ADD_PROP( Vec2f )
+	ADD_PROP( Vec3f )
+	ADD_PROP( int )
+	ADD_PROP( unsigned char )
+	ADD_PROP( float )
+	ADD_PROP( String )
+	ADD_PROP( bool )
+
+#undef  ADD_PROP
+
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] )
+	{
+		Prop prop;
+		prop.name = name;
+		prop.data.setEnumData( value , sizeValue );
+		mProps.push_back( prop );
+	}
+
+
 
 	typedef std::vector< Prop > PropVec;
 	PropVec mProps;
 };
 
-class TextPropImportor : public TextPropBase
+//TODO
+class TextPropImport : public TextPropBase
 {
 public:
 };
 
-class TextPropExportor : public TextPropBase
+class TextPropExport : public TextPropBase
 {
 public:
 

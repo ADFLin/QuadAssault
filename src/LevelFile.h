@@ -17,9 +17,8 @@ class LevelFile
 public:
 	enum DataBlock
 	{
-		BLOCK_MAP ,
-		BLOCK_OBJECT ,
-
+		DB_MAP ,
+		DB_OBJECT ,
 		NUM_DATA_BLOCK ,
 	};
 

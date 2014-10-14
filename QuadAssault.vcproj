@@ -528,6 +528,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libCore\FrameAllocator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libCore\IntegerType.h"
 				>
 			</File>

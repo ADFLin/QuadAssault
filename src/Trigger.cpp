@@ -185,7 +185,10 @@ void AreaTrigger::setupDefault()
 
 void SpawnAct::fire( Level* level )
 {
+	unsigned flag = level->getSpawnDestroyFlag();
+	flag = level->setSpwanDestroyFlag( flag | SDF_SETUP_DEFAULT );
 	LevelObject* object = level->spawnObjectByName( className.c_str() , spawnPos );
+	level->setSpwanDestroyFlag( flag );
 	//TODO
 	if ( object )
 	{

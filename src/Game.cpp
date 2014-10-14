@@ -24,6 +24,7 @@ Game::Game()
 	gGame = this;
 
 	mFPS = 0;
+	mStageAdd = NULL;
 
 	mMouseState = 0;
 }
@@ -155,14 +156,32 @@ void Game::run()
 		float deltaT = ( curTime - prevTime ) / 1000.0f;
 		prevTime = curTime;
 
+		while ( mStageAdd )
+		{
+			if( mbRemovePrevStage )
+			{
+				mStageStack.back()->onExit();
+				delete mStageStack.back();
+				mStageStack.pop_back();
+				cout << "Old stage deleted." << endl;
+			}
+
+			GameStage* stage = mStageAdd;
+			mStageAdd = NULL;
+			mStageStack.push_back( stage );
+			cout << "Setup new state..." << endl;
+			stage->onInit();
+			cout << "Stage Init !" << endl;
+		}
+
 		GameStage* stage = mStageStack.back();
 
 		mSoundMgr->update( deltaT );
-		mStageStack.back()->onUpdate( deltaT );
+		stage->onUpdate( deltaT );
 
 		if ( mRenderSystem->prevRender() )
 		{
-			mStageStack.back()->onRender();
+			stage->onRender();
 
 			++frameCount;
 			if ( frameCount > NumFramePerSample )
@@ -197,14 +216,14 @@ void Game::run()
 			mRenderSystem->postRender();
 		}
 
-		if( mStageStack.back()->needStop() )
+		if( stage->needStop() )
 		{
-			mStageStack.back()->onExit();
-			delete mStageStack.back();
 			mStageStack.pop_back();
+			stage->onExit();
+			delete stage;
 			cout << "Stage Exit !" << endl;
 		}
-		if(mStageStack.size()==0)		
+		if( mStageStack.empty() )		
 			mNeedEnd=true;
 	}
 
@@ -216,20 +235,18 @@ void Game::addStage( GameStage* stage, bool removePrev )
 	using std::cout;
 	using std::endl;
 
-	if( removePrev )
+	if ( mStageAdd )
 	{
-		mStageStack.back()->onExit();
-		delete mStageStack.back();
-		mStageStack.pop_back();
-		
-		cout << "Old stage deleted." << endl;
+		delete stage;
+		std::cerr << "Add Stage Error" << std::endl;
+		return;
 	}
+	if ( mStageAdd )
+		delete mStageAdd;
 
-	mStageStack.push_back(stage);
+	mStageAdd = stage;
+	mbRemovePrevStage = removePrev;
 
-	cout << "Setup new state..." << endl;
-	mStageStack.back()->onInit();
-	cout << "Stage Init !" << endl;
 }
 
 void Game::procWidgetEvent( int event , int id , GWidget* sender )

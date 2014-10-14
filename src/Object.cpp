@@ -57,7 +57,7 @@ IRenderer::IRenderer()
 	gLink = this;
 }
 
-void IRenderer::renderGroup( RenderPass pass , LevelObject* object )
+void IRenderer::renderGroup( RenderPass pass , int numObj, LevelObject* object )
 {
 	do 
 	{

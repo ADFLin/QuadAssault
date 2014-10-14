@@ -127,14 +127,14 @@ public:
 	IRenderer();
 	virtual void init() = 0;
 	virtual void render( RenderPass pass , LevelObject* object ) = 0;
-	virtual void renderGroup( RenderPass pass , LevelObject* object );
+	virtual void renderGroup( RenderPass pass , int numObj, LevelObject* object );
 
 	int    getOrder(){ return mRenderOrder; }
 
 	static void cleanup();
 	static void initialize();
 
-	
+	static LevelObject* nextObject( LevelObject* obj ){ return obj->renderLink; }
 
 protected:
 	int mRenderOrder;

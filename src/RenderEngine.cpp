@@ -7,6 +7,14 @@
 
 #include "DataPath.h"
 
+bool gUseGroupRender = true;
+
+RenderEngine::RenderEngine()
+	:mAllocator( 512 )
+{
+
+}
+
 bool RenderEngine::init( int width , int height )
 {
 	mAmbientLight=Vec3f(0.1f, 0.1f, 0.1f);
@@ -87,6 +95,7 @@ bool RenderEngine::setupFBO( int width , int height )
 
 void RenderEngine::renderScene( RenderParam& param )
 {
+	mAllocator.clearFrame();
 
 	param.renderWidth  = mFrameWidth * param.scaleFactor;
 	param.renderHeight = mFrameHeight * param.scaleFactor;
@@ -112,6 +121,10 @@ void RenderEngine::renderScene( RenderParam& param )
 	renderRange.xMax = Math::clamp( renderRange.xMax , 0 , terrain.getSizeX() );
 	renderRange.yMin = Math::clamp( renderRange.yMin , 0 , terrain.getSizeY() );
 	renderRange.yMax = Math::clamp( renderRange.yMax , 0 , terrain.getSizeY() );
+
+
+	if ( gUseGroupRender )
+		updateRenderGroup( param );
 
 	switch( param.mode )
 	{
@@ -501,35 +514,85 @@ void RenderEngine::renderTerrainShadow( Level* level , Vec2f const& lightPos , L
 
 void RenderEngine::renderObjects( RenderPass pass , Level* level )
 {
-#if 1
-	level->renderObjects( pass );
-#else
-	for( RenderGroupVec::iterator iter = mRenderGroups.begin() , itEnd = mRenderGroups.end();
-		iter != itEnd ; ++iter )
+	if ( gUseGroupRender )
 	{
-		RenderGroup* group = *iter;
-		group->renderer->renderGroup( pass , group->objectLists );
+		for( RenderGroupVec::iterator iter = mRenderGroups.begin() , itEnd = mRenderGroups.end();
+			iter != itEnd ; ++iter )
+		{
+			RenderGroup* group = *iter;
+			group->renderer->renderGroup( pass , group->numObject , group->objectLists );
+		}
 	}
-#endif
+	else
+	{
+		level->renderObjects( pass );
+	}
 }
+
+
 
 void RenderEngine::updateRenderGroup( RenderParam& param )
 {
 	mRenderGroups.clear();
 
-	float len = param.level->getColManager().getCellLength();
 	Rect bBox;
-	bBox.min = param.camera->getPos() - Vec2f( len , len );
-	bBox.max = param.camera->getPos() + Vec2f( param.renderWidth + len , param.renderHeight + len );
+	bBox.min = param.camera->getPos();
+	bBox.max = param.camera->getPos() + Vec2f( param.renderWidth  , param.renderHeight );
 
 	ColBodyVec bodyList;
 	param.level->getColManager().findBody( bBox , COL_RENDER , bodyList );
 
+	struct FindGrup
+	{
+		FindGrup(IRenderer* r):renderer( r ){}
+		bool operator()( RenderGroup* group ) const { return group->renderer == renderer; }
+		IRenderer* renderer;
+	};
+
+	struct GroupCompFun
+	{
+		bool operator()( RenderGroup* a , RenderGroup* b ) const 
+		{
+			if ( a->order > b->order )
+				return false;
+			if ( a->order == b->order )
+				return a->renderer < b->renderer;
+			return true;
+		}
+	};
+
 	for( ColBodyVec::iterator iter = bodyList.begin() , itEnd = bodyList.end();
 		 iter != itEnd ; ++iter )
 	{
+		LevelObject* obj = (*iter)->getClient();
+		IRenderer* renderer = obj->getRenderer();
 
+		RenderGroup testGroup;
+		testGroup.renderer = renderer;
+		testGroup.order    = renderer->getOrder();
+		RenderGroupVec::iterator iterGroup = std::lower_bound( mRenderGroups.begin() , mRenderGroups.end() , &testGroup , GroupCompFun() );
+		
+		RenderGroup* group;
+		if ( iterGroup != mRenderGroups.end() && (*iterGroup)->renderer == renderer )
+		{
+			
+			group = *iterGroup;
+			obj->renderLink = group->objectLists;
+			group->objectLists = obj;
+			group->numObject += 1;
+		}
+		else
+		{
+			group = new ( mAllocator ) RenderGroup;
+
+			group->order = renderer->getOrder();
+			group->renderer = renderer;
+			group->objectLists = obj;
+			group->numObject = 1;
+			obj->renderLink = NULL;
+
+			mRenderGroups.insert( iterGroup , group );
+		}
 	}
 
-	std::sort( mRenderGroups.begin() , mRenderGroups.end() , GroupCompFun() );
 }
