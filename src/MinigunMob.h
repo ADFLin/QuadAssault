@@ -10,7 +10,7 @@ public:
 	virtual void init();
 	virtual void tick();
 	virtual void takeDamage(Bullet* p);
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 	void onSpawn( unsigned flag );
 	void onDestroy( unsigned flag );
 	void shoot( IBulletFactory const& creator );

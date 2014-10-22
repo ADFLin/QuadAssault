@@ -25,7 +25,7 @@ void Explosion::init()
 	mbDead=false;
 
 	intensity=0;
-	maxIntenzitet=4;
+	maxIntensity=4;
 	growthRate=35;
 	deathRate=10;
 
@@ -51,7 +51,7 @@ void Explosion::onDestroy( unsigned flag )
 
 void Explosion::setParam(float intensity, float brzinaRasta, float brzinaUmiranja)
 {
-	maxIntenzitet=intensity*2;
+	maxIntensity=intensity*2;
 	this->growthRate=brzinaRasta;
 	this->deathRate=brzinaUmiranja;
 }
@@ -76,14 +76,14 @@ void Explosion::tick()
 	}
 	else
 	{
-		if(intensity<maxIntenzitet)
+		if(intensity<maxIntensity)
 			intensity += growthRate * TICK_TIME;
 		else
 		{
 			mbDead=true;
-			intensity=maxIntenzitet;
+			intensity=maxIntensity;
 		}
 	}	
-	mLight.setColorParam(color, intensity);	
+	mLight.intensity = intensity;	
 }
 

@@ -1,8 +1,6 @@
 #include "WeaponPickup.h"
 
-#include "GameInterface.h"
 #include "Level.h"
-#include "TextureManager.h"
 
 #include "Player.h"
 
@@ -11,35 +9,6 @@
 #include "Minigun.h"
 
 #include "RenderUtility.h"
-
-class WeaponPickupRenderer : public IRenderer
-{
-public:
-	virtual void init()
-	{
-		TextureManager* texMgr = getGame()->getTextureMgr();
-		mTex[ WEAPON_LASER ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-		mTex[ WEAPON_LASER ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
-		mTex[ WEAPON_LASER ][ RP_GLOW    ] = texMgr->getTexture("oruzje1Glow.tga");
-
-		mTex[ WEAPON_PLAZMA ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-		mTex[ WEAPON_PLAZMA ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
-		mTex[ WEAPON_PLAZMA ][ RP_GLOW    ] = texMgr->getTexture("oruzje2Glow.tga");
-
-		mTex[ WEAPON_MINIGUN ][ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-		mTex[ WEAPON_MINIGUN ][ RP_NORMAL  ] = texMgr->getTexture("weapon1Normal.tga");
-		mTex[ WEAPON_MINIGUN ][ RP_GLOW    ] = texMgr->getTexture("oruzje3Glow.tga");
-	}
-
-	virtual void render( RenderPass pass , LevelObject* object )
-	{
-		WeaponPickup* pickup = static_cast< WeaponPickup* >( object );
-		drawSprite( pickup->getRenderPos() + Vec2f( pickup->getSize().x/2-8,0),Vec2f(16,32), pickup->mRotation , mTex[ pickup->mId ][ pass ] );
-	}
-	Texture* mTex[ NUM_WEAPON_ID ][ NUM_RENDER_PASS ];
-};
-
-DEFINE_RENDERER( WeaponPickup , WeaponPickupRenderer )
 
 
 WeaponPickup::WeaponPickup( Vec2f const& pos , int id ) 

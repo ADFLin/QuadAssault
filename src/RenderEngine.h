@@ -4,6 +4,7 @@
 #include "Base.h"
 #include "Dependence.h"
 #include "FrameAllocator.h"
+#include "GBuffer.h"
 
 class ColBody;
 typedef std::vector< ColBody* > ColBodyVec;
@@ -12,7 +13,7 @@ class Level;
 class Object;
 class Shader;
 class Light;
-class IRenderer;
+class IObjectRenderer;
 
 struct TileRange
 {
@@ -50,7 +51,7 @@ struct RenderParam
 struct RenderGroup
 {
 	int          order;
-	IRenderer*   renderer;
+	IObjectRenderer*   renderer;
 	int          numObject;
 	LevelObject* objectLists;
 };
@@ -73,7 +74,7 @@ public:
 	void         postRender();
 private:
 
-	void   renderLightFBO( RenderParam& param );
+	void   renderLightingFBO( RenderParam& param );
 	void   renderNormalFBO( RenderParam& param );
 	void   renderGeometryFBO( RenderParam& param );
 	void   renderSceneFinal( RenderParam& param );
@@ -82,7 +83,7 @@ private:
 	void   renderTerrainNormal( Level* level , TileRange const& range );
 	void   renderTerrainGlow( Level* level , TileRange const& range );
 	void   renderTerrainShadow( Level* level , Vec2f const& lightPos , Light* light , TileRange const& range );
-	void   renderLighting( RenderParam& param , Vec2f const& lightPos , Light* light );
+	void   renderLight( RenderParam& param , Vec2f const& lightPos , Light* light );
 	bool   setupFBO( int width , int height );
 	void   setupLightShaderParam( Shader* shader , Light* light );
 
@@ -97,6 +98,7 @@ private:
 	FrameAllocator mAllocator;
 	ColBodyVec     mBodyList;
 
+	GBuffer        mGBuffer;
 	float   mFrameWidth;
 	float   mFrameHeight;
 
@@ -105,12 +107,11 @@ private:
 	Shader* mShaderScene[NumMode];
 
 	GLuint mFBOColor;	
-	GLuint mFBOStencil;
+	GLuint mFBODepth;
 	GLuint mTexLightmap;
 	GLuint mTexNormalMap;
 	GLuint mTexGeometry;
-
-	Vec3f   mAmbientLight;
+	Vec3f  mAmbientLight;
 
 };
 

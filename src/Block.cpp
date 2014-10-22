@@ -1,7 +1,7 @@
 #include "Block.h"
 
 #include "Level.h"
-#include "GameInterface.h"
+#include "RenderSystem.h"
 #include "TextureManager.h"
 
 #include "RenderUtility.h"
@@ -9,6 +9,19 @@
 #include "Explosion.h"
 
 static Block* gBlockMap[ 256 ] = { 0 };
+
+
+static Vec3f gDoorColor[ NUM_DOOR_TYPE ] =
+{
+	Vec3f( 1.0, 0.1, 0.1 ) ,
+	Vec3f( 0.1, 0.25, 1.0 ) ,
+	Vec3f( 0.1, 1.0, 0.1 ) ,
+};
+
+Vec3f const& getDoorColor( int type )
+{
+	return gDoorColor[ type ];
+}
 
 struct BlockInfo
 {
@@ -22,10 +35,26 @@ struct BlockInfo
 
 static void createBlockClass();
 
+struct TexInfo
+{
+	char const* texName[3];
+};
+
+TexInfo FlatTexInfo[] =
+{
+	{ "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
+	{ "Bathroom.tga" , "BathroomN.tga" , NULL } ,
+	{ "Tile.tga" , "TileN.tga" , NULL } ,
+	{ "Metal1.tga" , "Metal1N.tga" , NULL } ,
+	{ "Weave.tga" , "WeaveN.tga" , NULL } ,
+	{ "Hex.tga" , "HexN.tga" , NULL } ,
+};
+
 static BlockInfo const gInfo[] = 
 {
 	{ BID_FLAT , 0 , 0 , "pod1Diffuse.tga" , "prazninaNormal2.tga" , NULL } ,
 	{ BID_WALL , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "Block.tga" , "zid1Normal.tga" , NULL } ,
+	//{ BID_WALL , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "Block.tga" , "SqureN.tga" , NULL } ,
 	{ BID_GAP  , COL_SOILD | COL_TRIGGER | COL_VIEW , 0 , "prazninaDiffuse.tga" , "prazninaNormal.tga" , NULL } ,
 	{ BID_DOOR , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
 	{ BID_ROCK , COL_OBJECT | COL_VIEW , BF_CAST_SHADOW , "vrataDiffuse.tga" , "vrataNormal.tga" , "vrataGlow.tga" } ,
@@ -41,7 +70,7 @@ void Block::init( BlockType type )
 	mFlag = info.flag;
 	mColMask = info.colMask;
 	
-	TextureManager* texMgr = getGame()->getTextureMgr();
+	TextureManager* texMgr = getRenderSystem()->getTextureMgr();
 	
 	mTex[ RP_DIFFUSE ] = ( info.texDiffuse ) ? texMgr->getTexture( info.texDiffuse ) : NULL;
 	mTex[ RP_NORMAL  ] = ( info.texNormal ) ? texMgr->getTexture( info.texNormal ) : NULL;

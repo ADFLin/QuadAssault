@@ -6,7 +6,6 @@
 #include "ColBody.h"
 #include "Block.h"
 #include "Weapon.h"
-#include "Message.h"
 #include "Light.h"
 
 class LightObject;
@@ -24,7 +23,7 @@ public:
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 
 	virtual void updateEdit();
 

@@ -11,7 +11,7 @@ public:
 	virtual void init();
 	virtual void tick();
 	virtual void onSpawn( unsigned flag );
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 
 };
 

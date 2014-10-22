@@ -10,8 +10,7 @@
 
 Message::~Message()
 {
-	p_text->release();
-	text->release();
+
 }
 
 void Message::init( String const& sender, String const& content, float durstion, String const& soundName )
@@ -23,13 +22,13 @@ void Message::init( String const& sender, String const& content, float durstion,
 	timer=0.0;
 	unisten=false;
 
-	p_text = IText::create( getGame()->getFont(0) , 24 , Color(25,255,25) );
+	p_text.reset( IText::create( getGame()->getFont(0) , 24 , Color(25,255,25) ) );
 	p_text->setString( sender.c_str() );
 
-	text = IText::create( getGame()->getFont(0) , 24 , Color(255,255,255) );
+	text.reset( IText::create( getGame()->getFont(0) , 24 , Color(255,255,255) ) );
 	text->setString( content.c_str() );
 
-	portrait = getGame()->getTextureMgr()->getTexture("portrait2.tga");	
+	portrait = getRenderSystem()->getTextureMgr()->getTexture("portrait2.tga");	
 }
 
 void Message::nodifyShow()

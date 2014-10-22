@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+Texture gEmptyTexture( "EMPTY" , 0 );
+
 Texture::Texture()
 {
 	//file = NULL;
@@ -95,14 +97,17 @@ Texture* TextureManager::loadTexture(char const* name)
 	if( !image.loadFromFile( path.c_str() ))
 	{
 		MessageBox(NULL,TEXT("Greska kod ucitavanja textura."),TEXT("Error."),MB_OK);
-		return NULL;
+		return &gEmptyTexture;
 	}
 		
 	glGenTextures(1,&id);
 	glBindTexture(GL_TEXTURE_2D,id);
-	//gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, image.GetWidth(), image.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, image.GetPixelsPtr());			
+
+	//gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, image.getSize().x , image.getSize().y , GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());			
+	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D( GL_TEXTURE_2D, 0, 4, image.getSize().x , image.getSize().y , 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr() );
+
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -110,9 +115,15 @@ Texture* TextureManager::loadTexture(char const* name)
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
+
 	Texture* tex = new Texture(name,id);
 	mTextures.push_back( tex );
 	std::cout << "Textura loaded : " << name << std::endl;
 	return tex;
 
+}
+
+Texture* TextureManager::getEmptyTexture()
+{
+	return &gEmptyTexture;
 }

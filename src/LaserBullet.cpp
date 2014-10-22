@@ -6,31 +6,7 @@
 #include "Explosion.h"
 #include "RenderUtility.h"
 
-class LaserBulletRenderer : public IRenderer
-{
-public:
-	virtual void init()
-	{
-		mRenderOrder = 1;
-		texG = getGame()->getTextureMgr()->getTexture("laser1Glow.tga");
-		
-	}
 
-	virtual void render( RenderPass pass , LevelObject* object )
-	{
-		if( pass !=RP_GLOW )
-			return;
-
-		LaserBullet* bullet = object->cast< LaserBullet >();
-
-		Vec2f size = Vec2f(16,32);
-		float rot= Math::atan2( bullet->mDir.y, bullet->mDir.x ) + Math::toRad( 90 );
-		drawSprite( bullet->getPos() - size / 2 , size , rot , texG );		
-	}
-	Texture* texG;
-};
-
-DEFINE_RENDERER( LaserBullet , LaserBulletRenderer )
 
 void LaserBullet::init()
 {

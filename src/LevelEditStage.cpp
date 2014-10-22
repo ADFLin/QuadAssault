@@ -58,23 +58,23 @@ bool LevelEditStage::onInit()
 			GImageButton* button;
 			button = new GImageButton( UI_NEW_MAP  , pos , size  , frame );
 			button->setHelpText( "New Map" );
-			button->texImag = getGame()->getTextureMgr()->getTexture("button_gen.tga");
+			button->texImag = getRenderSystem()->getTextureMgr()->getTexture("button_gen.tga");
 			pos.x += offset;
 
 			button = new GImageButton( UI_SAVE_MAP , pos , size  , frame );
 			button->setHelpText( "Save Map" );
-			button->texImag = getGame()->getTextureMgr()->getTexture("button_save.tga");
+			button->texImag = getRenderSystem()->getTextureMgr()->getTexture("button_save.tga");
 			pos.x += offset;
 			
 #if 0
 			button = new GImageButton( UI_CREATE_LIGHT , pos , size , frame );
 			button->setHelpText( "Create Light" );
-			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+			button->texImag = getRenderSystem()->getTextureMgr()->getTexture("button_light.tga");
 			pos.x += offset;
 
 			button = new GImageButton( UI_CREATE_TRIGGER , pos , size  , frame );
 			button->setHelpText( "Create Trigger" );
-			button->texImag = getGame()->getTextureMgr()->getTexture("button_light.tga");
+			button->texImag = getRenderSystem()->getTextureMgr()->getTexture("button_light.tga");
 			pos.x += offset;
 #endif
 		}

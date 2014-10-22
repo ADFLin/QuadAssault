@@ -14,6 +14,7 @@ public:
 	TextureManager();		
 	~TextureManager();		
 
+	Texture* getEmptyTexture();
 	Texture* getTexture(int i);			
 	Texture* getTexture(char const* name);
 	void     destroyTexture(int i);		

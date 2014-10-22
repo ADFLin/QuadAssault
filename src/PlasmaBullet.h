@@ -15,7 +15,7 @@ public:
 	virtual void tick();
 	virtual void onDestroy( unsigned flag );
 	virtual void onSpawn( unsigned flag );
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 	
 private:
 	Light mLight;

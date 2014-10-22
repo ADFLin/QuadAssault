@@ -2,12 +2,12 @@
 #define Weapon_h__
 
 #include "Object.h"
+#include "Renderer.h"
 
 class Level;
 class Bullet;
 class Player;
 class Weapon;
-
 
 #include "ObjectFactory.h"
 typedef IFactoryT< Bullet > IBulletFactory;
@@ -22,16 +22,17 @@ public:
 	Weapon* weapon;
 };
 
+class WeaponRenderer;
+
 class Weapon : public Object
 {
 public:
 	virtual void init( Player* player );
 	virtual void tick();
 
-	virtual IRenderer* getRenderer(){ return NULL; }
+	void render( RenderPass pass );
 
-	virtual void render( RenderPass pass );
-	
+	virtual WeaponRenderer* getRenderer(){ return NULL; }
 	virtual void onFireBullet(Bullet* p);
 
 	void fire( Vec2f const& pos , Vec2f const& dir, int team );
@@ -51,6 +52,5 @@ protected:
 	Player* mOwner;
 	Vec2f   mSize;
 };
-
 
 #endif // Weapon_h__

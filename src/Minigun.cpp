@@ -1,21 +1,12 @@
 #include "Minigun.h"
 
-#include "GameInterface.h"
 #include "Level.h"
 #include "Player.h"
-#include "TextureManager.h"
 #include "MinigunBullet.h"
 
 void Minigun::init( Player* player )
 {
 	BaseClass::init( player );
-
-	TextureManager* texMgr = getGame()->getTextureMgr();
-
-	mTextues[ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-	mTextues[ RP_NORMAL ]  = texMgr->getTexture("weapon1Normal.tga");
-	mTextues[ RP_GLOW ]    = texMgr->getTexture("oruzje3Glow.tga");
-
 	mCDSpeed=1500;
 	mEnergyCast=0.5;
 }

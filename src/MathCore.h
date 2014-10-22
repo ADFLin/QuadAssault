@@ -16,7 +16,8 @@ class Math
 public:
 	static float toRad( float degree ){ return degree * PI / 180.0f;}
 	static float toDeg( float rad ){ return rad * 180.0f / PI; }
-
+	static float cos( float value ){ return ::cos( value ); }
+	static float sin( float value ){ return ::sin( value ); }
 	static float atan2( float y , float x ){ return ::atan2( y , x );  }
 
 	template< class T >

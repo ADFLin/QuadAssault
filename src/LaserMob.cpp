@@ -1,24 +1,8 @@
 #include "LaserMob.h"
 
-#include "GameInterface.h"
 #include "Level.h"
-#include "TextureManager.h"
 #include "Player.h"
 #include "LaserBullet.h"
-
-class LaserMobRenderer : public MobRenderer
-{
-public:
-	virtual void init()
-	{
-		TextureManager* texMgr = getGame()->getTextureMgr();
-		mTextures[ RP_DIFFUSE ] = texMgr->getTexture("mob1Diffuse.tga");
-		mTextures[ RP_NORMAL  ] = texMgr->getTexture("mob1Normal.tga");
-		mTextures[ RP_GLOW    ] = texMgr->getTexture("mob1Glow.tga");
-	}
-};
-
-DEFINE_RENDERER( LaserMob , LaserMobRenderer );
 
 void LaserMob::init()
 {

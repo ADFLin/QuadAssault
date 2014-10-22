@@ -19,6 +19,14 @@ namespace Detail
 		void setZero( ManageType& ptr ){ ptr = 0; }
 	};
 
+	template< class T , void (*FreeFun)( T* ) >
+	struct PtrFunFreePolicy
+	{
+		typedef T* ManageType; 
+		void destroy( ManageType ptr ){  if ( ptr ) ( *FreeFun )( ptr );  }
+		void setZero( ManageType& ptr ){ ptr = 0; }
+	};
+
 	template< class T >
 	struct ArrayPtrPolicy
 	{
@@ -27,10 +35,10 @@ namespace Detail
 		void setZero( ManageType& ptr ){ ptr = 0; }
 	};
 
-	template< class T , template< class T > class ManagePolicy >
-	class HolderImpl : private ManagePolicy< T >
+	template< class T , class ManagePolicy >
+	class HolderImpl : private ManagePolicy
 	{
-		typedef ManagePolicy< T > MP;
+		typedef ManagePolicy MP;
 	public:
 		typedef typename MP::ManageType ManageType;
 
@@ -69,13 +77,13 @@ namespace Detail
 	};
 }
 
-template< class T >
-class TPtrHolder : public Detail::HolderImpl< T , Detail::PtrPolicy >
+template< class T , class Policy >
+class TPtrHolderBase : public Detail::HolderImpl< T , Policy >
 {
 public:
-	TPtrHolder(){}
-	explicit TPtrHolder(T* ptr):Detail::HolderImpl< T , Detail::PtrPolicy  >(ptr){}
-	
+	TPtrHolderBase(){}
+	explicit TPtrHolderBase(T* ptr):Detail::HolderImpl< T , Policy >(ptr){}
+
 	T&       operator*()        { return *m_ptr; }
 	T const& operator*()  const { return *m_ptr; }
 	T*       operator->()       { return m_ptr; }
@@ -85,7 +93,32 @@ public:
 };
 
 template< class T >
-class TArrayHolder : public Detail::HolderImpl< T , Detail::ArrayPtrPolicy >
+class TPtrHolder : public TPtrHolderBase< T , Detail::PtrPolicy< T > >
+{
+public:
+	TPtrHolder(){}
+	explicit TPtrHolder(T* ptr):TPtrHolderBase< T , Detail::PtrPolicy< T > >(ptr){}
+};
+
+
+template< class T , void (*FreeFun)( T* ) >
+class TPtrFunFreeHolder : public TPtrHolderBase< T , Detail::PtrFunFreePolicy< T , FreeFun > >
+{
+public:
+	TPtrFunFreeHolder(){}
+	explicit TPtrFunFreeHolder(T* ptr):TPtrHolderBase< T , Detail::PtrFunFreePolicy< T , FreeFun >  >(ptr){}
+
+	T&       operator*()        { return *m_ptr; }
+	T const& operator*()  const { return *m_ptr; }
+	T*       operator->()       { return m_ptr; }
+	T const* operator->() const { return m_ptr; }
+	operator T*()               { return m_ptr; }
+	operator T const*() const   { return m_ptr; }
+};
+
+
+template< class T >
+class TArrayHolder : public Detail::HolderImpl< T , Detail::ArrayPtrPolicy< T > >
 {
 public:
 	TArrayHolder(){}

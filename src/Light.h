@@ -5,10 +5,11 @@
 
 enum LightingModel
 {
+	LIGHT_POINT ,
+	LIGHT_DIRECTIONAL ,
 
-
-
-
+	LIGHT_EXPLOSION ,
+	LIGHT_HEAD ,
 };
 
 class Light
@@ -28,7 +29,7 @@ public:
 	float  radius;
 	float  intensity;
 	Vec3f  color;
-	Vec2f  dir; //normal u kojem dir je light okrenuto (baterija)
+	Vec2f  dir;   //normal u kojem dir je light okrenuto (baterija)
 	float  angle; //od 0.0 do 1.0, odredjuje angle djelovanja baterije
 
 	bool  isExplosion;

@@ -7,8 +7,6 @@
 
 Vec2f const gSimpleBlockSize = Vec2f( BLOCK_SIZE , BLOCK_SIZE );
 
-
-
 enum DoorType
 {
 	DOOR_RED   = 0 ,
@@ -17,6 +15,8 @@ enum DoorType
 
 	NUM_DOOR_TYPE ,
 };
+
+Vec3f const& getDoorColor( int type );
 
 enum BlockFlag
 {

@@ -2,43 +2,10 @@
 
 #include "DebrisParticle.h"
 
-#include "GameInterface.h"
 #include "Level.h"
-#include "TextureManager.h"
 #include "Explosion.h"
 #include "Player.h"
 #include "RenderUtility.h"
-
-class DebrisPickupRenderer : public IRenderer
-{
-public:
-	virtual void init()
-	{
-		tex = getGame()->getTextureMgr()->getTexture("SmeceDiffuse.tga");
-		texN= getGame()->getTextureMgr()->getTexture("SmeceNormal.tga");
-	}
-
-	virtual void render( RenderPass pass , LevelObject* object )
-	{
-		if( pass == RP_GLOW )
-			return;
-
-		Texture* t;
-		if(pass==RP_DIFFUSE)
-			t=tex;
-		else if(pass==RP_NORMAL)
-			t=texN;
-
-		glColor3f(1.0, 1.0, 1.0);
-		drawSprite( object->getRenderPos() , object->getSize() , 0 , t );
-		glColor3f(1.0, 1.0, 1.0);
-	}
-
-	Texture* tex;
-	Texture* texN;
-};
-
-DEFINE_RENDERER( DebrisPickup , DebrisPickupRenderer )
 
 DebrisPickup::DebrisPickup( Vec2f const& pos ) 
 	:BaseClass( pos )

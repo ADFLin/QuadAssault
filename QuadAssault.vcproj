@@ -263,22 +263,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\RenderEngine.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\RenderSystem.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\RenderUtility.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Shader.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\SoundManager.h"
 				>
 			</File>
@@ -360,22 +344,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\RenderEngine.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\RenderSystem.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\RenderUtility.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Shader.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\SoundManager.cpp"
 				>
 			</File>
@@ -388,7 +356,31 @@
 			Name="Shader"
 			>
 			<File
+				RelativePath=".\out\shader\GeomDefaultFS.glsl"
+				>
+			</File>
+			<File
+				RelativePath=".\out\shader\GeomDefaultVS.glsl"
+				>
+			</File>
+			<File
 				RelativePath=".\out\shader\LightFS.glsl"
+				>
+			</File>
+			<File
+				RelativePath=".\out\shader\LightingGlowFS.glsl"
+				>
+			</File>
+			<File
+				RelativePath=".\out\shader\LightingGlowVS.glsl"
+				>
+			</File>
+			<File
+				RelativePath=".\out\shader\LightingPointFS.glsl"
+				>
+			</File>
+			<File
+				RelativePath=".\out\shader\LightingPointVS.glsl"
 				>
 			</File>
 			<File
@@ -417,22 +409,6 @@
 			</File>
 			<File
 				RelativePath=".\out\shader\SceneVS.glsl"
-				>
-			</File>
-			<File
-				RelativePath=".\out\shader\SjenaFS.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\out\shader\SjenaVS.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\out\shader\SpriteFS.glsl"
-				>
-			</File>
-			<File
-				RelativePath=".\out\shader\SpriteVS.glsl"
 				>
 			</File>
 		</Filter>
@@ -821,6 +797,74 @@
 			</File>
 			<File
 				RelativePath=".\src\PlatformWin.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Render"
+			>
+			<File
+				RelativePath=".\src\GBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ObjectRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ObjectRenderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderEngine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderEngine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Renderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Renderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderSystem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderSystem.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderUtility.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RenderUtility.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Shader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Shader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\WeaponRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\WeaponRenderer.h"
 				>
 			</File>
 		</Filter>

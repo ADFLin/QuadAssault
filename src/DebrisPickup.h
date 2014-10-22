@@ -15,7 +15,7 @@ public:
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 	virtual void tick();
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 
 	void onPick(Player* player);
 	bool testCollision( Vec2f const& offset );

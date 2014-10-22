@@ -298,7 +298,7 @@ bool CollisionManager::updateBodySize( ColBody& body )
 	if ( !body.bUpdateSize )
 		return false;
 
-	body.bUpdateSize = true;
+	body.bUpdateSize = false;
 	float halfLen = mCellLength / 2;
 	bool bLargeSize = body.halfSize.x > halfLen || body.halfSize.y > halfLen;
 

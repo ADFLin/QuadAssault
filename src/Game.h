@@ -44,7 +44,7 @@ private:
 	float    mFPS;
 	unsigned mMouseState;
 	bool     mNeedEnd;
-	RenderSystem* mRenderSystem;
+	FPtr< RenderSystem > mRenderSystem;
 	std::vector< GameStage* > mStageStack;
 	std::vector< IFont* >     mFonts;
 	GameWindow*               mWindow;

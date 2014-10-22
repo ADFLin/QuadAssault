@@ -1,6 +1,7 @@
 #ifndef GUISystem_h__
 #define GUISystem_h__
 
+#include "Base.h"
 #include "TUICore.h"
 #include "TUICommon.h"
 
@@ -128,7 +129,7 @@ public:
 	GTextButton( int id , Vec2i const& pos , Vec2i const& size  , GWidget* parent );
 	~GTextButton();
 	void   onRender();
-	IText* text;
+	FObjectPtr< IText > text;
 };
 
 class GImageButton : public GButtonBase

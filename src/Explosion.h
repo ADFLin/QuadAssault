@@ -35,7 +35,7 @@ protected:
 	float growthRate; 
 	// the speed at which the intensity is decreasing
 	float deathRate;  
-	float intensity, maxIntenzitet;
+	float intensity, maxIntensity;
 	// light color
 	Vec3f  color;
 };

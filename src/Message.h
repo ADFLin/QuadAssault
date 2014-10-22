@@ -1,11 +1,12 @@
-#ifndef PORUKA_H
-#define PORUKA_H
+#ifndef Message_h__
+#define Message_h__
 
 #include "Base.h"
-#include "Object.h"
+#include "RenderSystem.h"
 
 class Level;
 class Sound;
+class Texture;
 class IText;
 
 class Message
@@ -23,16 +24,16 @@ public:
 	void render();
 	bool unisten;
 private:	
-	IText*  p_text;
-	IText*  text;
+	FObjectPtr< IText >  p_text;
+	FObjectPtr< IText >  text;
 	Vec2f   mPos;
-	float   mDurstion; //trajanje poruke u sekundama
-
-	float    timer; //pocinje od nule	
+	float   mDurstion;
+	float    timer;	
 	Texture* portrait;
 	String   mSoundName;	
 	Sound*   sound;
 
 };
 
-#endif
+
+#endif // Message_h__

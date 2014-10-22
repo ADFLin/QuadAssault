@@ -8,6 +8,30 @@
 #include <string>
 typedef std::string String;
 
+#include "FixString.h"
+typedef FixString< 512 > FString;
+
+#include "THolder.h"
+
+namespace Priv
+{
+	template< class T >
+	void ReleaseFree( T * ptr ){ ptr->release(); }
+}
+
+
+template< class T >
+class FObjectPtr : public TPtrFunFreeHolder< T , &Priv::ReleaseFree< T > >
+{
+
+};
+
+template< class T >
+class FPtr : public TPtrHolder< T >
+{
+
+};
+
 #ifndef BIT
 #define BIT( n ) ( 1 << ( n ) )
 #endif

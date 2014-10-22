@@ -73,7 +73,10 @@ bool Shader::compileShader( GLuint shader , char const* path)
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 
 	if ( !status )
+	{
+		Log( shader );
 		return false;
+	}
 
 	return true;
 }

@@ -25,9 +25,10 @@ MenuStage::MenuStage()
 
 bool MenuStage::onInit()
 {
-	texCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
-	texBG     = getGame()->getTextureMgr()->getTexture("Menu1.tga");
-	texBG2    = getGame()->getTextureMgr()->getTexture("MenuLoading1.tga");		
+	TextureManager* texMgr = getRenderSystem()->getTextureMgr();
+	texCursor = texMgr->getTexture("cursor.tga");
+	texBG     = texMgr->getTexture("Menu1.tga");
+	texBG2    = texMgr->getTexture("MenuLoading1.tga");		
 
 	IFont* font = getGame()->getFont( 0 );
 

@@ -1,9 +1,11 @@
 #include "Level.h"
 
 #include "GameInterface.h"
+#include "RenderSystem.h"
 #include "SoundManager.h"
 
 #include "ObjectFactory.h"
+#include "ObjectRenderer.h"
 
 #include "Block.h"
 
@@ -13,6 +15,7 @@
 #include "Mob.h"
 #include "Player.h"
 #include "Particle.h"
+#include "Message.h"
 #include "Explosion.h"
 
 #include "LaserMob.h"
@@ -221,7 +224,7 @@ void Level::renderObjects( RenderPass pass )
 		iter != itEnd ; ++iter )
 	{
 		LevelObject* obj = *iter;
-		IRenderer* renderer =  obj->getRenderer();
+		IObjectRenderer* renderer =  obj->getRenderer();
 		renderer->render( pass , obj );
 	}
 
@@ -229,7 +232,7 @@ void Level::renderObjects( RenderPass pass )
 		iter != itEnd ; ++iter )
 	{
 		LevelObject* obj = *iter;
-		IRenderer* renderer =  obj->getRenderer();
+		IObjectRenderer* renderer =  obj->getRenderer();
 		renderer->render( pass , obj );
 	}
 
@@ -237,7 +240,7 @@ void Level::renderObjects( RenderPass pass )
 		 iter != itEnd ; ++iter )
 	{
 		Player* player = *iter;
-		IRenderer* renderer = player->getRenderer();
+		IObjectRenderer* renderer = player->getRenderer();
 		renderer->render( pass , player );
 	}
 
@@ -245,7 +248,7 @@ void Level::renderObjects( RenderPass pass )
 		iter != itEnd ; ++iter )
 	{
 		LevelObject* obj = *iter;
-		IRenderer* renderer =  obj->getRenderer();
+		IObjectRenderer* renderer =  obj->getRenderer();
 		renderer->render( pass , obj );
 	}
 
@@ -253,7 +256,7 @@ void Level::renderObjects( RenderPass pass )
 		iter != itEnd ; ++iter )
 	{
 		LevelObject* obj = *iter;
-		IRenderer* renderer =  obj->getRenderer();
+		IObjectRenderer* renderer =  obj->getRenderer();
 		renderer->render( pass , obj );
 	}
 

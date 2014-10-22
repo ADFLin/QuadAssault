@@ -47,14 +47,39 @@ public:
 	void setTexture2D( char const* name , GLuint idTex , int idx )
 	{
 		glActiveTexture( GL_TEXTURE0 + idx );
-		glBindTexture(GL_TEXTURE_2D, idTex);
+		glBindTexture( GL_TEXTURE_2D, idTex );
 		setParam( name , idx );
+		glActiveTexture( GL_TEXTURE0 );
 	}
+
+
+	void setParam( int loc , Vec2f const& v ){  glUniform2f( loc , v.x , v.y );	 }
+	void setParam( int loc , Vec3f const& v ){  glUniform3f( loc , v.x, v.y , v.z );  }
+	void setParam( int loc , float v1 ){  glUniform1f( loc , v1 );	}
+	void setParam( int loc, float v1 , float v2 ){  glUniform2f( loc , v1, v2 );  }
+	void setParam( int loc , int v1 ){  glUniform1i( loc , v1 );	}
+	void setTexture2D( int loc , GLuint idTex , int idx )
+	{
+		glActiveTexture( GL_TEXTURE0 + idx );
+		glBindTexture( GL_TEXTURE_2D, idTex );
+		setParam( loc , idx );
+		glActiveTexture( GL_TEXTURE0 );
+	}
+	void setTexture1D( int loc , GLuint idTex , int idx )
+	{
+		glActiveTexture( GL_TEXTURE0 + idx );
+		glBindTexture( GL_TEXTURE_1D, idTex );
+		setParam( loc , idx );
+		glActiveTexture( GL_TEXTURE0 );
+	}
+
+	int  getParamLoc( char const* name ){ return glGetUniformLocation( ID , name ); }
 
 private:
 
 	void Log(GLuint obj);
-	bool compileShader( GLuint shader , char const* path);
+
+	bool compileShader( GLuint shader , char const* path );
 
 	GLuint ID;
 	GLuint vertex_program;

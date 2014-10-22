@@ -189,13 +189,12 @@ void GWidget::doRenderAll()
 GTextButton::GTextButton( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent ) 
 	:BaseClass( id , pos , size , parent )
 {
-	text = IText::create( getGame()->getFont(0) , 24 , Color( 255 , 255 , 0 ) );
-
+	text.reset( IText::create( getGame()->getFont(0) , 24 , Color( 255 , 255 , 0 ) ) );
 }
 
 GTextButton::~GTextButton()
 {
-	text->release();
+
 }
 
 void GTextButton::onRender()

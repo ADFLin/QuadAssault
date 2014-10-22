@@ -13,7 +13,7 @@ public:
 	virtual void onDestroy( unsigned flag );
 	virtual void tick();
 
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 
 private:
 	Light mLight;

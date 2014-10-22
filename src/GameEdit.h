@@ -2,7 +2,6 @@
 #define GameEdit_h__
 
 #include "Base.h"
-#include "FixString.h"
 
 class IPropEditor
 {
@@ -51,8 +50,6 @@ enum PropType
 	PROP_CTRL   ,
 };
 
-
-typedef FixString< 512 > FString;
 class IPropCtrl
 {
 public:

@@ -11,6 +11,7 @@ uniform int   isExplosion;
 //uniform float scaleFactor;
 
 uniform sampler2D texNormalMap;
+uniform sampler2D texBaseColor;
 
 varying vec2 position;
 
@@ -21,35 +22,36 @@ void main()
 	//pixel = pixel / scaleFactor;
 	//vec2 aux = posLight - scaleFactor * pixel;
 	
-	vec2 aux = posLight - position;
-	float d = length(aux);
+	vec2 lightOffset = posLight - position;
+	float d = length(lightOffset);
 
 	if( d > radius )
 		discard;
 
-	vec3 normal=texture2D(texNormalMap, gl_TexCoord[0].st).rgb;
+	vec3 normal = texture2D(texNormalMap, gl_TexCoord[0].st).rgb;
 
 	normal=normal*2.0-1.0;
 	normal=normalize(normal);
 	
-	vec3 dd=vec3(aux.x, aux.y, 0.0);
+	vec3 lightDir = vec3(lightOffset.x / d , lightOffset.y / d , 0.0);
 	
-	float opad= 1.0 /d*intensity*10;
-	float shadow;
-	if(isExplosion == 0)
-		shadow = max(dot(normalize(dd), normal), 0.0);	
-	else
-		shadow = 0.05;
+	float diffuseFactor;
+	diffuseFactor = max(dot( lightDir , normal ), 0.0);	
 
-	float decay = clamp((1.0 - d / radius), 0.0, 1.0);
+	if(isExplosion != 0)
+		diffuseFactor = 0.05 + 0.01 * diffuseFactor;
 
 	if( texture2D( texNormalMap , gl_TexCoord[0].st).rgb == vec3(1.0, 1.0, 1.0) )
-		shadow=0.05;
+		diffuseFactor = 0.05;
 
-	if( dot(normalize(aux), dir)<angle*d/radius )
-		shadow = 0;
+	if( dot( lightDir.xy , dir)< angle * d / radius )
+		discard;
 
-	gl_FragColor = vec4(opad*shadow,opad*shadow,opad*shadow,1.0)*vec4(colorLight*decay,1.0);		
+	float opad = 10 * intensity / d;
+	float decay = clamp((1.0 - d / radius), 0.0, 1.0);
+	float c = decay * opad * diffuseFactor;
+
+	gl_FragColor = vec4( c * colorLight , 1.0 );		
 	
 	
 }

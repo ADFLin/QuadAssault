@@ -7,6 +7,7 @@
 #include "TVector2.h"
 
 class Shader;
+class TextureManager;
 typedef TVector2< float > Vec2f;
 
 class IFont
@@ -43,6 +44,7 @@ class RenderSystem
 {
 public:
 	RenderSystem();
+	~RenderSystem();
 
 	bool init( GameWindow& window );
 	void cleanup();
@@ -50,12 +52,17 @@ public:
 	void postRender();
 
 	Shader* createShader( char const* vsName , char const* fsName );
+	void    removeShader( Shader* shader );
 
+	TextureManager* getTextureMgr(){ return mTextureMgr; }
 	void drawText(  IText* text , Vec2f const& pos ,unsigned sideFlag = 0 );
 
 private:
 
-	std::vector<Shader*> mShaders;
+	typedef std::vector<Shader*> ShaderVec;
+
+	ShaderVec mShaders;
+	TextureManager* mTextureMgr;
 
 #if USE_SFML_WINDOW
 	sf::RenderWindow* mRenderWindow;

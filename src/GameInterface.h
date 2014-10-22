@@ -13,11 +13,10 @@ class IFont;
 class IGame
 {
 public:
-	virtual ~IGame(){}
+	virtual ~IGame();
 
 	RenderEngine*   getRenderEenine(){ return mRenderEngine; }
 	SoundManager*   getSoundMgr(){ return mSoundMgr; }
-	TextureManager* getTextureMgr(){ return mTextureMgr; }
 
 	Vec2i const&  getScreenSize(){ return mScreenSize; }
 	Vec2i const&  getMousePos(){ return mMousePos; }
@@ -33,10 +32,11 @@ public:
 	virtual IFont* getFont( int idx ) = 0;
 protected:
 	Vec2i           mScreenSize;
-	RenderEngine*   mRenderEngine;
-	SoundManager*   mSoundMgr;
-	TextureManager* mTextureMgr;
 	Vec2i           mMousePos;
+
+	FPtr< RenderEngine >  mRenderEngine;
+	FPtr< SoundManager >  mSoundMgr;
+	
 };
 
 IGame* getGame();

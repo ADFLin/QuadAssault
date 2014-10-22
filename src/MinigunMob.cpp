@@ -1,25 +1,10 @@
 #include "MinigunMob.h"
 
-#include "GameInterface.h"
 #include "Level.h"
-#include "TextureManager.h"
 #include "Player.h"
 
 #include "MinigunBullet.h"
 
-class MinigunMobRenderer : public MobRenderer
-{
-public:
-	virtual void init()
-	{
-		TextureManager* texMgr = getGame()->getTextureMgr();
-		mTextures[ RP_DIFFUSE ] = texMgr->getTexture("mob1Diffuse.tga");
-		mTextures[ RP_NORMAL  ] = texMgr->getTexture("mob1Normal.tga");
-		mTextures[ RP_GLOW    ] = texMgr->getTexture("mob3Glow.tga");
-	}
-};
-
-static MinigunMobRenderer gRenderer;
 
 void MinigunMob::init()
 {
@@ -79,9 +64,4 @@ void MinigunMob::shoot( IBulletFactory const& creator )
 void MinigunMob::takeDamage(Bullet* bullet )
 {
 	BaseClass::takeDamage(bullet);
-}
-
-IRenderer* MinigunMob::getRenderer()
-{
-	return &gRenderer;
 }

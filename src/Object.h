@@ -20,9 +20,7 @@ protected:
 		
 };
 
-
 class Level;
-
 
 enum ObjectType
 {
@@ -37,7 +35,7 @@ enum ObjectType
 	OT_TRIGGER ,
 };
 
-class IRenderer;
+class IObjectRenderer;
 struct Tile;
 class ColBody;
 
@@ -47,7 +45,7 @@ class ObjectClass
 	char const*  name;
 	ObjectType   type;
 	ObjectClass* parent;
-	IRenderer*   renderer;
+	IObjectRenderer*   renderer;
 };
 
 enum DevDrawMode
@@ -84,7 +82,7 @@ public:
 	virtual void onTileCollision( ColBody& self , Tile& tile ){}
 	virtual void onBodyCollision( ColBody& self , ColBody& other ){}
 
-	virtual IRenderer* getRenderer(){ return NULL; }
+	virtual IObjectRenderer* getRenderer(){ return NULL; }
 
 	Level* getLevel(){ return mLevel; }
 	void   destroy(){ mNeedDestroy = true; }
@@ -117,34 +115,10 @@ private:
 
 private:
 	friend class RenderEngine;
-	friend class IRenderer;
+	friend class IObjectRenderer;
 	LevelObject* renderLink;
 };
 
-class IRenderer
-{
-public:
-	IRenderer();
-	virtual void init() = 0;
-	virtual void render( RenderPass pass , LevelObject* object ) = 0;
-	virtual void renderGroup( RenderPass pass , int numObj, LevelObject* object );
-
-	int    getOrder(){ return mRenderOrder; }
-
-	static void cleanup();
-	static void initialize();
-
-	static LevelObject* nextObject( LevelObject* obj ){ return obj->renderLink; }
-
-protected:
-	int mRenderOrder;
-private:
-	IRenderer* mLink;
-};
-
-#define DEFINE_RENDERER( CLASS , RENDERER )\
-	static RENDERER g##CLASS##Renderer;\
-	IRenderer* CLASS::getRenderer(){  return &g##CLASS##Renderer;  }
 
 #endif // Object_h__
 

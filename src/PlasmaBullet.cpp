@@ -2,32 +2,10 @@
 
 #include "GameInterface.h"
 #include "Level.h"
-#include "TextureManager.h"
 #include "SmokeParticle.h"
 #include "Explosion.h"
 #include "RenderUtility.h"
 
-
-class PlasmaBulletRenderer : public IRenderer
-{
-public:
-	virtual void init()
-	{
-		mRenderOrder = 1;
-		tex = getGame()->getTextureMgr()->getTexture("granata1.tga");
-	}
-
-	virtual void render( RenderPass pass , LevelObject* object )
-	{
-		if( pass !=RP_DIFFUSE )
-			return ;
-
-		drawSprite( object->getRenderPos() , object->getSize() ,0,tex);
-	}
-	Texture* tex;
-};
-
-DEFINE_RENDERER( PlasmaBullet , PlasmaBulletRenderer )
 
 void PlasmaBullet::init()
 {

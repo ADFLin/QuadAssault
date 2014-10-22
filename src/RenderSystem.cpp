@@ -1,6 +1,7 @@
 #include "RenderSystem.h"
 
 #include "Shader.h"
+#include "TextureManager.h"
 
 #include "DataPath.h"
 #include "Dependence.h"
@@ -554,6 +555,12 @@ RenderSystem::RenderSystem()
 {
 	assert( gSystem == NULL );
 	gSystem = this;
+	mTextureMgr = NULL;
+}
+
+RenderSystem::~RenderSystem()
+{
+	delete mTextureMgr;
 }
 
 bool RenderSystem::init( GameWindow& window )
@@ -580,6 +587,8 @@ bool RenderSystem::init( GameWindow& window )
 	mRenderWindow = &window;
 	CFont::initilize();
 #endif
+
+	mTextureMgr   = new TextureManager;
 
 	return true;
 }
@@ -636,6 +645,15 @@ void RenderSystem::postRender()
 
 void RenderSystem::cleanup()
 {
+	for( ShaderVec::iterator iter = mShaders.begin() , itEnd = mShaders.end();
+		 iter != itEnd ; ++iter )
+	{
+		delete (*iter);
+	}
+	mShaders.clear();
+
+	mTextureMgr->cleanup();
+
 	mContext->release();
 }
 
@@ -652,4 +670,16 @@ Shader* RenderSystem::createShader( char const* vsName , char const* fsName )
 		return NULL;
 	}
 	return shader;
+}
+
+void RenderSystem::removeShader( Shader* shader )
+{
+	ShaderVec::iterator iter = std::find( mShaders.begin() , mShaders.end() , shader );
+	if ( iter == mShaders.end() )
+	{
+		return;
+	}
+	mShaders.erase( iter );
+	delete shader;
+
 }

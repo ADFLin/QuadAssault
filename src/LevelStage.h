@@ -43,6 +43,7 @@ public:
 	ActionCreator* getActionCreator(){ return mActionCreator; }
 
 	void          build();
+	void          cleanup();
 private:
 	void          reigsterObject();
 protected:
@@ -56,6 +57,7 @@ protected:
 class LevelStageBase : public GameStage
 {
 public:
+	~LevelStageBase();
 	virtual bool onInit();
 	virtual void onExit();
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
@@ -75,7 +77,7 @@ protected:
 
 	};
 
-	IText*         mDevMsg;
+	FObjectPtr< IText >  mDevMsg;
 	Texture*       mTexCursor;
 	RenderParam    mRenderParam;
 	

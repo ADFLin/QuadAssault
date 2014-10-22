@@ -15,7 +15,7 @@ public:
 	void takeDamage(Bullet* p);
 	void shoot( IBulletFactory const& creator );
 
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 
 };
 

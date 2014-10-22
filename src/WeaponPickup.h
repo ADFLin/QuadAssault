@@ -29,7 +29,7 @@ public:
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 
 	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();

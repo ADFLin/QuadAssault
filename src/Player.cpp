@@ -1,8 +1,6 @@
 #include "Player.h"
 
-#include "GameInterface.h"
 #include "Level.h"
-#include "TextureManager.h"
 #include "SoundManager.h"
 
 #include "Light.h"
@@ -10,8 +8,8 @@
 #include "Mob.h"
 #include "Explosion.h"
 
+#include "Message.h"
 #include "RenderUtility.h"
-#include "Texture.h"
 
 bool gPlayerGodPower = true;
 
@@ -22,154 +20,6 @@ Vec2f const gWeaponSlotOffset[] =
 	Vec2f(-24,0 ) ,
 	Vec2f( 24,0 ) ,
 };
-
-class PlayerRenderer : public IRenderer
-{
-public:
-	virtual void init()
-	{
-		TextureManager* texMgr = getGame()->getTextureMgr();
-		textura = texMgr->getTexture("tenkTorzoDiffuse.tga");	
-		texturaN = texMgr->getTexture("tenkTorzoNormal.tga");
-
-		podloga_tex = texMgr->getTexture("tenkPodlogaDiffuse.tga");
-		podloga_normal = texMgr->getTexture("tenkPodlogaNormal.tga");
-
-		tracnica_tex = texMgr->getTexture("tracnicaDiffuse.tga");	
-		tracnica_normal = texMgr->getTexture("tracnicaNormal.tga");
-	}
-
-	virtual void render( RenderPass pass , LevelObject* object )
-	{
-		Player* player = object->cast< Player >();
-
-		if( player->mIsDead )
-			return;
-
-		switch( pass )
-		{
-		case RP_DIFFUSE:
-			//Shadow
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glPushMatrix();
-			glTranslatef(4,4,0);
-			glColor4f( 0.0, 0.0, 0.0, 0.5 );	
-			RenderPodlogu( pass , player );
-			RenderTrack( pass , player );
-			RenderTorzo( pass , player );	
-			glColor4f(1.0, 1.0, 1.0, 1.0);
-			glPopMatrix();
-			glDisable(GL_BLEND);
-			//
-		case RP_NORMAL:
-			glColor3f( 1.0, 1.0, 1.0 );	
-			RenderPodlogu( pass , player );
-			RenderTrack( pass , player );
-			RenderTorzo( pass , player );	
-			glColor3f(1.0, 1.0, 1.0 );
-			break;
-		}
-
-
-		for(int i=0; i<4; i++)
-		{
-			Weapon* weapon = player->mWeaponSlot[i];
-			if( weapon )
-			{
-				Vec2f centerPos = player->getPos();
-
-				glPushMatrix();
-				glTranslatef( centerPos.x,centerPos.y,0 );
-				glRotatef( Math::toDeg( player->rotationAim ) + 90 ,0,0,1 );
-				weapon->render( pass );
-				glPopMatrix();
-			}
-		}
-
-	}
-
-	void RenderPodlogu( RenderPass pass , Player* player )
-	{
-		Texture* tex;
-		if(pass==RP_DIFFUSE)
-			tex=podloga_tex;
-		if(pass==RP_NORMAL)
-			tex=podloga_normal;
-
-		glPushMatrix();	
-		drawSprite( player->getRenderPos() , player->getSize() , player->getRotation() ,tex);	
-		glPopMatrix();
-	}
-
-	void RenderTorzo(RenderPass pass , Player* player )
-	{
-		Texture* tex;	
-		if(pass==RP_DIFFUSE)
-			tex = textura;	
-		if(pass==RP_NORMAL)
-			tex = texturaN;	
-		glPushMatrix();	
-		drawSprite( player->getRenderPos() , player->getSize(), player->rotationAim + Math::toRad(90) , tex );			
-		glPopMatrix();	
-	}
-
-	void RenderTrack( RenderPass pass , Player* player )
-	{
-		float razmak_tracnica=8;
-		float odmak=24;
-
-		Texture* tex;
-		if(pass==RP_DIFFUSE)
-			tex=tracnica_tex;
-		if(pass==RP_NORMAL)
-			tex=tracnica_normal;
-
-		glEnable(GL_TEXTURE_2D);
-
-		tex->bind();
-
-		Vec2f centerPos = player->getPos();
-		float shift = player->shiftTrack;
-		Vec2f size = player->getSize();
-
-		glPushMatrix();
-		glTranslatef( centerPos.x, centerPos.y , 0 );
-		glRotatef(Math::toDeg( player->getRotation()),0,0,1);
-		glTranslatef( -odmak - razmak_tracnica, -size.y/2,0);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0, shift); glVertex2f(0.0, 0.0);
-		glTexCoord2f(1.0, shift); glVertex2f(size.x/4, 0.0);
-		glTexCoord2f(1.0, shift + 1.0); glVertex2f(size.x/4, size.y);	
-		glTexCoord2f(0.0, shift + 1.0); glVertex2f(0.0, size.y);
-		glEnd();
-		glPopMatrix();
-
-		glPushMatrix();
-		glTranslatef( centerPos.x, centerPos.y , 0 );
-		glRotatef(Math::toDeg( player->getRotation()),0,0,1);
-		glTranslatef( odmak - razmak_tracnica, -size.y/2,0);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0, shift); glVertex2f(0.0, 0.0);
-		glTexCoord2f(1.0, shift); glVertex2f(size.x/4, 0.0);
-		glTexCoord2f(1.0, shift + 1.0); glVertex2f(size.x/4, size.y);	
-		glTexCoord2f(0.0, shift + 1.0); glVertex2f(0.0, size.y);
-		glEnd();
-		glPopMatrix();
-
-		glDisable(GL_TEXTURE_2D);
-	}
-
-	Texture* textura;
-	Texture* texturaN;
-	Texture* tracnica_tex;
-	Texture* tracnica_normal;
-	Texture* podloga_tex;
-	Texture* podloga_normal;
-
-};
-
-DEFINE_RENDERER( Player , PlayerRenderer )
 
 
 Player::Player()

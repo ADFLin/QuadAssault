@@ -14,7 +14,7 @@ public:
 	virtual void tick();
 
 	void takeDamage(Bullet* p);
-	virtual IRenderer* getRenderer();
+	virtual IObjectRenderer* getRenderer();
 };
 
 #endif // PlasmaMob_h__

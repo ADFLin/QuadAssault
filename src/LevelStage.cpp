@@ -13,6 +13,8 @@
 #include "GlobalVariable.h"
 #include "DataPath.h"
 #include "RenderUtility.h"
+
+#include "ObjectRenderer.h"
 #include "Block.h"
 
 #include "Player.h"
@@ -62,6 +64,12 @@ void WorldData::build()
 	mWorldScaleFactor = 1.0f;
 }
 
+void WorldData::cleanup()
+{
+	IRenderer::cleanup();
+	Block::cleanup();
+}
+
 void WorldData::reigsterObject()
 {
 	mObjectCreator->registerClass< LaserMob >( "Mob.Laser" );
@@ -84,19 +92,23 @@ void WorldData::reigsterObject()
 
 }
 
+LevelStageBase::~LevelStageBase()
+{
+
+}
+
 bool LevelStageBase::onInit()
 {
 	mPause    = false;
-	mTexCursor = getGame()->getTextureMgr()->getTexture("cursor.tga");
+	mTexCursor = getRenderSystem()->getTextureMgr()->getTexture("cursor.tga");
 
-	mDevMsg = IText::create( getGame()->getFont( 0 ) , 18 , Color(50,255,50) );
-
+	mDevMsg.reset( IText::create( getGame()->getFont( 0 ) , 18 , Color(50,255,50) ) );
 	return true;
 }
 
 void LevelStageBase::onExit()
 {
-	mDevMsg->release();
+	mDevMsg.clear();
 }
 
 void LevelStageBase::onWidgetEvent( int event , int id , GWidget* sender )
@@ -137,7 +149,7 @@ bool LevelStage::onInit()
 	int screenWidth   = getGame()->getScreenSize().x;
 	int screenHeight  = getGame()->getScreenSize().y;
 
-	getGame()->getTextureMgr()->loadTexture("backgroundUniverse.tga");
+	getRenderSystem()->getTextureMgr()->loadTexture("backgroundUniverse.tga");
 
 	GUISystem::getInstance().cleanupWidget();
 
@@ -221,10 +233,6 @@ void LevelStage::onExit()
 	delete mLevel;
 	delete mCamera;
 
-	//FIXME
-	IRenderer::cleanup();
-	Block::cleanup();
-	
 }
 
 
@@ -734,7 +742,7 @@ void LevelStage::loadLevel()
 
 void LevelStage::renderLoading()
 {
-	Texture* texBG2 = getGame()->getTextureMgr()->getTexture("MenuLoading1.tga");		
+	Texture* texBG2 = getRenderSystem()->getTextureMgr()->getTexture("MenuLoading1.tga");		
 
 	getRenderSystem()->prevRender();
 

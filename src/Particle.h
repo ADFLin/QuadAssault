@@ -19,7 +19,7 @@ protected:
 	float maxZivot; //za rendering
 
 	friend class SmokeRenderer;
-	friend class MineParticleRenderer;
+	friend class DebrisParticleRenderer;
 };
 
 

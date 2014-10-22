@@ -18,6 +18,11 @@
 static Game* gGame = NULL;
 IGame* getGame(){ return gGame; }
 
+IGame::~IGame()
+{
+
+}
+
 Game::Game()
 {
 	assert( gGame == NULL );
@@ -59,7 +64,7 @@ bool Game::init( char const* pathConfig )
 	mWindow->showCursor( false );
 
 	cout << "Build Render System..." << endl;
-	mRenderSystem = new RenderSystem;
+	mRenderSystem.reset( new RenderSystem );
 	if ( !mRenderSystem->init( *mWindow ) )
 	{
 		return false;
@@ -69,9 +74,8 @@ bool Game::init( char const* pathConfig )
 	//IFont* font = NULL;
 	mFonts.push_back( font );
 
-	mSoundMgr     = new SoundManager;
-	mTextureMgr   = new TextureManager;
-	mRenderEngine = new RenderEngine;
+	mSoundMgr.reset( new SoundManager );
+	mRenderEngine.reset( new RenderEngine );
 
 	cout << "Initilize Render Engine..." << endl;
 	mRenderEngine->init( width , height );
@@ -114,17 +118,9 @@ void Game::exit()
 	}
 	mFonts.clear();	
 	
-	mTextureMgr->cleanup();	
-	delete mTextureMgr;
-
 	mSoundMgr->cleanup();
-	delete mSoundMgr;
-
 	mRenderEngine->cleanup();
-	delete mRenderEngine;
-
 	mRenderSystem->cleanup();
-	delete mRenderSystem;
 
 	mWindow->release();
 
@@ -170,7 +166,10 @@ void Game::run()
 			mStageAdd = NULL;
 			mStageStack.push_back( stage );
 			cout << "Setup new state..." << endl;
-			stage->onInit();
+			if ( !stage->onInit() )
+			{
+				cout << "Stage Can't Init !" << endl;
+			}
 			cout << "Stage Init !" << endl;
 		}
 

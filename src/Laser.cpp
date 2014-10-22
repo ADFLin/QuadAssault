@@ -1,19 +1,13 @@
 #include "Laser.h"
 
-#include "GameInterface.h"
 #include "Level.h"
 #include "Player.h"
-#include "TextureManager.h"
 #include "LaserBullet.h"
+
 
 void Laser::init( Player* player )
 {
 	BaseClass::init( player );
-
-	TextureManager* texMgr = getGame()->getTextureMgr();
-	mTextues[ RP_DIFFUSE ] = texMgr->getTexture("weapon1.tga");
-	mTextues[ RP_NORMAL ]  = texMgr->getTexture("weapon1Normal.tga");
-	mTextues[ RP_GLOW ]    = texMgr->getTexture("oruzje1Glow.tga");
 
 	mCDSpeed=600;
 	mEnergyCast=2;

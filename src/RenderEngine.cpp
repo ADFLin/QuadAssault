@@ -4,9 +4,11 @@
 #include "Shader.h"
 #include "Level.h"
 #include "Light.h"
+#include "ObjectRenderer.h"
 #include "Block.h"
 
 bool gUseGroupRender = true;
+bool gUseMRT = true;
 
 RenderEngine::RenderEngine()
 	:mAllocator( 512 )
@@ -18,13 +20,16 @@ RenderEngine::RenderEngine()
 
 bool RenderEngine::init( int width , int height )
 {
-	mAmbientLight=Vec3f(0.1f, 0.1f, 0.1f);
+	//mAmbientLight=Vec3f(0.1f, 0.1f, 0.1f);
+	mAmbientLight.setValue( 0 , 0 , 0 );
+	//mAmbientLight=Vec3f(0.3f, 0.3f, 0.3f);
 
 	mFrameWidth  = width;
 	mFrameHeight = height;
 
 	if ( !setupFBO( width , height ) )
 		return false;
+
 
 	RenderSystem* system = getRenderSystem();
 	mShaderLighting = system->createShader( "LightVS.glsl", "LightFS.glsl" );
@@ -37,18 +42,19 @@ bool RenderEngine::init( int width , int height )
 
 void RenderEngine::cleanup()
 {
-	delete mShaderLighting;
-	for( int i = 0 ; i < NumMode ; ++i )
-		delete mShaderScene[i];	
-
 	glDeleteFramebuffers(1,&mFBOColor);
 	glDeleteTextures(1,&mTexLightmap);
 	glDeleteTextures(1,&mTexNormalMap);
 	glDeleteTextures(1,&mTexGeometry);
 }
 
+#include <iostream>
 bool RenderEngine::setupFBO( int width , int height )
 {
+	if ( !mGBuffer.create( width , height ) )
+		return false;
+
+
 	glGenFramebuffers(1,&mFBOColor);
 
 	glGenTextures(1,&mTexLightmap);
@@ -57,8 +63,11 @@ bool RenderEngine::setupFBO( int width , int height )
 		0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);  
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenTextures(1,&mTexNormalMap);
@@ -67,8 +76,8 @@ bool RenderEngine::setupFBO( int width , int height )
 		0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);  
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenTextures(1,&mTexGeometry);
@@ -79,11 +88,13 @@ bool RenderEngine::setupFBO( int width , int height )
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);  
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 
-	glGenRenderbuffers(1, &mFBOStencil );  
-	glBindRenderbuffer(GL_RENDERBUFFER, mFBOStencil );  
+	glGenRenderbuffers(1, &mFBODepth );  
+	glBindRenderbuffer(GL_RENDERBUFFER, mFBODepth );  
 	//glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8 , width , height);  
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width , height );
 
@@ -127,13 +138,13 @@ void RenderEngine::renderScene( RenderParam& param )
 	{
 	case RM_ALL:
 		renderGeometryFBO( param );
-		renderLightFBO( param );	
+		renderLightingFBO( param );	
 		break;
 	case RM_GEOMETRY:
 		renderGeometryFBO( param );
 		break;
 	case RM_LINGHTING:
-		renderLightFBO( param );
+		renderLightingFBO( param );
 		break;
 	case RM_NORMAL_MAP:
 		renderNormalFBO( param );
@@ -224,7 +235,7 @@ void RenderEngine::renderTerrainGlow( Level* level , TileRange const& range )
 }
 
 
-void RenderEngine::renderLighting( RenderParam& param , Vec2f const& lightPos , Light* light )
+void RenderEngine::renderLight( RenderParam& param , Vec2f const& lightPos , Light* light )
 {
 	Vec2f posLight = lightPos - param.camera->getPos();
 
@@ -283,8 +294,7 @@ void RenderEngine::setupLightShaderParam( Shader* shader , Light* light )
 void RenderEngine::renderGeometryFBO( RenderParam& param )
 {
 	glBindFramebuffer(GL_FRAMEBUFFER ,mFBOColor);		
-	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , 
-		GL_TEXTURE_2D, mTexGeometry, 0); 	
+	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, mTexGeometry, 0); 	
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	glClearColor(0.0, 0.0, 0.0, 1.0f);
@@ -305,16 +315,15 @@ void RenderEngine::renderGeometryFBO( RenderParam& param )
 void RenderEngine::renderNormalFBO( RenderParam& param )
 {
 	glBindFramebuffer( GL_FRAMEBUFFER ,mFBOColor);		
-	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , 
-		GL_TEXTURE_2D, mTexNormalMap, 0); 	
+	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, mTexNormalMap, 0 ); 	
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	glClearColor(0.0, 0.0, 0.0, 1.0f);
-	glLoadIdentity();	
+	glLoadIdentity();
 
 	glPushMatrix();	
 
-	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);			
+	glTranslatef( - param.camera->getPos().x, - param.camera->getPos().y, 0);
 
 	//Sprite(Vec2(0,0),Vec2(igra->DajRW()->getSize().x, igra->DajRW()->getSize().y),mt->DajTexturu(1)->id);
 	renderTerrainNormal( param.level , param.terrainRange );
@@ -322,20 +331,18 @@ void RenderEngine::renderNormalFBO( RenderParam& param )
 	renderObjects( RP_NORMAL , param.level );
 
 	glPopMatrix();
-	glBindFramebufferEXT(GL_FRAMEBUFFER ,0);
+	glBindFramebuffer(GL_FRAMEBUFFER ,0);
 }
 
 
 
-void RenderEngine::renderLightFBO( RenderParam& param )
+void RenderEngine::renderLightingFBO( RenderParam& param )
 {
 	renderNormalFBO( param );
 
 	glBindFramebuffer(GL_FRAMEBUFFER ,mFBOColor);		
 	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, mTexLightmap, 0);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBOStencil ); 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mFBOStencil ); 
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mFBODepth ); 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -444,14 +451,13 @@ void RenderEngine::renderLightFBO( RenderParam& param )
 			glDisable( GL_STENCIL_TEST );
 		}
 
-		renderLighting( param , lightPos , light );
+		renderLight( param , lightPos , light );
 	}
 
 	glDisable( GL_STENCIL_TEST );
 	glDisable(GL_BLEND);
 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0 ); 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ); 
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0 ); 
 	glBindFramebuffer( GL_FRAMEBUFFER ,0);
 }
 
@@ -488,9 +494,13 @@ void RenderEngine::renderTerrainShadow( Level* level , Vec2f const& lightPos , L
 					int ny = j + offsetY[idxCur];
 
 #if 1
-					if ( terrain.checkRange( nx , ny ) && 
-						 Block::FromType( terrain.getData( nx , ny ).type )->checkFlag( BF_CAST_SHADOW )  )
-						continue;
+					if ( terrain.checkRange( nx , ny ) )
+					{
+						Block* block = Block::FromType( terrain.getData( nx , ny ).type );
+						if ( !block->checkFlag( BF_NONSIMPLE ) && 
+							  block->checkFlag( BF_CAST_SHADOW ) )
+							continue;
+					}
 #endif
 					Vec2f offsetCur  = tileVertex[ idxCur ]  + tileOffset;
 
@@ -550,13 +560,6 @@ void RenderEngine::updateRenderGroup( RenderParam& param )
 	
 	param.level->getColManager().findBody( bBox , COL_RENDER , mBodyList );
 
-	struct FindGrup
-	{
-		FindGrup(IRenderer* r):renderer( r ){}
-		bool operator()( RenderGroup* group ) const { return group->renderer == renderer; }
-		IRenderer* renderer;
-	};
-
 	struct GroupCompFun
 	{
 		bool operator()( RenderGroup* a , RenderGroup* b ) const 
@@ -574,7 +577,7 @@ void RenderEngine::updateRenderGroup( RenderParam& param )
 		 iter != itEnd ; ++iter )
 	{
 		LevelObject* obj = (*iter)->getClient();
-		IRenderer* renderer = obj->getRenderer();
+		IObjectRenderer* renderer = obj->getRenderer();
 
 		RenderGroup testGroup;
 		testGroup.renderer = renderer;
