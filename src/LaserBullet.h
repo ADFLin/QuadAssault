@@ -6,7 +6,7 @@
 
 class LaserBullet : public Bullet
 {
-	typedef Bullet BaseClass;
+	DECLARE_OBJECT_CLASS( LaserBullet , Bullet )
 public:	
 	virtual void init();
 	virtual void onSpawn( unsigned flag );
@@ -17,6 +17,9 @@ public:
 
 private:
 	Light mLight;
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 

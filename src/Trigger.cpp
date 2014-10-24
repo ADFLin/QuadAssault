@@ -167,15 +167,6 @@ void AreaTrigger::renderDev( DevDrawMode mode )
 	}
 }
 
-void AreaTrigger::enumProp( IPropEditor& editor )
-{
-	BaseClass::enumProp( editor );
-	int fireModeValue[] = { FM_ONCE , FM_ON_TOUCH , FM_ALWAYS , FM_DESTROY };
-	char const* fireModeStr[] = { "Once" , "On Touch" , "Always" , "Destroy" };
-
-	editor.addProp( "AreaSize" , mSize );
-	editor.addEnumProp( "FireMode" , mMode , ARRAY_SIZE( fireModeValue ) , fireModeValue , fireModeStr );
-}
 
 void AreaTrigger::setupDefault()
 {

@@ -6,8 +6,7 @@
 
 class DebrisPickup : public ItemPickup
 {
-	typedef ItemPickup BaseClass;
-
+	DECLARE_OBJECT_CLASS( DebrisPickup , ItemPickup )
 public:
 	DebrisPickup( Vec2f const& pos );
 
@@ -26,6 +25,8 @@ protected:
 	float cesticaTimer; //dok dosegne 0, spawna cesticu
 	Light mLight;
 
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 

@@ -15,8 +15,7 @@ typedef IFactoryT< Bullet > IBulletFactory;
 
 class Mob : public Actor
 {
-	typedef Actor BaseClass;
-
+	DECLARE_OBJECT_CLASS( Mob , Actor )
 public:
 	virtual void init();
 

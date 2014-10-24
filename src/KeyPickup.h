@@ -8,7 +8,7 @@
 
 class KeyPickup : public ItemPickup
 {
-	typedef ItemPickup BaseClass;
+	DECLARE_OBJECT_CLASS( KeyPickup , ItemPickup )
 
 public:
 	KeyPickup();
@@ -21,7 +21,6 @@ public:
 	virtual void onSpawn( unsigned flag );
 	virtual IObjectRenderer* getRenderer();
 
-	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
 
 	virtual void updateEdit();
@@ -34,6 +33,9 @@ protected:
 	
 	friend class KeyPickupRenderer;
 
+	BEGIN_CLASS_PROP()
+	MEMBER_PROP( "DoorId" , mId )
+	END_CLASS_PROP()
 };
 
 #endif // KeyPickup_h__

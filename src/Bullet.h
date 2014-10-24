@@ -14,9 +14,7 @@ enum Team
 
 class Bullet : public LevelObject
 {
-	typedef LevelObject BaseClass;
-
-
+	DECLARE_OBJECT_CLASS( Bullet , LevelObject )
 public:
 	Bullet();
 	~Bullet();
@@ -45,6 +43,9 @@ protected:
 	float   mDamage;
 	float   mSpeed;
 	ColBody mBody;
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 

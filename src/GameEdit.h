@@ -87,7 +87,7 @@ class IPropEditor
 {
 public:
 	virtual void addPropData( char const* name , PropData const& data , unsigned flag ) = 0;
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag ) = 0;
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag ) = 0;
 
 	template< class T >
 	void addProp( char const* name , T& value , unsigned flag = 0 )
@@ -95,7 +95,7 @@ public:
 		addPropData( name , PropData( value ) , flag );
 	}
 	template< class T >
-	void addEnumProp( char const* name , T& value , int numSet , int valueSet[] , char const* strSet[], unsigned flag = 0  )
+	void addEnumProp( char const* name , T& value , int numSet , int const valueSet[] , char const* strSet[], unsigned flag = 0  )
 	{
 		addProp( name , &value , sizeof( T ) , numSet , valueSet , strSet , flag );
 	}
@@ -122,9 +122,9 @@ public:
 	Prop* findProp( char const* name );
 	void  setupPorp( IEditable& editable );
 	virtual void addPropData(char const* name , PropData const& data , unsigned flag );
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag );
-	void  exportString( String& str );
-	void  importString( String const& str );
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag );
+	void  exportString( String& out );
+	void  importString( char const* str );
 
 	typedef std::vector< Prop > PropVec;
 	PropVec mProps;

@@ -82,12 +82,6 @@ void WeaponPickup::onPick(Player* player)
 	destroy();
 }
 
-void WeaponPickup::enumProp( IPropEditor& editor )
-{
-	BaseClass::enumProp( editor );
-	editor.addProp( "WeaponId" , mId );
-}
-
 void WeaponPickup::setupDefault()
 {
 	BaseClass::setupDefault();

@@ -5,7 +5,7 @@
 
 class Particle : public LevelObject
 {
-	typedef LevelObject BaseClass;
+	DECLARE_OBJECT_CLASS( Particle , LevelObject )
 public:
 	Particle( Vec2f const& pos );
 
@@ -20,6 +20,9 @@ protected:
 
 	friend class SmokeRenderer;
 	friend class DebrisParticleRenderer;
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 

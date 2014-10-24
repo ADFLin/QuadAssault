@@ -2,10 +2,12 @@
 
 #include "Level.h"
 
+
 LightObject::LightObject()
 {
 
 }
+
 LightObject::~LightObject()
 {	
 	
@@ -20,15 +22,6 @@ void LightObject::init()
 void LightObject::tick()
 {
 
-}
-
-void LightObject::enumProp( IPropEditor& editor )
-{
-	BaseClass::enumProp( editor );
-	editor.addProp( "Radius" , radius );
-	editor.addProp( "Color" , color );
-	editor.addProp( "Intensity" , intensity );
-	editor.addProp( "DrawShadow" , drawShadow );
 }
 
 void LightObject::onSpawn( unsigned flag )

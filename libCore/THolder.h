@@ -107,13 +107,6 @@ class TPtrFunFreeHolder : public TPtrHolderBase< T , Detail::PtrFunFreePolicy< T
 public:
 	TPtrFunFreeHolder(){}
 	explicit TPtrFunFreeHolder(T* ptr):TPtrHolderBase< T , Detail::PtrFunFreePolicy< T , FreeFun >  >(ptr){}
-
-	T&       operator*()        { return *m_ptr; }
-	T const& operator*()  const { return *m_ptr; }
-	T*       operator->()       { return m_ptr; }
-	T const* operator->() const { return m_ptr; }
-	operator T*()               { return m_ptr; }
-	operator T const*() const   { return m_ptr; }
 };
 
 

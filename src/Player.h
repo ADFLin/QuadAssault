@@ -12,7 +12,7 @@ class LightObject;
 
 class Player : public Actor
 {
-	typedef Actor BaseClass;
+	DECLARE_OBJECT_CLASS( Player , Actor )
 public:
 
 	Player();
@@ -23,9 +23,8 @@ public:
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
-	virtual IObjectRenderer* getRenderer();
-
 	virtual void updateEdit();
+	virtual IObjectRenderer* getRenderer();
 
 	void  init();
 	void  update( Vec2f const& aimPos );
@@ -78,6 +77,9 @@ private:
 
 	friend class PlayerRenderer;
 
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 

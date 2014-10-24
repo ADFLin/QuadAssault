@@ -5,7 +5,7 @@
 
 class LaserMob : public Mob
 {
-	typedef Mob BaseClass;
+	DECLARE_OBJECT_CLASS( LaserMob , Mob )
 public:
 	virtual void init();
 	virtual void onSpawn( unsigned flag );
@@ -17,6 +17,8 @@ public:
 
 	virtual IObjectRenderer* getRenderer();
 
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 #endif // LaserMob_h__

@@ -6,8 +6,7 @@
 
 class MinigunBullet : public Bullet
 {
-	typedef Bullet BaseClass;
-
+	DECLARE_OBJECT_CLASS( MinigunBullet , Bullet )
 public:	
 	virtual void init();
 	virtual void tick();
@@ -18,6 +17,8 @@ public:
 private:
 	Light light;
 
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 #endif // MinigunBullet_h__

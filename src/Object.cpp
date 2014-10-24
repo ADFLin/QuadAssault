@@ -35,7 +35,3 @@ void LevelObject::calcBoundBox( Rect& bBox )
 	bBox.max = mPos + half;
 }
 
-void LevelObject::enumProp( IPropEditor& editor )
-{
-	editor.addProp( "Pos" , mPos );
-}

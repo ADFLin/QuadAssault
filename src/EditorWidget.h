@@ -50,7 +50,7 @@ class IntPropChioce : public GChoice
 public:
 	IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GWidget* parent );
 
-	void     init( int numSet , int valueSet[] , char const* strSet[] );
+	void     init( int numSet , int const valueSet[] , char const* strSet[] );
 	void     inputData();
 	void     outputData();
 	void     setData( void* data , int dataSize ){ mData = data; mDataSize = dataSize; }
@@ -81,7 +81,7 @@ public:
 
 	using IPropEditor::addProp;
 	virtual void addPropData( char const* name , PropData const& data , unsigned flag );
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag );
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag );
 
 	void addPorpWidget( char const* name , GWidget* widget );
 

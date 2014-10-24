@@ -5,7 +5,7 @@
 
 class Actor : public LevelObject
 {
-	typedef LevelObject BaseClass;
+	DECLARE_OBJECT_CLASS( Actor , LevelObject )
 public:
 
 	Actor()
@@ -24,15 +24,13 @@ public:
 	}
 	void  rotate(float theta){ setRotation( rotation + theta ); }
 
-	virtual void enumProp( IPropEditor& editor )
-	{
-		BaseClass::enumProp( editor );
-		editor.addProp( "Rotation" , rotation );
-	}
-
 protected:
 
-	float rotation;	
+	float rotation;
+
+	BEGIN_CLASS_PROP()
+	MEMBER_PROP( "Rotation" , rotation  )
+	END_CLASS_PROP()
 
 };
 

@@ -170,7 +170,7 @@ void TextPropEditor::addPropData(char const* name , PropData const& data , unsig
 }
 
 
-void TextPropEditor::addProp(char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag)
+void TextPropEditor::addProp(char const* name , void* value , int sizeValue , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag)
 {
 	Prop prop;
 	prop.name = name;
@@ -194,7 +194,7 @@ void TextPropEditor::exportString( String& out )
 	}
 }
 
-void TextPropEditor::importString(String const& str)
+void TextPropEditor::importString( char const* str )
 {
 	char buf[ 512 ];
 	std::stringstream ss( str );

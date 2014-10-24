@@ -40,7 +40,7 @@ IntPropChioce::IntPropChioce( int id , Vec2i const& pos , Vec2i const& size , GW
 
 }
 
-void IntPropChioce::init( int numSet , int valueSet[] , char const* strSet[] )
+void IntPropChioce::init( int numSet , int const valueSet[] , char const* strSet[] )
 {
 	for( int i = 0 ; i < numSet ; ++i )
 	{
@@ -57,9 +57,9 @@ void IntPropChioce::inputData()
 	int value;
 	switch( mDataSize )
 	{
-	case 1: value = *((char*)mData);  break;
-	case 2: value = *((short*)mData); break;
-	case 4: value = *((int*)mData);   break;
+	case 1: value = *((int8*)mData);  break;
+	case 2: value = *((int16*)mData); break;
+	case 4: value = *((int32*)mData);   break;
 	}
 	for( int i = 0 ; i < getItemNum() ; ++i )
 	{
@@ -83,9 +83,9 @@ void IntPropChioce::outputData()
 	int  value = (int)getItemData( pos );
 	switch( mDataSize )
 	{
-	case 1: *((char*)mData)  = value; break;
-	case 2: *((short*)mData) = value; break;
-	case 4: *((int*)mData)   = value; break;
+	case 1: *((int8*)mData)  = value; break;
+	case 2: *((int16*)mData) = value; break;
+	case 4: *((int32*)mData)   = value; break;
 	}
 }
 
@@ -244,7 +244,7 @@ void PropFrame::addPropData(char const* name , PropData const& data , unsigned f
 	}
 }
 
-void PropFrame::addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag )
+void PropFrame::addProp( char const* name , void* value , int sizeValue , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag )
 {
 	IntPropChioce* chioce = new IntPropChioce( UI_INT_PROP_CHIOCE , calcWidgetPos() , getWidgetSize() , this );
 	chioce->init( numSet , valueSet , strSet );

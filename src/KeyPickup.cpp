@@ -74,12 +74,6 @@ void KeyPickup::onPick( Player* player )
 	destroy();
 }
 
-void KeyPickup::enumProp( IPropEditor& editor )
-{
-	BaseClass::enumProp( editor );
-	editor.addProp( "DoorId" , mId );
-}
-
 void KeyPickup::setupDefault()
 {
 	BaseClass::setupDefault();

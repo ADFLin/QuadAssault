@@ -16,7 +16,7 @@ enum WeaponId
 
 class WeaponPickup : public ItemPickup
 {
-	typedef ItemPickup BaseClass;
+	DECLARE_OBJECT_CLASS( WeaponPickup , ItemPickup )
 
 public:
 	WeaponPickup();
@@ -31,7 +31,6 @@ public:
 
 	virtual IObjectRenderer* getRenderer();
 
-	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
 	virtual void updateEdit();
 
@@ -43,6 +42,9 @@ protected:
 
 	friend class WeaponPickupRenderer;
 
+	BEGIN_CLASS_PROP()
+	MEMBER_PROP( "WeaponId" , mId )
+	END_CLASS_PROP()
 };
 
 #endif // WeaponPickup_h__

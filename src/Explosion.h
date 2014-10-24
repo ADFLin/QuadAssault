@@ -7,8 +7,8 @@
 
 class Explosion : public LevelObject
 {
-	typedef LevelObject BaseClass;
-
+	DECLARE_OBJECT_CLASS( Explosion , LevelObject )
+	
 public:
 	Explosion();
 	Explosion( Vec2f const& pos , float radius );
@@ -38,7 +38,12 @@ protected:
 	float intensity, maxIntensity;
 	// light color
 	Vec3f  color;
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
+
+
 
 
 #endif // Explosion_h__

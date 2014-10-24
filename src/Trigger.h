@@ -54,7 +54,7 @@ protected:
 class AreaTrigger : public LevelObject
 	              , public TriggerBase
 {
-	typedef LevelObject BaseClass;
+	DECLARE_OBJECT_CLASS( AreaTrigger , LevelObject )
 public:
 	AreaTrigger();
 	AreaTrigger( Vec2f const& min , Vec2f const& max );
@@ -65,7 +65,6 @@ public:
 	virtual void onDestroy( unsigned flag );
 	virtual ObjectType getType(){ return OT_TRIGGER; }
 	virtual void tick();
-	virtual void enumProp( IPropEditor& editor );
 	virtual void setupDefault();
 	virtual void renderDev( DevDrawMode mode );
 
@@ -73,6 +72,13 @@ private:
 	ColBody mBody;
 	typedef std::vector< LevelObject* >  ObjectList;
 	std::vector< LevelObject* > mTouchObjects;
+
+	BEGIN_CLASS_PROP()
+	MEMBER_PROP( "AreaSize" , mSize )
+	int const fireModeValue[] = { FM_ONCE , FM_ON_TOUCH , FM_ALWAYS , FM_DESTROY };
+	char const* fireModeStr[] = { "Once" , "On Touch" , "Always" , "Destroy" };
+	MENBER_ENUM_PROP( "FireMode" , mMode , ARRAY_SIZE( fireModeValue ) , fireModeValue , fireModeStr )
+	END_CLASS_PROP()
 };
 
 class SpawnAct : public Action

@@ -5,7 +5,7 @@
 
 class DebrisParticle : public Particle
 {
-	typedef Particle BaseClass;
+	DECLARE_OBJECT_CLASS( DebrisParticle , Particle )
 public:
 	DebrisParticle( Vec2f const& pos );
 	virtual void init();
@@ -14,6 +14,8 @@ public:
 
 	virtual IObjectRenderer* getRenderer();
 
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 #endif // DebrisParticle_h__

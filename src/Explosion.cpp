@@ -1,6 +1,8 @@
 #include "Explosion.h"
 #include "Level.h"
 
+DEFINE_OBJECT_TYPE( Explosion , OT_EXPLOSION , "Explsion" )
+
 Explosion::Explosion()
 {
 

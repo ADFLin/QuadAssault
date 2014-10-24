@@ -5,13 +5,16 @@
 
 class SmokeParticle : public Particle
 {
-	typedef Particle BaseClass;
+	DECLARE_OBJECT_CLASS( SmokeParticle , Particle )
 public:
 	SmokeParticle( Vec2f const& pos );
 	virtual void init();
 	virtual void tick();
 	virtual void onSpawn( unsigned flag );
 	virtual IObjectRenderer* getRenderer();
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 
 };
 

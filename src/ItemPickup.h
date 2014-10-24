@@ -9,7 +9,7 @@ class Player;
 
 class ItemPickup : public LevelObject
 {
-	typedef LevelObject BaseClass;
+	DECLARE_OBJECT_CLASS( ItemPickup , LevelObject )
 public:
 	ItemPickup();
 	ItemPickup( Vec2f const& pos );
@@ -23,6 +23,9 @@ public:
 
 protected:
 	ColBody mBody;
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 

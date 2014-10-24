@@ -5,8 +5,7 @@
 
 class PlasmaMob : public Mob
 {
-	typedef Mob BaseClass;
-private:
+	DECLARE_OBJECT_CLASS( PlasmaMob , Mob )
 public:
 	virtual void init();
 	virtual void onDestroy( unsigned flag );

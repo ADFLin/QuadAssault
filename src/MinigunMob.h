@@ -5,15 +5,19 @@
 
 class MinigunMob : public Mob
 {
-	typedef Mob BaseClass;
+	DECLARE_OBJECT_CLASS( MinigunMob , Mob )
 public:
 	virtual void init();
+	virtual void onSpawn( unsigned flag );
+	virtual void onDestroy( unsigned flag );
 	virtual void tick();
-	virtual void takeDamage(Bullet* p);
 	virtual IObjectRenderer* getRenderer();
-	void onSpawn( unsigned flag );
-	void onDestroy( unsigned flag );
+
+	virtual void takeDamage(Bullet* p);
 	void shoot( IBulletFactory const& creator );
+
+	BEGIN_CLASS_PROP()
+	END_CLASS_PROP()
 };
 
 #endif // MinigunMob_h__
