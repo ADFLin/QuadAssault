@@ -39,7 +39,6 @@ void main()
 {
 	vec3 normal = texture2D( texNormal , gl_TexCoord[0].st ).rgb;
 	float matId = texture2D( texNormal , gl_TexCoord[0].st ).a;
-
 	vec3 baseColor = texture2D( texBaseColor , gl_TexCoord[0].st ).rgb;
 
 	if ( normal == vec3(0,0,0) )
@@ -58,6 +57,11 @@ void main()
 	vec3 hDir = reflect( lightDir , normal );
 
 	float difFactor = clamp( dot( lightDir , normal ) , 0.0 , 1.0 );
+
+	if ( texture2D( texNormal , gl_TexCoord[0].st ).rgb == vec3(1,1,1) )
+		difFactor = 1.0;
+
+
 	float speFactor = clamp( dot( hDir , vec3(0,0,-1) ) , 0.0 , 1.0 );
 	float decay = clamp(( 1.0 - d / gLight.radius ), 0.0, 1.0 ) / ( d + 1 );
 	//float decay = clamp(( 1.0 - d / gLight.radius ), 0.0, 1.0 ) / 100;
@@ -68,4 +72,5 @@ void main()
 	gl_FragColor = vec4( color , 1.0 ) ;
 	//gl_FragColor = vec4( texture1D( texMaterial , matId ).rgb , 1.0 ) ;
 	//gl_FragColor = vec4( texture2D( texNormal , gl_TexCoord[0].st ).rgb , 1.0 );
+	//gl_FragColor = vec4( baseColor , 1.0 );
 }

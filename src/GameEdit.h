@@ -3,36 +3,7 @@
 
 #include "Base.h"
 
-class IPropEditor
-{
-public:
-	virtual void addProp( char const* name , Vec2f& value ) = 0;
-	virtual void addProp( char const* name , Vec3f& value ) = 0;
-	virtual void addProp( char const* name , int& value ) = 0;
-	virtual void addProp( char const* name , unsigned char& value ) = 0;
-	virtual void addProp( char const* name , float& value ) = 0;
-	virtual void addProp( char const* name , String& value ) = 0;
-	virtual void addProp( char const* name , bool& value ) = 0;
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] ) = 0;
-
-	template< class T >
-	void addEnumProp( char const* name , T& value , int numSet , int valueSet[] , char const* strSet[] )
-	{
-		addProp( name , &value , sizeof( T ) , numSet , valueSet , strSet );
-	}
-};
-
-
-
-class IEditable
-{
-public:
-	virtual ~IEditable(){}
-	virtual void enumProp( IPropEditor& editor ){}
-	virtual void updateEdit(){}
-	virtual void setupDefault(){}
-};
-
+#include <vector>
 
 enum PropType
 {
@@ -66,6 +37,10 @@ public:
 		mDataSize = 0;
 		mType     = PROP_NONE;
 	}
+	template< class T >
+	PropData( T& data ){ setData( data ); }
+
+	PropType getType() const {  return mType;  }
 
 	void     setData( char&   data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_INT; }
 	void     setData( short&  data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_INT; }
@@ -92,7 +67,7 @@ public:
 	void     setControl( IPropCtrl* propCtrl ){ mData = propCtrl; mType = PROP_CTRL; }
 
 	template< class T >
-	T&       castValueT(){ return *static_cast< T* >( mData ); }
+	T&       cast() const { return *static_cast< T* >( mData ); }
 	bool     getString( FString& str );
 	bool     setValue( char const* str );
 
@@ -102,7 +77,41 @@ private:
 	PropType mType;
 };
 
-class TextPropBase : public IPropEditor
+enum PropFlag
+{
+	PF_COLOR   = BIT(0) ,
+	PF_NETWORK = BIT(1) ,
+};
+
+class IPropEditor
+{
+public:
+	virtual void addPropData( char const* name , PropData const& data , unsigned flag ) = 0;
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag ) = 0;
+
+	template< class T >
+	void addProp( char const* name , T& value , unsigned flag = 0 )
+	{
+		addPropData( name , PropData( value ) , flag );
+	}
+	template< class T >
+	void addEnumProp( char const* name , T& value , int numSet , int valueSet[] , char const* strSet[], unsigned flag = 0  )
+	{
+		addProp( name , &value , sizeof( T ) , numSet , valueSet , strSet , flag );
+	}
+};
+
+class IEditable
+{
+public:
+	virtual ~IEditable(){}
+	virtual void enumProp( IPropEditor& editor ){}
+	virtual void updateEdit(){}
+	virtual void setupDefault(){}
+};
+
+
+class TextPropEditor : public IPropEditor
 {
 public:
 	struct Prop
@@ -111,51 +120,15 @@ public:
 		PropData    data;
 	};
 	Prop* findProp( char const* name );
-
-#define ADD_PROP( TYPE )\
-	virtual void addProp( char const* name , TYPE& value )\
-	{\
-		Prop prop;\
-		prop.name = name;\
-		prop.data.setData( value );\
-		mProps.push_back( prop );\
-	}
-
-	ADD_PROP( Vec2f )
-	ADD_PROP( Vec3f )
-	ADD_PROP( int )
-	ADD_PROP( unsigned char )
-	ADD_PROP( float )
-	ADD_PROP( String )
-	ADD_PROP( bool )
-
-#undef  ADD_PROP
-
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] )
-	{
-		Prop prop;
-		prop.name = name;
-		prop.data.setEnumData( value , sizeValue );
-		mProps.push_back( prop );
-	}
-
-
+	void  setupPorp( IEditable& editable );
+	virtual void addPropData(char const* name , PropData const& data , unsigned flag );
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag );
+	void  exportString( String& str );
+	void  importString( String const& str );
 
 	typedef std::vector< Prop > PropVec;
 	PropVec mProps;
 };
 
-//TODO
-class TextPropImport : public TextPropBase
-{
-public:
-};
-
-class TextPropExport : public TextPropBase
-{
-public:
-
-
-};
 
 #endif // GameEdit_h__

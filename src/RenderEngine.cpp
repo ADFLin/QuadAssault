@@ -248,33 +248,33 @@ void RenderEngine::renderLight( RenderParam& param , Vec2f const& lightPos , Lig
 	setupLightShaderParam( mShaderLighting , light );
 
 #if 1
-		Vec2f halfRange = param.scaleFactor * Vec2f( light->radius , light->radius ); 
+	Vec2f halfRange = param.scaleFactor * Vec2f( light->radius , light->radius ); 
 
-		Vec2f minRender = posLight - halfRange;
-		Vec2f maxRender = posLight + halfRange;
+	Vec2f minRender = posLight - halfRange;
+	Vec2f maxRender = posLight + halfRange;
 
-		Vec2f minTex , maxTex;
-		minTex.x = minRender.x / param.renderWidth;
-		maxTex.x = maxRender.x / param.renderWidth;
-		minTex.y = 1 - minRender.y / param.renderHeight;
-		maxTex.y = 1 - maxRender.y / param.renderHeight;
+	Vec2f minTex , maxTex;
+	minTex.x = minRender.x / param.renderWidth;
+	maxTex.x = maxRender.x / param.renderWidth;
+	minTex.y = 1 - minRender.y / param.renderHeight;
+	maxTex.y = 1 - maxRender.y / param.renderHeight;
 
-		glColor3f(1,1,1);
+	glColor3f(1,1,1);
 
-		glBegin(GL_QUADS);
-		glTexCoord2f(minTex.x,minTex.y); glVertex2f( minRender.x , minRender.y );
-		glTexCoord2f(maxTex.x,minTex.y); glVertex2f( maxRender.x , minRender.y );
-		glTexCoord2f(maxTex.x,maxTex.y); glVertex2f( maxRender.x , maxRender.y );
-		glTexCoord2f(minTex.x,maxTex.y); glVertex2f( minRender.x , maxRender.y );
-		glEnd();	
+	glBegin(GL_QUADS);
+	glTexCoord2f(minTex.x,minTex.y); glVertex2f( minRender.x , minRender.y );
+	glTexCoord2f(maxTex.x,minTex.y); glVertex2f( maxRender.x , minRender.y );
+	glTexCoord2f(maxTex.x,maxTex.y); glVertex2f( maxRender.x , maxRender.y );
+	glTexCoord2f(minTex.x,maxTex.y); glVertex2f( minRender.x , maxRender.y );
+	glEnd();	
 #else
-		glColor3f(1,1,1);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0, 1.0); glVertex2f( 0.0, 0.0);
-		glTexCoord2f(1.0, 1.0); glVertex2f( param.renderWidth , 0.0);
-		glTexCoord2f(1.0, 0.0); glVertex2f( param.renderWidth , param.renderHeight );
-		glTexCoord2f(0.0, 0.0); glVertex2f( 0.0 , param.renderHeight );
-		glEnd();	
+	glColor3f(1,1,1);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0, 1.0); glVertex2f( 0.0, 0.0);
+	glTexCoord2f(1.0, 1.0); glVertex2f( param.renderWidth , 0.0);
+	glTexCoord2f(1.0, 0.0); glVertex2f( param.renderWidth , param.renderHeight );
+	glTexCoord2f(0.0, 0.0); glVertex2f( 0.0 , param.renderHeight );
+	glEnd();	
 #endif
 
 	mShaderLighting->unbind();	

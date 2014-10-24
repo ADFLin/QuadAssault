@@ -97,11 +97,10 @@ PropFrame::PropFrame( int id , Vec2i const& pos , GWidget* parent )
 
 void PropFrame::addPorpWidget( char const* name , GWidget* widget )
 {
-	PropData data;
+	PropInfo data;
 	data.widget = widget;
 	data.name   = IText::create( getGame()->getFont(0) , 20 , Color( 0 , 0 , 255 ) );
 	data.name->setString( name );
-
 	mPorps.push_back( data );
 }
 
@@ -139,10 +138,10 @@ void PropFrame::changeEdit( IEditable& obj )
 
 void PropFrame::cleanupAllPorp()
 {
-	for( PropDataVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
+	for( PropInfoVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
 		iter != itEnd ; ++iter )
 	{
-		PropData& data = *iter;
+		PropInfo& data = *iter;
 		data.widget->destroy();
 		data.name->release();
 	}
@@ -155,10 +154,10 @@ void PropFrame::onRender()
 
 	Vec2i pos = getWorldPos();
 	int i = 0;
-	for( PropDataVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
+	for( PropInfoVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
 		iter != itEnd ; ++iter )
 	{
-		PropData& data = *iter;
+		PropInfo& data = *iter;
 
 		getRenderSystem()->drawText( data.name , 
 			pos + Vec2i( 5 , TopSideHeight + 5 + i * ( getWidgetSize().y + 5 ) + getWidgetSize().y / 2 ) , 
@@ -170,20 +169,20 @@ void PropFrame::onRender()
 
 void PropFrame::inputData()
 {
-	for( PropDataVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
+	for( PropInfoVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
 		iter != itEnd ; ++iter )
 	{
-		PropData& data = *iter;
+		PropInfo& data = *iter;
 		data.widget->inputData();
 	}
 }
 
 void PropFrame::outputData()
 {
-	for( PropDataVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
+	for( PropInfoVec::iterator iter= mPorps.begin() , itEnd = mPorps.end();
 		iter != itEnd ; ++iter )
 	{
-		PropData& data = *iter;
+		PropInfo& data = *iter;
 		data.widget->outputData();
 	}
 }
@@ -195,44 +194,62 @@ Vec2i PropFrame::calcWidgetPos()
 	return Vec2i( x , y );
 }
 
-void PropFrame::addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] )
+void PropFrame::addPropData(char const* name , PropData const& data , unsigned flag)
+{
+	switch ( data.getType() )
+	{
+	case PROP_VEC3F:
+		if ( flag & PF_COLOR )
+		{
+
+		}
+		else
+		{
+			FixString< 128 > fullName;
+			fullName = name;
+			fullName += ".X";
+			addProp( fullName , data.cast< Vec3f >().x , flag );
+			fullName = name;
+			fullName += ".Y";
+			addProp( fullName , data.cast< Vec3f >().y , flag );
+			fullName = name;
+			fullName += ".Y";
+			addProp( fullName , data.cast< Vec3f >().z , flag );
+		}
+		break;
+	case PROP_VEC2F:
+		{
+			FixString< 128 > fullName;
+			fullName = name;
+			fullName += ".X";
+			addProp( fullName , data.cast< Vec2f >().x , flag );
+			fullName = name;
+			fullName += ".Y";
+			addProp( fullName , data.cast< Vec2f >().y , flag );
+		}
+		break;
+	case PROP_BOOL:
+		{
+			int valueSet[] = { 1 , 0 };
+			char const* strSet[] = { "True" , "False" };
+			addEnumProp( name , data.cast< bool >() , 2 , valueSet , strSet );
+		}
+		break;
+	default:
+		{
+			PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );
+			textCtrl->setData( data );
+			addPorpWidget( name , textCtrl );
+		}
+	}
+}
+
+void PropFrame::addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag )
 {
 	IntPropChioce* chioce = new IntPropChioce( UI_INT_PROP_CHIOCE , calcWidgetPos() , getWidgetSize() , this );
 	chioce->init( numSet , valueSet , strSet );
 	chioce->setData( value , sizeValue );
 	addPorpWidget( name , chioce );
-}
-
-void PropFrame::addProp( char const* name , Vec2f& value )
-{
-	FixString< 128 > fullName;
-	fullName = name;
-	fullName += ".X";
-	addProp( fullName , value.x );
-	fullName = name;
-	fullName += ".Y";
-	addProp( fullName , value.y );
-}
-
-void PropFrame::addProp( char const* name , Vec3f& value )
-{
-	FixString< 128 > fullName;
-	fullName = name;
-	fullName += ".X";
-	addProp( fullName , value.x );
-	fullName = name;
-	fullName += ".Y";
-	addProp( fullName , value.y );
-	fullName = name;
-	fullName += ".Z";
-	addProp( fullName , value.z );
-}
-
-void PropFrame::addProp( char const* name , bool& value )
-{
-	int valueSet[] = { 1 , 0 };
-	char const* strSet[] = { "True" , "False" };
-	addEnumProp( name , value , 2 , valueSet , strSet );
 }
 
 void PropFrame::removeEdit()

@@ -65,9 +65,9 @@ public:
 
 	struct Material
 	{
-		float ka; // 0 - 1
-		float kd; // 0 - 1
-		float ks; // 0 - 1
+		float ka;
+		float kd;
+		float ks;
 		float power;
 
 		Material(){}
@@ -137,11 +137,11 @@ public:
 
 	void registeDefaultMaterial()
 	{
-		float c = 0.5;
-		registerMaterial( Material( c / 3, c / 3 , c / 3 , 10 ) );
+		float c = 1.0;
+		registerMaterial( Material( c / 2 , c / 2 , c , 5 ) );
 		registerMaterial( Material( c , 0 , 0 , 0 ) );
 		registerMaterial( Material( 0 , c , 0 , 0 ) );
-		registerMaterial( Material( 0 , 0 , c , 10 ) );
+		registerMaterial( Material( 0 , 0 , c , 5 ) );
 	}
 	int registerMaterial( Material const& mat )
 	{
@@ -203,8 +203,8 @@ public:
 		mTexBlock[0] = texMgr->getTexture( "Block.tga" );
 		mTexBlock[1] = texMgr->getTexture( "CircleN.tga" );
 
-		mTexBlock[0] = texMgr->getTexture( "Tile.tga" );
-		mTexBlock[1] = texMgr->getTexture( "TileN.tga" );
+		mTexBlock[0] = texMgr->getTexture( "Block.tga" );
+		mTexBlock[1] = texMgr->getTexture( "SqureN.tga" );
 
 		mTexObject[ RP_DIFFUSE ] = texMgr->getTexture("mob1Diffuse.tga");
 		mTexObject[ RP_NORMAL  ] = texMgr->getTexture("mob1Normal.tga");
@@ -218,7 +218,7 @@ public:
 
 		mLights[0].pos = Vec2f( 30 , 30 );
 		mLights[0].color = Vec3f( 1 , 1 , 1 );
-		mLights[0].ambIntensity = 25;
+		mLights[0].ambIntensity = 100;
 		mLights[0].difIntensity = 25;
 		mLights[0].speIntensity = 50;
 		mLights[0].radius = 512;
@@ -285,7 +285,7 @@ public:
 		for( int j = 0 ; j < 10 ; ++j )
 		for( int i = 0 ; i < 20 ; ++i )
 		{
-			mGeomShader->setParam( "matId" , MatId2TexCoord(( i + j ) % 4 ) );
+			mGeomShader->setParam( "matId" , MatId2TexCoord(( i ) % 4 ) );
 			Vec2f pos( 10 + BLOCK_SIZE * i , 10 + BLOCK_SIZE * j );
 			Vec2f size( BLOCK_SIZE , BLOCK_SIZE );
 			glBegin(GL_QUADS);
@@ -301,6 +301,7 @@ public:
 		mGeomShader->setTexture2D( "texGlow" , mTexObject[2]->id , 2 );
 
 
+		mGeomShader->setParam( "matId" , MatId2TexCoord(( 0 ) % 4 ) );
 		drawSprite( Vec2f( 200 + 64 * 1 , 100 ) , Vec2f( 64 , 64 ) , 0.0f );	
 		drawSprite( Vec2f( 300 + 64 * 2 , 210 ) , Vec2f( 64 , 64 ) , 0.0f );	
 
@@ -314,25 +315,21 @@ public:
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_ONE , GL_ONE );
 
+		Vec2i size = getGame()->getScreenSize();
+
 		mLightingGlowShader->bind();
 		mLightingGlowShader->setTexture2D( "texBaseColor" , mGBuffer->getTexture( GBuffer::eBASE_COLOR ) , 0 );
 		mLightingGlowShader->setTexture2D( "texGlow" , mGBuffer->getTexture( GBuffer::eLIGHTING ) , 1 );
 		
-		Vec2i size = getGame()->getScreenSize();
-		Vec2i pos  = Vec2i(0,0);
-
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0, 1.0); glVertex2f(pos.x, pos.y);
-		glTexCoord2f(1.0, 1.0); glVertex2f(pos.x+size.x, pos.y);
-		glTexCoord2f(1.0, 0.0); glVertex2f(pos.x+size.x, pos.y+size.y);
-		glTexCoord2f(0.0, 0.0); glVertex2f(pos.x, pos.y+size.y);
+		glTexCoord2f(0.0, 1.0); glVertex2f(0, 0);
+		glTexCoord2f(1.0, 1.0); glVertex2f(size.x, 0);
+		glTexCoord2f(1.0, 0.0); glVertex2f(size.x, size.y);
+		glTexCoord2f(0.0, 0.0); glVertex2f(0, size.y);
 		glEnd();
 		mLightingGlowShader->unbind();
 
-
 		mLightingShader->bind();
-
-
 		mLightingParam.setTexture( mGBuffer , mTexMaterial );
 
 		for( int i = 0 ; i < ARRAY_SIZE( mLights ) ; ++i )

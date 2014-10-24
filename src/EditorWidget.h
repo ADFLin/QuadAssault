@@ -39,8 +39,7 @@ public:
 	~PorpTextCtrl();
 	void      inputData();
 	void      outputData();
-	PropData& getProp(){ return mPorpData; }
-
+	void      setData( PropData const& data ){ mPorpData = data; }
 private:
 	PropData mPorpData;
 };
@@ -80,27 +79,11 @@ public:
 	void     inputData();
 	void     outputData();
 
-	virtual void addProp( char const* name , Vec2f& value );
-	virtual void addProp( char const* name , Vec3f& value );
-	virtual void addProp( char const* name , bool& value );
-	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] );
-
-#define ADD_TEXT_PROP( TYPE )\
-	virtual void addProp( char const* name , TYPE& value )\
-	{\
-		PorpTextCtrl* textCtrl = new PorpTextCtrl( UI_PROP_TEXTCTRL , calcWidgetPos() , getWidgetSize() , this );\
-		textCtrl->getProp().setData( value );\
-		addPorpWidget( name , textCtrl );\
-	}
-
-	ADD_TEXT_PROP( int )
-	ADD_TEXT_PROP( unsigned char )
-	ADD_TEXT_PROP( float )
-	ADD_TEXT_PROP( String )
-
+	using IPropEditor::addProp;
+	virtual void addPropData( char const* name , PropData const& data , unsigned flag );
+	virtual void addProp( char const* name , void* value , int sizeValue , int numSet , int valueSet[] , char const* strSet[] , unsigned flag );
 
 	void addPorpWidget( char const* name , GWidget* widget );
-
 
 	Vec2i getWidgetSize(){ return Vec2i( 130 , 20 ); }
 	Vec2i calcWidgetPos();
@@ -111,13 +94,13 @@ public:
 private:
 	void     cleanupAllPorp();
 
-	struct PropData
+	struct PropInfo
 	{
 		IText*    name;
 		GWidget*  widget;
 	};
-	typedef std::vector< PropData >  PropDataVec;
-	PropDataVec mPorps;
+	typedef std::vector< PropInfo >  PropInfoVec;
+	PropInfoVec mPorps;
 	IEditable*  mEditObj;
 
 };

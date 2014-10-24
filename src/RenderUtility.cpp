@@ -65,7 +65,6 @@ void drawSprite(Vec2f const& pos, Vec2f const& size, float rot )
 
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_EQUAL,1.0f);
-	//glEnable(GL_TEXTURE_2D);
 
 	glPushMatrix();
 	glTranslatef( pos.x + hotspot.x , pos.y + hotspot.y , 0);
@@ -81,8 +80,6 @@ void drawSprite(Vec2f const& pos, Vec2f const& size, float rot )
 
 	glPopMatrix();
 
-	//glBindTexture(GL_TEXTURE_2D,0);
-	//glDisable(GL_TEXTURE_2D);
 	glDisable(GL_ALPHA_TEST);
 }
 
