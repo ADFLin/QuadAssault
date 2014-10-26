@@ -60,52 +60,6 @@ private:
 	unsigned     typeBits;
 };
 
-class ClassEditHelper
-{
-public:
-	ClassEditHelper( IPropEditor& editor ):mEditor( editor ){}
-	template < class T >
-	void generate( T* obj )
-	{
-		obj->reigsterContext( *this );
-	}
-	template< class T >
-	void addMember( char const* name , T& var , unsigned flag = 0 )
-	{
-		mEditor.addProp( name , var , flag );
-	}
-	template< class T >
-	void addEnumMember( char const* name , T& var , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag = 0 )
-	{
-		mEditor.addEnumProp( name , var , numSet , valueSet , strSet , flag );
-	}
-	IPropEditor& mEditor;
-};
-
-
-#define DECLARE_OBJECT_CLASS( CLASS , BASE )\
-private:\
-	typedef CLASS ThisClass;\
-	typedef BASE  BaseClass;\
-public:\
-	static ObjectClass* StaticClass();\
-	virtual ObjectClass* getClass(){ return ThisClass::StaticClass(); }\
-	friend class ClassEditHelper;\
-	virtual void enumProp( IPropEditor& editor )\
-	{\
-		ClassEditHelper helper( editor );\
-		helper.generate( this );\
-	}
-
-#define IMPL_OBJECT_CLASS( CLASS , TYPE , NAME )\
-	ObjectClass* CLASS::StaticClass()\
-	{\
-		static ObjectClass myClass( BaseClass::StaticClass() , NAME , TYPE );\
-		return &myClass;\
-	}
-
-
-
 enum DevDrawMode
 {
 	DDM_EDIT ,
@@ -132,8 +86,8 @@ public:
 	virtual ObjectClass* getClass(){ return StaticClass(); }
 	virtual void enumProp( IPropEditor& editor )
 	{
-		ClassEditHelper helper( editor );
-		helper.generate( this );
+		ClassEditReigster reg( editor );
+		reigsterContext( reg );
 	}
 	
 	virtual void init(){}
@@ -196,6 +150,26 @@ private:
 
 };
 
+
+#define DECLARE_OBJECT_CLASS( CLASS , BASE )\
+private:\
+	typedef CLASS ThisClass;\
+	typedef BASE  BaseClass;\
+public:\
+	static ObjectClass* StaticClass();\
+	virtual ObjectClass* getClass(){ return ThisClass::StaticClass(); }\
+	virtual void enumProp( IPropEditor& editor )\
+{\
+	ClassEditReigster reg( editor );\
+	reigsterContext( reg );\
+}
+
+#define IMPL_OBJECT_CLASS( CLASS , TYPE , NAME )\
+	ObjectClass* CLASS::StaticClass()\
+{\
+	static ObjectClass myClass( BaseClass::StaticClass() , NAME , TYPE );\
+	return &myClass;\
+}
 
 
 

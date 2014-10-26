@@ -58,6 +58,9 @@ public:
 	bool     setValue( char const* str );
 
 private:
+
+	bool     getArrayString( FString& str );
+	bool     setArrayValue( char const* str );
 	void*    mData;
 	uint8    mDataSize;
 	uint8    mType;
@@ -89,6 +92,27 @@ public:
 	virtual void updateEdit(){}
 	virtual void setupDefault(){}
 };
+
+
+class ClassEditReigster
+{
+public:
+	ClassEditReigster( IPropEditor& editor ):mEditor( editor ){}
+
+	template< class T >
+	void addMember( char const* name , T& var , unsigned flag = 0 )
+	{
+		mEditor.addProp( name , var , flag );
+	}
+	template< class T >
+	void addEnumMember( char const* name , T& var , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag = 0 )
+	{
+		mEditor.addEnumProp( name , var , numSet , valueSet , strSet , flag );
+	}
+	IPropEditor& mEditor;
+};
+
+
 
 
 class TextPropEditor : public IPropEditor

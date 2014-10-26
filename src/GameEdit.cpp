@@ -31,6 +31,9 @@ bool PropData::getString( FString& str )
 	if ( !mData )
 		return false;
 
+	if ( mType & PROP_ARRAY_MASK )
+		return getArrayString( str );
+
 	switch( mType )
 	{
 	case PROP_INT:
@@ -97,7 +100,6 @@ bool PropData::setValue( char const* str )
 
 	switch( mType )
 	{
-
 	case PROP_INT:
 		{
 			int value = ::atoi( str );
@@ -145,6 +147,30 @@ bool PropData::setValue( char const* str )
 		return static_cast< IPropCtrl* >( mData )->output( str );
 	}
 
+	return false;
+}
+
+bool PropData::getArrayString(FString& str)
+{
+	switch( getType() )
+	{
+	case PROP_INT:
+		{
+			int value = ::atoi( str );
+			switch( mDataSize )
+			{
+			case 1: cast< int8  >() = value;
+			case 2: cast< int16 >() = value;
+			case 4: cast< int32 >() = value;
+			}
+		}
+
+	}
+	return false;
+}
+
+bool PropData::setArrayValue(char const* str)
+{
 	return false;
 }
 
