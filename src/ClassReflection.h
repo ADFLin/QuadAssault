@@ -15,7 +15,7 @@ public:
 	template< class T >
 	void addMember( char const* name , T& var , unsigned flag = 0 );
 	template< class T >
-	void addEnumMember( char const* name , T& var , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag );
+	void addEnumMember( char const* name , T& var , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag = 0 );
 };
 
 
@@ -42,9 +42,9 @@ enum PropType
 	PROP_OBJECT ,
 	PROP_CTRL   ,
 
-	PROP_ARRAY_MASK  = 0x80 ,
-};
 
+	PROP_ARRAY_MASK = 0x80 ,
+};
 
 class CRClass
 {
@@ -55,7 +55,7 @@ public:
 
 	}
 	char const* getName(){ return name; }
-
+	
 	char const*  name;
 	CRClass*     parent;
 };
@@ -67,6 +67,7 @@ public:
 	virtual CRClass*   getClass(){ return NULL; }
 };
 
+
 #define DECLARE_RC_CLASS_NOBASE( CLASS )\
 private:\
 	typedef CLASS ThisClass;
@@ -75,7 +76,7 @@ private:\
 	public:\
 	template < class ClassContextRegister >\
 	void reigsterContext( ClassContextRegister& ccr )\
-	{
+{
 
 #define BEGIN_CLASS_PROP()\
 	BEGIN_CLASS_PROP_NOBASE()\
@@ -93,6 +94,6 @@ private:\
 #define FUN_PROP( NAME , TYPE , SET , GET )
 
 #define END_CLASS_PROP()\
-}
+	}
 
 #endif // ClassReflection_h__

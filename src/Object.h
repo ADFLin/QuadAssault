@@ -6,12 +6,12 @@
 #include "GameEdit.h"
 #include "ClassReflection.h"
 
-
 class Object : public CRObject
 {
 public:
 	Object();
 	Object( Vec2f const& pos );
+	virtual ~Object(){}
 
 	Vec2f const&  getPos() const { return mPos; }
 	void          setPos(Vec2f const& pos){ mPos = pos; }
@@ -46,7 +46,6 @@ public:
 	ObjectClass( ObjectClass* inParent , char const* inName , ObjectType inType )
 		:CRClass( inParent , inName ),type( inType )
 	{
-		parent = inParent;
 		typeBits = BIT( inType );
 		if ( inParent )
 			typeBits |= inParent->typeBits ;
@@ -58,7 +57,9 @@ private:
 	friend class LevelObject;
 	ObjectType   type;
 	unsigned     typeBits;
+
 };
+
 
 enum DevDrawMode
 {
@@ -73,7 +74,7 @@ enum SpawnDestroyFlag
 	SDF_LOAD_LEVEL    = BIT(2),
 };
 
-class LevelObject : public Object 
+class LevelObject : public Object
 	              , public IEditable
 {
 	typedef Object BaseClass;
@@ -89,7 +90,7 @@ public:
 		ClassEditReigster reg( editor );
 		reigsterContext( reg );
 	}
-	
+
 	virtual void init(){}
 	virtual void onSpawn( unsigned flag ){}
 	virtual void onDestroy( unsigned flag ){}
@@ -145,9 +146,6 @@ private:
 	BEGIN_CLASS_PROP_NOBASE()
 	MEMBER_PROP( "Pos" , mPos )
 	END_CLASS_PROP()
-
-	
-
 };
 
 
@@ -170,8 +168,6 @@ public:\
 	static ObjectClass myClass( BaseClass::StaticClass() , NAME , TYPE );\
 	return &myClass;\
 }
-
-
 
 
 #endif // Object_h__
