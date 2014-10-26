@@ -4,13 +4,14 @@
 #include "Base.h"
 #include "IntrList.h"
 #include "GameEdit.h"
+#include "ClassReflection.h"
 
-class Object : public IEditable
+
+class Object : public CRObject
 {
 public:
 	Object();
 	Object( Vec2f const& pos );
-	virtual ~Object(){}
 
 	Vec2f const&  getPos() const { return mPos; }
 	void          setPos(Vec2f const& pos){ mPos = pos; }
@@ -39,27 +40,46 @@ class IObjectRenderer;
 struct Tile;
 class ColBody;
 
-class ObjectClass
+class ObjectClass : public CRClass
 {
 public:
 	ObjectClass( ObjectClass* inParent , char const* inName , ObjectType inType )
-		:parent( inParent ) ,name( inName ),type( inType )
+		:CRClass( inParent , inName ),type( inType )
 	{
+		parent = inParent;
 		typeBits = BIT( inType );
-		if ( parent )
-			typeBits |= parent->typeBits ;
+		if ( inParent )
+			typeBits |= inParent->typeBits ;
 	}
 
-	char const* getName(){ return name; }
 	ObjectType  getType(){ return type; }
 
 private:
 	friend class LevelObject;
-	ObjectClass* parent;
-	char const*  name;
 	ObjectType   type;
 	unsigned     typeBits;
-	
+};
+
+class ClassEditHelper
+{
+public:
+	ClassEditHelper( IPropEditor& editor ):mEditor( editor ){}
+	template < class T >
+	void generate( T* obj )
+	{
+		obj->reigsterContext( *this );
+	}
+	template< class T >
+	void addMember( char const* name , T& var , unsigned flag = 0 )
+	{
+		mEditor.addProp( name , var , flag );
+	}
+	template< class T >
+	void addEnumMember( char const* name , T& var , int numSet , int const valueSet[] , char const* strSet[] , unsigned flag = 0 )
+	{
+		mEditor.addEnumProp( name , var , numSet , valueSet , strSet , flag );
+	}
+	IPropEditor& mEditor;
 };
 
 
@@ -69,7 +89,13 @@ private:\
 	typedef BASE  BaseClass;\
 public:\
 	static ObjectClass* StaticClass();\
-	virtual ObjectClass* getClass(){ return ThisClass::StaticClass(); }
+	virtual ObjectClass* getClass(){ return ThisClass::StaticClass(); }\
+	friend class ClassEditHelper;\
+	virtual void enumProp( IPropEditor& editor )\
+	{\
+		ClassEditHelper helper( editor );\
+		helper.generate( this );\
+	}
 
 #define IMPL_OBJECT_CLASS( CLASS , TYPE , NAME )\
 	ObjectClass* CLASS::StaticClass()\
@@ -78,28 +104,6 @@ public:\
 		return &myClass;\
 	}
 
-
-#define BEGIN_CLASS_PROP_NOBASE()\
-public:\
-	void enumProp( IPropEditor& editor ){
-
-#define BEGIN_CLASS_PROP()\
-	BEGIN_CLASS_PROP_NOBASE()\
-	BaseClass::enumProp( editor );
-
-#define MEMBER_PROP( NAME , MEMBER )\
-	editor.addProp( NAME , MEMBER );
-
-#define MEMBER_PROP_F( NAME , MEMBER , FLAG )\
-	editor.addProp( NAME , MEMBER , FLAG );
-
-#define MENBER_ENUM_PROP( NAME , MEMBER , NUM , VALUE_SET , STR_SET )\
-	editor.addEnumProp( NAME , MEMBER , NUM , VALUE_SET , STR_SET );
-
-#define FUN_PROP( NAME , TYPE , SET , GET )
-
-#define END_CLASS_PROP()\
-	}
 
 
 enum DevDrawMode
@@ -115,7 +119,8 @@ enum SpawnDestroyFlag
 	SDF_LOAD_LEVEL    = BIT(2),
 };
 
-class LevelObject : public Object
+class LevelObject : public Object 
+	              , public IEditable
 {
 	typedef Object BaseClass;
 public:
@@ -125,6 +130,11 @@ public:
 	static  ObjectClass* StaticClass();
 	ObjectType   getType(){ return getClass()->getType(); }
 	virtual ObjectClass* getClass(){ return StaticClass(); }
+	virtual void enumProp( IPropEditor& editor )
+	{
+		ClassEditHelper helper( editor );
+		helper.generate( this );
+	}
 	
 	virtual void init(){}
 	virtual void onSpawn( unsigned flag ){}
@@ -181,18 +191,14 @@ private:
 	BEGIN_CLASS_PROP_NOBASE()
 	MEMBER_PROP( "Pos" , mPos )
 	END_CLASS_PROP()
-};
 
-
-template < class T >
-class ClassEditHelperT : public IEditable
-{
-
-
-
-
+	
 
 };
+
+
+
+
 
 #endif // Object_h__
 

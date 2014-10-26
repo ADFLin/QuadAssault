@@ -24,7 +24,9 @@ public:
 	template< class T >
 	PropData( T& data ){ setData( data ); }
 
-	PropType getType() const {  return mType;  }
+	PropType getType() const {  return PropType( mType & ~PROP_ARRAY_MASK );  }
+
+	bool     isArray() const { return ( mType & PROP_ARRAY_MASK ) != 0; }
 
 	void     setData( char&   data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_INT; }
 	void     setData( short&  data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_INT; }
@@ -58,7 +60,7 @@ public:
 private:
 	void*    mData;
 	uint8    mDataSize;
-	PropType mType;
+	uint8    mType;
 };
 
 class IPropEditor
