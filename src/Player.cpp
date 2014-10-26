@@ -13,6 +13,8 @@
 
 bool gPlayerGodPower = true;
 
+IMPL_OBJECT_CLASS( Player , OT_PLAYER , "Player" )
+
 Vec2f const gWeaponSlotOffset[] = 
 {
 	Vec2f(-9,-20) ,

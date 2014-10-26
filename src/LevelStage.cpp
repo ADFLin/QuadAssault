@@ -72,16 +72,16 @@ void WorldData::cleanup()
 
 void WorldData::reigsterObject()
 {
-	mObjectCreator->registerClass< LaserMob >( "Mob.Laser" );
-	mObjectCreator->registerClass< MinigunMob >( "Mob.Minigun" );
-	mObjectCreator->registerClass< PlasmaMob >( "Mob.Plasma" );
-	mObjectCreator->registerClass< KeyPickup >( "Pickup.Key" );
-	mObjectCreator->registerClass< WeaponPickup >( "Pickup.Weapon" );
-	mObjectCreator->registerClass< LightObject >( "Light" );
-	mObjectCreator->registerClass< AreaTrigger >( "Trigger.Area" );
+	mObjectCreator->registerClass< LaserMob >();
+	mObjectCreator->registerClass< MinigunMob >();
+	mObjectCreator->registerClass< PlasmaMob >();
+	mObjectCreator->registerClass< KeyPickup >();
+	mObjectCreator->registerClass< WeaponPickup >();
+	mObjectCreator->registerClass< LightObject >();
+	mObjectCreator->registerClass< AreaTrigger >();
 
 #define REG_ACTION( ACTION )\
-	mActionCreator->registerClass< ACTION >( ACTION::Name() )
+	mActionCreator->registerClass< ACTION >( ACTION::StaticName() )
 
 	REG_ACTION( GoalAct );
 	REG_ACTION( PlaySoundAct );
@@ -266,12 +266,12 @@ void LevelStage::onUpdate(float deltaT)
 
 void LevelStage::changeMenuStage()
 {
+	MenuStage* stage;
 	if(  mLevel->getState() == Level::eFINISH || mLevel->getPlayer()->isDead() )
-		odabir_levela_odmah = true;
+		stage = new MenuStage( MenuStage::MS_SELECT_LEVEL );
 	else
-		odabir_levela_odmah = false;
+		stage = new MenuStage();
 
-	MenuStage* stage = new MenuStage;
 	getGame()->addStage( stage , true );
 }
 
@@ -517,7 +517,7 @@ void LevelStage::loadLevel()
 	String mapPath = LEVEL_DIR;
 	mapPath += gMapFileName;
 
-	std::ifstream mapFS( mapPath.c_str() ,ios::in);
+	std::ifstream mapFS( mapPath.c_str() , std::ios::in );
 
 	if ( mapFS.is_open() )
 	{
@@ -593,11 +593,11 @@ void LevelStage::loadLevel()
 	String levelPath = LEVEL_DIR;
 	levelPath += gLevelFileName;
 
-	ifstream levelFS( levelPath.c_str() ,ios::in);
+	std::ifstream levelFS( levelPath.c_str() ,std::ios::in);
 	std::string linija;
 	while(getline(levelFS,linija))
 	{
-		istringstream lstring(linija,ios::in);
+		std::istringstream lstring(linija,std::ios::in);
 		std::string token;
 		while(getline(lstring,token,' '))
 		{			

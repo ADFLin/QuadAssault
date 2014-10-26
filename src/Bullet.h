@@ -22,7 +22,6 @@ public:
 	virtual void init();
 	void setup( Vec2f const& poz, Vec2f const& dir, int team );
 
-	virtual ObjectType getType() { return OT_BULLET; }
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 	virtual void tick();

@@ -2,6 +2,8 @@
 #include "Level.h"
 #include "Player.h"
 
+IMPL_OBJECT_CLASS( ItemPickup , OT_ITEM , "Pickup" )
+
 ItemPickup::ItemPickup( Vec2f const& pos ) 
 	:BaseClass( pos )
 {

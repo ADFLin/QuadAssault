@@ -8,6 +8,8 @@
 
 #include "RenderUtility.h"
 
+IMPL_OBJECT_CLASS( AreaTrigger , OT_TRIGGER , "Trigger.Area" )
+
 TriggerBase::TriggerBase()
 {
 	mEnable = true;

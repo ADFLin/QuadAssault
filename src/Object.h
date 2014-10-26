@@ -17,7 +17,6 @@ public:
 
 protected:
 	Vec2f mPos;
-		
 };
 
 class Level;
@@ -25,6 +24,7 @@ class Level;
 enum ObjectType
 {
 	OT_OBJECT ,
+	OT_ACTOR ,
 	OT_BULLET ,
 	OT_EXPLOSION ,
 	OT_LIGHT ,
@@ -39,14 +39,68 @@ class IObjectRenderer;
 struct Tile;
 class ColBody;
 
-//TODO: Contruct Object RTTI System
 class ObjectClass
 {
+public:
+	ObjectClass( ObjectClass* inParent , char const* inName , ObjectType inType )
+		:parent( inParent ) ,name( inName ),type( inType )
+	{
+		typeBits = BIT( inType );
+		if ( parent )
+			typeBits |= parent->typeBits ;
+	}
+
+	char const* getName(){ return name; }
+	ObjectType  getType(){ return type; }
+
+private:
+	friend class LevelObject;
+	ObjectClass* parent;
 	char const*  name;
 	ObjectType   type;
-	unsigned     typeBit;
-	ObjectClass* parent;
+	unsigned     typeBits;
+	
 };
+
+
+#define DECLARE_OBJECT_CLASS( CLASS , BASE )\
+private:\
+	typedef CLASS ThisClass;\
+	typedef BASE  BaseClass;\
+public:\
+	static ObjectClass* StaticClass();\
+	virtual ObjectClass* getClass(){ return ThisClass::StaticClass(); }
+
+#define IMPL_OBJECT_CLASS( CLASS , TYPE , NAME )\
+	ObjectClass* CLASS::StaticClass()\
+	{\
+		static ObjectClass myClass( BaseClass::StaticClass() , NAME , TYPE );\
+		return &myClass;\
+	}
+
+
+#define BEGIN_CLASS_PROP_NOBASE()\
+public:\
+	void enumProp( IPropEditor& editor ){
+
+#define BEGIN_CLASS_PROP()\
+	BEGIN_CLASS_PROP_NOBASE()\
+	BaseClass::enumProp( editor );
+
+#define MEMBER_PROP( NAME , MEMBER )\
+	editor.addProp( NAME , MEMBER );
+
+#define MEMBER_PROP_F( NAME , MEMBER , FLAG )\
+	editor.addProp( NAME , MEMBER , FLAG );
+
+#define MENBER_ENUM_PROP( NAME , MEMBER , NUM , VALUE_SET , STR_SET )\
+	editor.addEnumProp( NAME , MEMBER , NUM , VALUE_SET , STR_SET );
+
+#define FUN_PROP( NAME , TYPE , SET , GET )
+
+#define END_CLASS_PROP()\
+	}
+
 
 enum DevDrawMode
 {
@@ -61,37 +115,17 @@ enum SpawnDestroyFlag
 	SDF_LOAD_LEVEL    = BIT(2),
 };
 
-
-
-#define BEGIN_CLASS_PROP_NOBASE()\
-public:\
-	void enumProp( IPropEditor& editor ){
-
-#define BEGIN_CLASS_PROP()\
-public:\
-	void enumProp( IPropEditor& editor ){\
-	BaseClass::enumProp( editor );
-
-#define MEMBER_PROP( NAME , MEMBER )\
-	editor.addProp( NAME , MEMBER );
-
-#define MEMBER_PROP_F( NAME , MEMBER , FLAG )\
-	editor.addProp( NAME , MEMBER , FLAG );
-
-#define MENBER_ENUM_PROP( NAME , MEMBER , NUM , VALUE_SET , STR_SET )\
-	editor.addEnumProp( NAME , MEMBER , NUM , VALUE_SET , STR_SET );
-
-#define END_CLASS_PROP() }
-
 class LevelObject : public Object
 {
 	typedef Object BaseClass;
 public:
 	LevelObject();
 	LevelObject( Vec2f const& pos );
+
+	static  ObjectClass* StaticClass();
+	ObjectType   getType(){ return getClass()->getType(); }
+	virtual ObjectClass* getClass(){ return StaticClass(); }
 	
-	//virtual ObjectClass* getClass(){}
-	virtual ObjectType   getType() = 0;
 	virtual void init(){}
 	virtual void onSpawn( unsigned flag ){}
 	virtual void onDestroy( unsigned flag ){}
@@ -100,7 +134,6 @@ public:
 	virtual void updateRender( float dt ){}
 	
 	virtual void renderDev( DevDrawMode mode ){}
-	
 
 	virtual void onTileCollision( ColBody& self , Tile& tile ){}
 	virtual void onBodyCollision( ColBody& self , ColBody& other ){}
@@ -110,6 +143,13 @@ public:
 	Level* getLevel(){ return mLevel; }
 	void   destroy(){ mNeedDestroy = true; }
 
+	template< class T >
+	T* tryCast()
+	{ 
+		if ( getClass()->typeBits & BIT( T::StaticClass()->getType() ) )
+			return static_cast< T* >( this );
+		return NULL;
+	}
 	template< class T >
 	T* cast()
 	{ 
@@ -139,18 +179,10 @@ private:
 	LevelObject* renderLink;
 
 	BEGIN_CLASS_PROP_NOBASE()
-	MEMBER_PROP( "Pos" , mPos );
+	MEMBER_PROP( "Pos" , mPos )
 	END_CLASS_PROP()
 };
 
-#define DECLARE_OBJECT_CLASS( CLASS , BASE )\
-private:\
-	typedef CLASS ThisClass;\
-	typedef BASE  BaseClass;\
-
-
-
-#define DEFINE_OBJECT_TYPE( CLASS , TYPE , NAME )
 
 template < class T >
 class ClassEditHelperT : public IEditable

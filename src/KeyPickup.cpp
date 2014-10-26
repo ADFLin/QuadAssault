@@ -5,6 +5,8 @@
 #include "Explosion.h"
 #include "RenderUtility.h"
 
+IMPL_OBJECT_CLASS( KeyPickup , OT_ITEM , "Pickup.Key" )
+
 KeyPickup::KeyPickup( Vec2f const& pos , int id ) 
 	:BaseClass( pos ),mId( id )
 {

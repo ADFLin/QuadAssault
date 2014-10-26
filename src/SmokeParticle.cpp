@@ -2,6 +2,8 @@
 
 #include "Level.h"
 
+IMPL_OBJECT_CLASS( SmokeParticle , OT_PARTICLE , "Particle.Smoke" )
+
 SmokeParticle::SmokeParticle( Vec2f const& pos ) 
 	:BaseClass( pos )
 {

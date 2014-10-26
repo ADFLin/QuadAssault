@@ -35,3 +35,9 @@ void LevelObject::calcBoundBox( Rect& bBox )
 	bBox.max = mPos + half;
 }
 
+ObjectClass* LevelObject::StaticClass()
+{
+	static ObjectClass myClass( NULL , "LevelObject" , OT_OBJECT );
+	return &myClass;
+}
+

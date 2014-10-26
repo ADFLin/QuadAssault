@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "LaserBullet.h"
 
+IMPL_OBJECT_CLASS( LaserMob , OT_MOB , "Mob.Laser" )
+
 void LaserMob::init()
 {
 	BaseClass::init();

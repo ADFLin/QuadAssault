@@ -2,24 +2,8 @@
 #define GameEdit_h__
 
 #include "Base.h"
-
+#include "ClassReflection.h"
 #include <vector>
-
-enum PropType
-{
-	PROP_NONE ,
-	PROP_INT ,
-	PROP_UINT ,
-	PROP_FLOAT ,
-	PROP_DOUBLE ,
-	PROP_BOOL  ,
-	PROP_VEC3F ,
-	PROP_VEC2I ,
-	PROP_VEC2F ,
-	PROP_COLOR ,
-	PROP_STRING ,
-	PROP_CTRL   ,
-};
 
 class IPropCtrl
 {
@@ -75,12 +59,6 @@ private:
 	void*    mData;
 	uint8    mDataSize;
 	PropType mType;
-};
-
-enum PropFlag
-{
-	PF_COLOR   = BIT(0) ,
-	PF_NETWORK = BIT(1) ,
 };
 
 class IPropEditor

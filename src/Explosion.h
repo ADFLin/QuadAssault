@@ -15,7 +15,6 @@ public:
 	~Explosion();
 
 	virtual void init();
-	virtual ObjectType getType(){ return OT_EXPLOSION; }
 	virtual void tick();
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );

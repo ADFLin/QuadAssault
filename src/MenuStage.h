@@ -14,7 +14,16 @@ class GTextButton;
 class MenuStage : public GameStage
 {
 public:
-	MenuStage();
+
+	enum State
+	{
+		MS_NONE ,
+		MS_SELECT_MENU ,
+		MS_ABOUT ,
+		MS_SELECT_LEVEL ,
+	};
+
+	MenuStage( State state = MS_NONE );
 	virtual bool onInit();
 	virtual void onUpdate(float deltaT);	
 	virtual void onRender();
@@ -24,13 +33,7 @@ public:
 	virtual void onWidgetEvent( int event , int id , GWidget* sender );
 
 private:
-	enum State
-	{
-		MS_NONE ,
-		MS_SELECT_MENU ,
-		MS_ABOUT ,
-		MS_SELECT_LEVEL ,
-	};
+
 
 	void changeState( State state );
 	void showStateWidget( State state , bool beShow );

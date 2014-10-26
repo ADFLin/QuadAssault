@@ -187,6 +187,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ClassReflection.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ColBody.h"
 				>
 			</File>
@@ -575,6 +579,10 @@
 		<Filter
 			Name="Object"
 			>
+			<File
+				RelativePath=".\src\Actor.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\src\Actor.h"
 				>

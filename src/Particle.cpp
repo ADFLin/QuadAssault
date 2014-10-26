@@ -2,6 +2,8 @@
 
 #include "Level.h"
 
+IMPL_OBJECT_CLASS( Particle , OT_PARTICLE , "Particle" )
+
 Particle::Particle( Vec2f const& pos ) 
 	:BaseClass( pos )
 {

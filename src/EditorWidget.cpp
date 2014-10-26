@@ -199,7 +199,7 @@ void PropFrame::addPropData(char const* name , PropData const& data , unsigned f
 	switch ( data.getType() )
 	{
 	case PROP_VEC3F:
-		if ( flag & PF_COLOR )
+		if ( flag & CPF_COLOR )
 		{
 
 		}

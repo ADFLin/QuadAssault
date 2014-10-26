@@ -8,6 +8,8 @@
 #include "DebrisPickup.h"
 #include "RenderUtility.h"
 
+IMPL_OBJECT_CLASS( Mob , OT_MOB , "Mob" )
+
 void Mob::init()
 {
 	BaseClass::init();

@@ -14,7 +14,6 @@ public:
 	ItemPickup();
 	ItemPickup( Vec2f const& pos );
 	virtual void init();
-	virtual ObjectType getType(){ return OT_ITEM; }
 	virtual void tick();
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );

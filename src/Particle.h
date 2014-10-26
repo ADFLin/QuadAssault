@@ -9,7 +9,6 @@ class Particle : public LevelObject
 public:
 	Particle( Vec2f const& pos );
 
-	virtual ObjectType getType(){ return OT_PARTICLE; }
 	virtual void init();
 	virtual void tick();
 	virtual void onSpawn( unsigned flag );

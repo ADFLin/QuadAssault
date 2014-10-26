@@ -18,9 +18,9 @@
 #include <fstream>
 #include <sstream>
 
-MenuStage::MenuStage()
+MenuStage::MenuStage( State state )
 {
-	mState = MS_NONE;
+	mState = state;
 }
 
 bool MenuStage::onInit()
@@ -122,12 +122,12 @@ bool MenuStage::onInit()
 	file.close();
 
 
-	ifstream in( LEVEL_DIR LEVEL_LOCK_FILE );	
+	std::ifstream fs( LEVEL_DIR LEVEL_LOCK_FILE );	
 	for(int i=0; i<MAX_LEVEL_NUM; i++)
 	{
-		in >> gLevelEnabled[i];	
+		fs >> gLevelEnabled[i];	
 	}
-	in.close();
+	fs.close();
 	for(int i=0; i<mLevels.size(); i++)
 	{		
 
@@ -146,14 +146,12 @@ bool MenuStage::onInit()
 	}
 
 
+	State stateStart = MS_SELECT_MENU;
+	if ( mState != MS_NONE )
+		State stateStart = mState;
+
 	mState = MS_NONE;
-	changeState( MS_SELECT_MENU );
-
-
-	if(odabir_levela_odmah==NULL)
-		odabir_levela_odmah=false;
-	if(odabir_levela_odmah==true)
-		changeState( MS_SELECT_LEVEL );
+	changeState( stateStart );
 
 	mScreenFade.setColor( 1 );
 	mScreenFade.fadeIn();

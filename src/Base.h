@@ -15,13 +15,15 @@ typedef FixString< 512 > FString;
 
 namespace Priv
 {
-	template< class T >
-	void ReleaseFree( T * ptr ){ ptr->release(); }
+	struct ReleaseFree
+	{
+		template< class T >
+		void operator()( T* ptr ){ ptr->release(); }
+	};
 }
 
-
 template< class T >
-class FObjectPtr : public TPtrFunFreeHolder< T , &Priv::ReleaseFree< T > >
+class FObjectPtr : public TPtrFunFreeHolder< T , Priv::ReleaseFree >
 {
 
 };

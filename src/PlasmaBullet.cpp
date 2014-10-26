@@ -6,6 +6,7 @@
 #include "Explosion.h"
 #include "RenderUtility.h"
 
+IMPL_OBJECT_CLASS( PlasmaBullet , OT_BULLET , "Bullet.Plasma" )
 
 void PlasmaBullet::init()
 {

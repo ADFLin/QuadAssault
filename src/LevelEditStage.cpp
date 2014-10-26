@@ -326,7 +326,7 @@ bool LevelEditStage::saveLevel( char const* path )
 	}
 	of.close ();
 
-	cout << "Map Saved." << endl;
+	std::cout << "Map Saved." << std::endl;
 
 	return true;
 }
@@ -597,13 +597,13 @@ bool ObjectEditMode::onMouse( MouseMsg const& msg )
 			}
 			else if ( Input::isKeyPressed( Keyboard::eLCONTROL ) )
 			{
-				//TODO: Dont use dynamic_cast
-				Actor* actor = dynamic_cast< Actor* >( mObject );
+				Actor* actor = mObject->tryCast< Actor >();
 				if ( actor )
 				{
 					Vec2f dir = wPos - mObject->getPos();
 					float angle = Math::atan2( dir.y , dir.x );
 					actor->setRotation( angle );
+					getWorld().mPropFrame->inputData();
 				}
 			}
 		}

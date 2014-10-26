@@ -19,7 +19,6 @@ class Mob : public Actor
 public:
 	virtual void init();
 
-	virtual ObjectType getType(){ return OT_MOB; }
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 	virtual void tick();

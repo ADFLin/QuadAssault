@@ -14,8 +14,8 @@ public:
 	virtual void renderDev(){}
 };
 #define DEF_ACTION_NAME( NAME )\
-	static char const* Name(){ return NAME; }\
-	virtual char const* getName(){ return Name(); }
+	static char const* StaticName(){ return NAME; }\
+	virtual char const* getName(){ return StaticName(); }
 
 
 enum FireMode
@@ -63,7 +63,6 @@ public:
 	virtual void init();
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
-	virtual ObjectType getType(){ return OT_TRIGGER; }
 	virtual void tick();
 	virtual void setupDefault();
 	virtual void renderDev( DevDrawMode mode );

@@ -2,6 +2,7 @@
 
 #include "Level.h"
 
+IMPL_OBJECT_CLASS( LightObject , OT_LIGHT , "LightObject" )
 
 LightObject::LightObject()
 {

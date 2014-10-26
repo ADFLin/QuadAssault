@@ -19,8 +19,6 @@ public:
 	virtual void onDestroy( unsigned flag );
 	virtual void tick();
 	virtual void setupDefault();
-	virtual ObjectType getType(){ return OT_LIGHT; }
-
 
 	BEGIN_CLASS_PROP()
 	MEMBER_PROP( "Radius" , radius )

@@ -6,7 +6,7 @@
 #include "Explosion.h"
 #include "RenderUtility.h"
 
-
+IMPL_OBJECT_CLASS( LaserBullet , OT_BULLET , "Bullet.Laser" )
 
 void LaserBullet::init()
 {

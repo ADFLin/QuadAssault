@@ -5,6 +5,7 @@
 
 #include "MinigunBullet.h"
 
+IMPL_OBJECT_CLASS( MinigunMob , OT_MOB , "Mob.Minigun" )
 
 void MinigunMob::init()
 {

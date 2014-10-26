@@ -59,6 +59,9 @@ public:
 	}
 
 	template< class T >
+	bool registerClass(){  return registerClass< T >( T::StaticClass()->getName() );  }
+
+	template< class T >
 	bool registerClass( char const* name )
 	{
 		CFactory< T >* factory = new CFactory< T >( name );

@@ -4,6 +4,8 @@
 #include "PlasmaBullet.h"
 #include "Player.h"
 
+IMPL_OBJECT_CLASS( PlasmaMob , OT_MOB , "Mob.Plasma" )
+
 void PlasmaMob::init()
 {
 	BaseClass::init();

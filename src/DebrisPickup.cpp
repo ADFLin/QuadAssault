@@ -7,6 +7,8 @@
 #include "Player.h"
 #include "RenderUtility.h"
 
+IMPL_OBJECT_CLASS( DebrisPickup , OT_ITEM , "Pickup.Debris" )
+
 DebrisPickup::DebrisPickup( Vec2f const& pos ) 
 	:BaseClass( pos )
 {

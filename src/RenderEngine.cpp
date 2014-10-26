@@ -470,6 +470,27 @@ void RenderEngine::renderTerrainShadow( Level* level , Vec2f const& lightPos , L
 {
 	TileMap& terrain = level->getTerrain();
 
+#if 1
+	Vec2i tpLight = Vec2i( Math::floor( lightPos.x / BLOCK_SIZE ) , Math::floor( lightPos.y / BLOCK_SIZE ) );
+	if ( terrain.checkRange( tpLight.x , tpLight.y ) )
+	{
+		Tile const& tile = terrain.getData( tpLight.x , tpLight.y );
+		Block* block = Block::FromType( tile.type );
+		if ( block->checkFlag( BF_CAST_SHADOW ) )
+		{
+			if ( !block->checkFlag( BF_NONSIMPLE ) )
+				return;
+
+			Rect bBox;
+			bBox.min = lightPos - Vec2f(0.1,0.1);
+			bBox.max = lightPos + Vec2f(0.1,0.1);
+			if ( block->testIntersect( tile , bBox ) )
+				return;
+		}
+	}
+#endif
+	
+	
 	for(int i = range.xMin; i < range.xMax ; ++i )
 	{
 		for(int j = range.yMin; j < range.yMax; ++j )
@@ -497,9 +518,11 @@ void RenderEngine::renderTerrainShadow( Level* level , Vec2f const& lightPos , L
 					if ( terrain.checkRange( nx , ny ) )
 					{
 						Block* block = Block::FromType( terrain.getData( nx , ny ).type );
+
 						if ( !block->checkFlag( BF_NONSIMPLE ) && 
-							  block->checkFlag( BF_CAST_SHADOW ) )
+							block->checkFlag( BF_CAST_SHADOW ) )
 							continue;
+
 					}
 #endif
 					Vec2f offsetCur  = tileVertex[ idxCur ]  + tileOffset;

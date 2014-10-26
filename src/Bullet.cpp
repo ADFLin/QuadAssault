@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "Explosion.h"
 
+IMPL_OBJECT_CLASS( Bullet , OT_BULLET , "Bullet" )
 
 Bullet::Bullet()
 {

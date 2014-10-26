@@ -8,6 +8,8 @@
 #include "RenderUtility.h"
 
 
+IMPL_OBJECT_CLASS( MinigunBullet , OT_BULLET , "Bullet.Minigun" )
+
 void MinigunBullet::init()
 {
 	BaseClass::init();

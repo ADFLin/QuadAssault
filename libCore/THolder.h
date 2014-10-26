@@ -19,11 +19,11 @@ namespace Detail
 		void setZero( ManageType& ptr ){ ptr = 0; }
 	};
 
-	template< class T , void (*FreeFun)( T* ) >
+	template< class T , class FreeFun >
 	struct PtrFunFreePolicy
 	{
 		typedef T* ManageType; 
-		void destroy( ManageType ptr ){  if ( ptr ) ( *FreeFun )( ptr );  }
+		void destroy( ManageType ptr ){  if ( ptr ) FreeFun()( ptr );  }
 		void setZero( ManageType& ptr ){ ptr = 0; }
 	};
 
@@ -101,12 +101,12 @@ public:
 };
 
 
-template< class T , void (*FreeFun)( T* ) >
+template< class T , class FreeFun >
 class TPtrFunFreeHolder : public TPtrHolderBase< T , Detail::PtrFunFreePolicy< T , FreeFun > >
 {
 public:
 	TPtrFunFreeHolder(){}
-	explicit TPtrFunFreeHolder(T* ptr):TPtrHolderBase< T , Detail::PtrFunFreePolicy< T , FreeFun >  >(ptr){}
+	explicit TPtrFunFreeHolder(T* ptr):TPtrHolderBase< T , Detail::PtrFunFreePolicy< T , FreeFun > >(ptr){}
 };
 
 

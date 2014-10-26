@@ -19,14 +19,14 @@ public:
 
 	int getPlayerId(){ return mPlayerId; }
 
-	virtual ObjectType getType(){ return OT_PLAYER; }
+	virtual void init();
 	virtual void onSpawn( unsigned flag );
 	virtual void onDestroy( unsigned flag );
 	virtual void onBodyCollision( ColBody& self , ColBody& other );
 	virtual void updateEdit();
 	virtual IObjectRenderer* getRenderer();
 
-	void  init();
+	
 	void  update( Vec2f const& aimPos );
 
 	void  shoot( Vec2f const& posTaget );

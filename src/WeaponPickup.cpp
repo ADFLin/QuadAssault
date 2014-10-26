@@ -10,6 +10,7 @@
 
 #include "RenderUtility.h"
 
+IMPL_OBJECT_CLASS( WeaponPickup , OT_ITEM , "Pickup.Weapon" )
 
 WeaponPickup::WeaponPickup( Vec2f const& pos , int id ) 
 	:BaseClass( pos ),mId( id )
