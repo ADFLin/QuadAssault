@@ -8,5 +8,9 @@ public:
 	static bool sKeyBlocked;
 };
 
+class IActorController
+{
+
+};
 
 #endif // GameInput_h__

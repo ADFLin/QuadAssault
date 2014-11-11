@@ -14,41 +14,16 @@ public:
 	void push( Vec2i const& pos , Vec2i const& size , bool bOverlapPrev );
 	void pop();
 
-	struct Rect
-	{
-		Vec2i min;
-		Vec2i max;
-
-		Vec2i getSize(){ return max - min; }
-		bool  overlap( Rect const& other )
-		{
-			int xMin = std::max( min.x, other.min.x );
-			int yMin = std::max( min.y, other.min.y );
-			int xMax = std::min( max.x , other.max.x );
-			int yMax = std::min( max.y , other.max.y );
-
-			if ( xMax  >= xMin && yMax >= yMin )
-			{
-				min.x = xMin;
-				min.y = yMin;
-				max.x = xMax;
-				max.y = yMax;
-				return true;
-			}
-
-			max = min;
-			return false;
-		}
-	};
+	typedef TRect< int > SRect;
 	bool mPrevEnable;
-	std::vector< Rect > mStack;
+	std::vector< SRect > mStack;
 };
 
 ScissorClipStack gClipStack;
 
 void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size , bool bOverlapPrev )
 {
-	Rect rect;
+	SRect rect;
 	rect.min = pos;
 	rect.max = pos + size;
 
@@ -60,7 +35,8 @@ void ScissorClipStack::push( Vec2i const& pos , Vec2i const& size , bool bOverla
 	}
 	else if ( bOverlapPrev )
 	{
-		rect.overlap( mStack.back() );
+		if ( !rect.overlap( mStack.back() ) )
+			rect.max = rect.min;
 	}
 	Vec2i sizeRect = rect.getSize();
 	glScissor( rect.min.x , rect.min.y , sizeRect.x , sizeRect.y );
@@ -78,7 +54,7 @@ void ScissorClipStack::pop()
 	}
 	else
 	{
-		Rect& rect = mStack.back();
+		SRect& rect = mStack.back();
 		Vec2i size = rect.getSize();
 		glScissor( rect.min.x , rect.min.y , size.x , size.y );
 	}

@@ -2,7 +2,11 @@
 #define TUICommon_hpp__
 
 #include "TUICommon.h"
+#include "PlatformConfig.h"
+
+#ifdef SYS_PLATFORM_WIN
 #include "Win32Header.h"
+#endif
 
 template < class Impl ,class CoreImpl >
 bool  TButtonUI< Impl , CoreImpl >::onMouseMsg( MouseMsg const& msg )
@@ -263,7 +267,9 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 			_this()->onPressEnter();
 			getManager()->setFocusUI( NULL );
 			break;
+
 		case Keyboard::eV:
+#ifdef SYS_PLATFORM_WIN
 			if ( ::GetKeyState( VK_CONTROL ) < 0 )
 			{
 				if ( ::OpenClipboard( NULL ) )
@@ -291,7 +297,9 @@ bool TTextCtrlUI<Impl, CoreImpl>::onKeyMsg( unsigned key , bool isDown )
 					::CloseClipboard();
 				}
 			}
+#endif //SYS_PLATFORM_WIN
 			break;
+
 		}
 	}
 	return false;

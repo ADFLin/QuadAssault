@@ -65,6 +65,7 @@ bool LevelEditStage::onInit()
 			button->setHelpText( "Save Map" );
 			button->texImag = getRenderSystem()->getTextureMgr()->getTexture("button_save.tga");
 			pos.x += offset;
+
 			
 #if 0
 			button = new GImageButton( UI_CREATE_LIGHT , pos , size , frame );
@@ -308,7 +309,32 @@ bool LevelEditStage::saveLevel( char const* path )
 	}
 
 
-	LightList lights = mLevel->getLights();
+	ObjectList& objects = mLevel->getObjects();
+	for( ObjectList::iterator iter = objects.begin() , itEnd = objects.end();
+		 iter != itEnd ; ++iter )
+	{
+		LevelObject* obj = *iter;
+
+		switch( obj->getType() )
+		{
+		case OT_LIGHT:
+		case OT_MOB:
+		case OT_TRIGGER:
+		case OT_ITEM:
+			{
+				of << obj->getClass()->getName() << " ";
+				TextPropEditor editor;
+				editor.setupPorp( *obj );
+				String str;
+				editor.exportString( str );
+				of << str << "\n";
+			}
+			
+		}
+	}
+
+#if 0
+	LightList& lights = mLevel->getLights();
 	for( LightList::iterator iter = lights.begin() , itEnd = lights.end();
 		iter != itEnd ; ++iter )
 	{
@@ -324,7 +350,9 @@ bool LevelEditStage::saveLevel( char const* path )
 			<< light->color.z << "\n";
 
 	}
-	of.close ();
+#endif
+
+	of.close();
 
 	std::cout << "Map Saved." << std::endl;
 

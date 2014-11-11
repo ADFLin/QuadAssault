@@ -6,6 +6,9 @@
 #include <vector>
 
 #include "SysMsg.h"
+#include "Rect.h"
+
+
 //#include "ProfileSystem.h"
 #define  PROFILE_ENTRY(...)
 
@@ -35,27 +38,6 @@ enum UIFlag
 #ifdef min
 	#undef min
 #endif
-class TRect
-{
-public:
-	TRect( Vec2i const& _pos , Vec2i const& _size )
-		:min( _pos )
-		,max( _pos + _size )
-	{
-
-	}
-
-	Vec2i getSize(){ return max - min; }
-	Vec2i max;
-	Vec2i min;
-};
-
-inline
-bool testPointInRect( Vec2i const& pos , TRect const& rect )
-{
-	return  rect.min.x <= pos.x && pos.x <= rect.max.x &&
-		    rect.min.y <= pos.y && pos.y <= rect.max.y ;
-}
 
 
 template< class T >
@@ -112,6 +94,7 @@ template< class T >
 class TUICore
 {
 	T* _this(){ return static_cast< T* >( this );  }
+	typedef TRect< int > Rect;
 public:
 	TUICore( Vec2i const& pos , Vec2i const& size , T* parent );
 	virtual ~TUICore();
@@ -127,10 +110,8 @@ public:
 
 	Vec2i const&  getWorldPos();
 	Vec2i const&  getPos() const { return mBoundRect.min; }
-	Vec2i         getSize(){ return mBoundRect.max - mBoundRect.min; }
-	TRect const&  getBoundRect() const { return mBoundRect; }
-
-
+	Vec2i         getSize() const { return mBoundRect.getSize(); }
+	Rect const&   getBoundRect() const { return mBoundRect; }
 
 	bool           isFocus();
 	bool           isEnable() const { return !checkFlag( UF_DISABLE ); }
@@ -165,7 +146,7 @@ protected:
 
 	void    onFocus( bool beF ){}
 	void    onResize( Vec2i const& size ){}
-	bool    doHitTest( Vec2i const& pos ){ return testPointInRect( pos , mBoundRect ); }
+	bool    doHitTest( Vec2i const& pos ){ return mBoundRect.hitTest( pos ); }
 
 	void    doRenderAll();
 	void    onRender(){}
@@ -201,6 +182,7 @@ private:
 	void          setManager( TUIManager<T>* mgr );
 
 	TUICore*      hitTestChildren( Vec2i const& testPos );
+	bool          hitTest( Vec2i const& testPos ){ return _this()->doHitTest( testPos ); }
 	bool          clipTest(){ return _this()->doClipTest(); }
 
 
@@ -235,6 +217,7 @@ private:
 
 protected:
 
+	
 	TUIManager<T>* mManager;
 	TUICore*       mParent;
 	TUICore*       mChild;
@@ -245,7 +228,7 @@ protected:
 	Vec2i          mCacheWorldPos;
 	unsigned       mFlag;
 	int            mNumChild;
-	TRect          mBoundRect;
+	Rect           mBoundRect;
 };
 
 

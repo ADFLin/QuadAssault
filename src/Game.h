@@ -47,7 +47,7 @@ private:
 	FPtr< RenderSystem > mRenderSystem;
 	std::vector< GameStage* > mStageStack;
 	std::vector< IFont* >     mFonts;
-	GameWindow*               mWindow;
+	FObjectPtr< GameWindow >  mWindow;
 
 };
 

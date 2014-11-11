@@ -116,7 +116,6 @@ public:
 	
 public:
 
-	
 
 	typedef MemberHook< LevelObject , &LevelObject::baseHook > ObjHook;
 	typedef MemberHook< LevelObject , &LevelObject::typeHook > TypeHook;
@@ -124,6 +123,7 @@ public:
 	typedef IntrList< LightObject  , TypeHook , PointerType > LightList;
 	typedef IntrList< Bullet , TypeHook , PointerType > BulletList;
 	typedef IntrList< Mob    , TypeHook , PointerType > MobList;
+	typedef IntrList< LevelObject , ObjHook , PointerType > ObjectList;
 
 	typedef IntrList< Light , MemberHook< Light , &Light::mHook > , PointerType > RenderLightList;
 
@@ -131,9 +131,10 @@ public:
 	BulletList&      getBullets(){ return mBullets; }
 	LightList&       getLights() { return mLights; }
 	RenderLightList& getRenderLights(){ return mRenderLights; }
+	ObjectList&      getObjects(){ return mObjects; }
 
 protected:
-	typedef IntrList< LevelObject , ObjHook , PointerType > ObjectList;
+	
 	typedef IntrList< ItemPickup  , TypeHook , PointerType > ItemList;
 	typedef IntrList< Particle , TypeHook , PointerType > ParticleList;
 
@@ -168,8 +169,9 @@ protected:
 	ListenerList     mListeners;
 };
 
+
 typedef Level::RenderLightList RenderLightList;
 typedef Level::LightList LightList;
-
+typedef Level::ObjectList ObjectList;
 
 #endif // Level_h__

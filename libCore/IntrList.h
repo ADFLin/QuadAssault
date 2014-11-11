@@ -286,6 +286,9 @@ public:
 
 private:
 
+	IntrList( IntrList const& );
+	IntrList& operator = ( IntrList const& other );
+
 	void insertBefore( T& value , NodeType& nodeWhere )
 	{
 		NodeType& nodeValue = HookTraits::castNode( value );

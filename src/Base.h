@@ -13,6 +13,10 @@ typedef FixString< 512 > FString;
 
 #include "THolder.h"
 
+#include "Rect.h"
+
+typedef TRect< float > Rect;
+
 namespace Priv
 {
 	struct ReleaseFree
@@ -55,34 +59,6 @@ class AreaTrigger;
 
 class Texture;
 
-struct Rect
-{
-	Vec2f min;
-	Vec2f max;
-
-	bool intersect( Rect const& a ) const
-	{
-		if( max.x < a.min.x || max.y<a.min.y ||	
-			min.x > a.max.x || min.y>a.max.y ) 
-			return false;		
-		return true;
-	}
-
-	bool intersect( Rect const& a , Vec2f const& offset ) const
-	{
-		if( max.x < a.min.x + offset.x || max.y< a.min.y + offset.y ||	
-			min.x > a.max.x + offset.x || min.y>a.max.y + offset.y ) 
-			return false;
-
-		return true;
-	}
-
-	bool hitTest( Vec2f const& p ) const
-	{
-		return min.x < p.x && p.x < max.x &&
-			   min.y < p.y && p.y < max.y ;
-	}
-};
 
 struct Color
 {

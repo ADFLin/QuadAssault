@@ -7,7 +7,7 @@
 
 template< class T >
 TUICore<T>::TUICore( Vec2i const& pos , Vec2i const& size , T* parent ) 
-	:mBoundRect( pos , size )
+	:mBoundRect( pos , pos + size )
 {
 	init();
 
@@ -459,7 +459,7 @@ bool TUIManager<T>::procMouseMsg( MouseMsg const& msg )
 	}
 	else if ( mUIModal )
 	{
-		if (  testPointInRect( mMouseMsg.getPos() , mUIModal->mBoundRect ) )
+		if (  mUIModal->hitTest( mMouseMsg.getPos() ) )
 			ui = mUIModal->hitTestChildren( mMouseMsg.getPos() - mUIModal->getPos() );
 		else
 			ui = NULL;

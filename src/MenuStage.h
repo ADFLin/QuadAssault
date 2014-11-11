@@ -66,7 +66,7 @@ private:
 
 	State      mState;
 	SrceenFade mScreenFade;
-	IText*     mTextAbout;
+	FObjectPtr< IText > mTextAbout;
 };
 
 #endif // MenuStage_h__

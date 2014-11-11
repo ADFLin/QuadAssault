@@ -12,6 +12,7 @@ public:
 	virtual bool input( FString& str ) = 0;
 };
 
+
 class PropData
 {
 public:
@@ -24,8 +25,8 @@ public:
 	template< class T >
 	PropData( T& data ){ setData( data ); }
 
-	PropType getType() const {  return PropType( mType & ~PROP_ARRAY_MASK );  }
-	bool     isArray() const {  return ( mType & PROP_ARRAY_MASK ) != 0;  }
+	PropType getType() const {  return PropType( mType & ~PROP_CONTAINER_MASK );  }
+	bool     isContainer() const {  return ( mType & PROP_CONTAINER_MASK ) != 0;  }
 
 	void     setData( char&   data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_INT; }
 	void     setData( short&  data ){ mData = &data; mDataSize = sizeof(data); mType = PROP_INT; }
@@ -57,12 +58,10 @@ public:
 	bool     setValue( char const* str );
 
 private:
-
-	bool     getArrayString( FString& str );
-	bool     setArrayValue( char const* str );
 	void*    mData;
-	uint8    mDataSize;
-	uint8    mType;
+	uint16   mType;
+	uint16   mDataSize;
+	
 };
 
 class IPropEditor
@@ -110,9 +109,6 @@ public:
 	}
 	IPropEditor& mEditor;
 };
-
-
-
 
 class TextPropEditor : public IPropEditor
 {

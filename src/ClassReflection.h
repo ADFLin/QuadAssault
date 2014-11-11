@@ -42,8 +42,11 @@ enum PropType
 	PROP_OBJECT ,
 	PROP_CTRL   ,
 
-
-	PROP_ARRAY_MASK = 0x80 ,
+	PROP_CARRAY  = 0x100,
+	PROP_CVECTOR = 0x200,
+	PROP_CLIST   = 0x300,
+	
+	PROP_CONTAINER_MASK = 0xf00 ,
 };
 
 class CRClass
@@ -65,6 +68,16 @@ class CRObject
 public:
 	virtual ~CRObject(){}
 	virtual CRClass*   getClass(){ return NULL; }
+};
+
+
+class CRField
+{
+
+
+
+
+
 };
 
 

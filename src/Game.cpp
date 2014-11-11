@@ -54,7 +54,7 @@ bool Game::init( char const* pathConfig )
 	mScreenSize.y = height;
 
 	char const* tile ="QuadAssault";
-	mWindow = Platform::createWindow( tile , mScreenSize , 32 , false );
+	mWindow.reset( Platform::createWindow( tile , mScreenSize , 32 , false ) );
 	if ( !mWindow  )
 	{
 		std::cerr << "ERROR: Can't create window !" << endl;
@@ -77,7 +77,7 @@ bool Game::init( char const* pathConfig )
 	mSoundMgr.reset( new SoundManager );
 	mRenderEngine.reset( new RenderEngine );
 
-	cout << "Initilize Render Engine..." << endl;
+	cout << "Initialize Render Engine..." << endl;
 	mRenderEngine->init( width , height );
 		
 	mNeedEnd=false;
@@ -122,7 +122,7 @@ void Game::exit()
 	mRenderEngine->cleanup();
 	mRenderSystem->cleanup();
 
-	mWindow->release();
+	mWindow.clear();
 
 	cout << "Game End !!" << endl;
 	cout << "*******************" << endl;	

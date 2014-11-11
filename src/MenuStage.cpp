@@ -90,7 +90,8 @@ bool MenuStage::onInit()
 		"The game uses a library of functions and classes OpenGL and SFML, and shaders is\n"
 		"koristen scripting language GLSL. Not used outside engine, but it was written\n"
 		"own, special to the game.\n";
-	mTextAbout = IText::create( font , 22 , Color(50,255,25) );
+
+	mTextAbout.reset( IText::create( font , 22 , Color(50,255,25) ) );
 	mTextAbout->setString( text );
 	
 
@@ -161,7 +162,7 @@ bool MenuStage::onInit()
 
 void MenuStage::onExit()
 {	
-	mTextAbout->release();
+	mTextAbout.clear();
 	mLevels.clear();	
 }
 

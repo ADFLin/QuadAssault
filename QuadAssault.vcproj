@@ -420,6 +420,10 @@
 			Name="GameStage"
 			>
 			<File
+				RelativePath=".\src\DevStage.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\DevStage.h"
 				>
 			</File>
@@ -525,6 +529,10 @@
 			</File>
 			<File
 				RelativePath=".\libCore\PlatformConfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libCore\Rect.h"
 				>
 			</File>
 			<File

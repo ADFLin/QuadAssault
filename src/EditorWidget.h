@@ -18,6 +18,7 @@ enum
 	
 	UI_NEW_MAP ,
 	UI_SAVE_MAP  ,
+	UI_SAVE_AS_MAP ,
 	UI_OBJECT_EDIT ,
 	UI_TILE_EDIT ,
 
