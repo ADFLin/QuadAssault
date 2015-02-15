@@ -20,8 +20,8 @@ void Mob::init()
 
 	rotation=0;
 	akceleracija=0;
-	brzina=100;
-	maxbrzina=100;	
+	mSpeed = 100;
+	mMaxSpeed=100;	
 
 	brzinaPunjenja=250;
 	punjenje=0;
@@ -34,8 +34,8 @@ void Mob::onSpawn( unsigned flag )
 {
 	BaseClass::onSpawn( flag );
 	mBody.setSize( getSize()- Vec2f(4,4) );
-	mBody.setMask( COL_SOILD | COL_RENDER );
-	mBody.setMaskCheck( COL_BULLET | COL_SOILD | COL_TERRAIN );
+	mBody.setTypeMask( COL_SOILD | COL_RENDER );
+	mBody.setColMask( COL_BULLET | COL_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
 
 	if ( flag & SDF_CAST_EFFECT )
@@ -95,12 +95,12 @@ void Mob::tick()
 
 		rotation = atan2(dir.y,dir.x) + Math::toRad( 90 );
 
-		Vec2f moment;
+		Vec2f monent;
 		float angle = rotation - Math::toRad( 90 );
-		moment.x = cos( angle )*akceleracija;
-		moment.y = sin( angle )*akceleracija;
+		monent.x = cos( angle ) * akceleracija;
+		monent.y = sin( angle ) * akceleracija;
 
-		Vec2f off = ( brzina * TICK_TIME ) * moment;
+		Vec2f off = ( mSpeed * TICK_TIME ) * dir;
 
 		Vec2f offset = Vec2f( 0 , 0 );
 
@@ -114,9 +114,9 @@ void Mob::tick()
 		mPos += offset;
 	}
 
-	if(punjenje<100)
+	if( punjenje < 100 )
 	{
-		punjenje+=brzinaPunjenja* TICK_TIME;
+		punjenje += brzinaPunjenja * TICK_TIME;
 	}
 
 	if( mHP<=0 )
@@ -155,7 +155,7 @@ void Mob::shoot( IBulletFactory const& creator )
 	if( mTarget->isDead() )
 		return;
 
-	if(punjenje>=100)
+	if( punjenje >= 100 )
 	{
 		Vec2f offset= mPosLastView - getPos();
 		if( offset.length2() < domet * domet )
@@ -166,7 +166,7 @@ void Mob::shoot( IBulletFactory const& creator )
 			p->setup( getPos() ,offset , TEAM_EMPTY );	
 			getLevel()->addBullet(p);
 		}	
-		punjenje=0;
+		punjenje = 0;
 	}
 }
 

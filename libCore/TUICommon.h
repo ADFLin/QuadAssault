@@ -480,8 +480,11 @@ public:
 	template < class T >
 	static T castFast( CoreImpl* ui )
 	{
-		assert( dynamic_cast< T >( ui ) );
+#if _DEBUG
+		return dynamic_cast< T >( ui );
+#else
 		return static_cast< T >( ui );
+#endif
 	}
 
 

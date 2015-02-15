@@ -41,3 +41,9 @@ ObjectClass* LevelObject::StaticClass()
 	return &myClass;
 }
 
+void LevelObject::enumProp(IPropEditor& editor)
+{
+	ClassEditReigster reg( editor );
+	reigsterContext( reg );
+}
+

@@ -12,13 +12,17 @@ public:
 	TVector3( T v[] ){ setValue( v[0] , v[1] , v[2] ); }
 	TVector3( RefConstType sx,RefConstType sy, RefConstType sz);
 
+	template< class Q >
+	TVector3( TVector3< Q > const& rhs )
+		:x( rhs.x ),y(rhs.y),z(rhs.z){}
+
 	void setValue( RefConstType sx,RefConstType sy,RefConstType sz)
 	{ x=sx; y=sy; z=sz;}
 
 	T length2() const { return dot( *this ); }
 
-	operator       T* ()       { return &x; }
-	operator const T* () const { return &x; }
+	operator T*(){ return &x; }
+	operator T const*() const { return &x; }
 
 	TVector3& operator += ( TVector3 const& v);
 	TVector3& operator -= ( TVector3 const& v);
@@ -33,11 +37,17 @@ public:
 	T        dot(TVector3 const& b) const;
 	TVector3 cross(TVector3 const& b) const;
 
-	//float x()const { return x; }
-	//float y()const { return y; }
-	//float z()const { return z; }
+	bool     operator == ( TVector3 const& v ) const { return x == v.x && y == v.y && z == v.z; }
+	bool     operator != ( TVector3 const& v ) const { return !this->operator == ( v ); }
+
 public:
 	T x,y,z;
+
+private:
+	void operator + ( int ) const;
+	void operator - ( int ) const;
+	void operator +=( int ) const;
+	void operator -=( int ) const;
 };
 
 
@@ -95,16 +105,23 @@ inline TVector3<T> operator- (TVector3<T> const& a,TVector3<T> const& b)
 }
 
 template< class T >
-inline TVector3<T> operator * ( typename TVector3<T>::RefConstType a , TVector3<T> const& b )
+inline TVector3<T> operator * ( typename TVector3<T>::RefConstType s , TVector3<T> const& v )
 {
-	return TVector3< T >(a*b.x,a*b.y,a*b.z);
+	return TVector3< T >( s*v.x , s*v.y , s*v.z );
 }
 
 template< class T >
-inline TVector3<T> operator*(TVector3<T> const& b, typename TVector3<T>::RefConstType a)
+inline TVector3<T> operator*(TVector3<T> const& v, typename TVector3<T>::RefConstType s)
 {
-	return TVector3<T>(a*b.x,a*b.y,a*b.z);
+	return TVector3<T>( s*v.x , s*v.y , s*v.z );
 }
+
+template< class T >
+inline TVector3<T> operator/(TVector3<T> const& v, typename TVector3<T>::RefConstType s)
+{
+	return TVector3<T>( v.x / s , v.y / s , v.z / s );
+}
+
 
 template< class T >
 inline TVector3<T> operator-(TVector3<T> const& a)

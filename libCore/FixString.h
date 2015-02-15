@@ -64,13 +64,14 @@ public:
 	FixString& operator += ( StdString const& str ){ CFT::cat( mStr , str.c_str() ); return *this; }
 
 
-	void  clear(){ mStr[0] = 0; }
-	void  format( CharT const* fmt , ... )
+	void       clear(){ mStr[0] = 0; }
+	FixString& format( CharT const* fmt , ... )
 	{
 		va_list argptr;
 		va_start( argptr, fmt );
 		CFT::vprintf( mStr , fmt , argptr );
 		va_end( argptr );
+		return *this;
 	}
 
 

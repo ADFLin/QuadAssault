@@ -43,7 +43,7 @@ public:
 	GLuint mTexBuffers[ NUM_BUFFER_TYPE ];
 
 	GLuint mFBO;
-	GLuint mFBODepth;
+	GLuint mRBODepth;
 };
 
 #endif // GBuffer_h__

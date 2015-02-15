@@ -10,7 +10,10 @@ public:
 	IObjectRenderer();
 
 	virtual void render( RenderPass pass , LevelObject* object ) = 0;
-	virtual void renderGroup( RenderPass pass , int numObj, LevelObject* object );
+	virtual void renderGroup( RenderPass pass , int numObj , LevelObject* object );
+
+	virtual void renderMRT( LevelObject* object ){}
+	virtual void renderGroupMRT( int numObj , LevelObject* object );
 
 	int    getOrder(){ return mRenderOrder; }
 	static LevelObject* nextObject( LevelObject* obj ){ return obj->renderLink; }

@@ -106,8 +106,8 @@ private:
 	static int const NumMode = 3;
 	Shader* mShaderScene[NumMode];
 
-	GLuint mFBOColor;	
-	GLuint mFBODepth;
+	GLuint mFBO;	
+	GLuint mRBODepth;
 	GLuint mTexLightmap;
 	GLuint mTexNormalMap;
 	GLuint mTexGeometry;

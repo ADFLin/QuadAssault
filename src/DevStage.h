@@ -8,6 +8,7 @@
 class TestBase
 {
 public:
+	virtual ~TestBase(){}
 	virtual bool onInit() = 0;
 	virtual void setDevMsg( FString& str ){}
 	virtual void onUpdate( float dt ){}

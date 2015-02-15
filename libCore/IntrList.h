@@ -195,10 +195,10 @@ public:
 		clear();
 	}
 
-	RType  front(){ return TP::fixRT( HookTraits::castValue< T >( NodeTraits::getNext( mHeader ) ) ); }
-	RType  back() { return TP::fixRT( HookTraits::castValue< T >( NodeTraits::getPrev( mHeader ) ) ); }
+	RType  front(){ return TP::fixRT( HookTraits::castValue< T >( *NodeTraits::getNext( &mHeader ) ) ); }
+	RType  back() { return TP::fixRT( HookTraits::castValue< T >( *NodeTraits::getPrev( &mHeader ) ) ); }
 
-	bool   empty() const { return NodeTraits::getNext( mHeader ) != &mHeader; }
+	bool   empty() const { return NodeTraits::getNext( &mHeader ) != &mHeader; }
 	size_t size() const {  return Algorithm::count( NodeTraits::getNext( &mHeader ) , &mHeader );  }
 
 

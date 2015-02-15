@@ -33,8 +33,8 @@ void Bullet::onSpawn( unsigned flag )
 {
 	BaseClass::onSpawn( flag );
 	mBody.setSize( Vec2f( 2 , 2 ) );
-	mBody.setMask( COL_BULLET | COL_RENDER );
-	mBody.setMaskCheck( COL_SOILD | COL_FLY_SOILD | COL_TERRAIN );
+	mBody.setTypeMask( COL_BULLET | COL_RENDER );
+	mBody.setColMask( COL_SOILD | COL_FLY_SOILD | COL_TERRAIN );
 	getLevel()->getColManager().addBody( *this , mBody );
 }
 

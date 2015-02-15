@@ -4,12 +4,6 @@
 
 namespace Detail
 {
-	template< class T >
-	struct ManagePolicy
-	{
-		class ManageType;
-		void release( T* ptr );
-	};
 
 	template< class T >
 	struct PtrPolicy
@@ -115,7 +109,7 @@ class TArrayHolder : public Detail::HolderImpl< T , Detail::ArrayPtrPolicy< T > 
 {
 public:
 	TArrayHolder(){}
-	explicit TArrayHolder(T* ptr):Detail::HolderImpl< T , Detail::ArrayPtrPolicy >(ptr){}
+	explicit TArrayHolder(T* ptr):Detail::HolderImpl< T , Detail::ArrayPtrPolicy< T > >(ptr){}
 
 	operator T*()             { return m_ptr;  }
 	operator T const*() const { return m_ptr;  }

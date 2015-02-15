@@ -13,7 +13,7 @@ void LaserMob::init()
 	mSize.x=64;
 	mSize.y=64;
 	
-	maxbrzina=150;	
+	mMaxSpeed=150;	
 	brzinaPunjenja=250;	
 	domet=512;
 
@@ -40,19 +40,21 @@ void LaserMob::tick()
 
 	shoot( IBulletFactory::Make< LaserBullet >() );
 
-	Vec2f dir = getLevel()->getPlayer()->getPos()- getPos();
-	
-	if( dir.length2()<300 * 300 )
+	if ( mTarget )
 	{
-		brzina-=100*TICK_TIME;
-		if(brzina<0)
-			brzina=0;
-	}
-	else
-	{
-		brzina+=100*TICK_TIME;
-		if(brzina>maxbrzina)
-			brzina=maxbrzina;
+		Vec2f dir = mPosLastView - getPos();
+		if( dir.length2() < 300 * 300 )
+		{
+			mSpeed -= 100*TICK_TIME;
+			if( mSpeed < 0 )
+				mSpeed = 0;
+		}
+		else
+		{
+			mSpeed += 100*TICK_TIME;
+			if( mSpeed > mMaxSpeed )
+				mSpeed = mMaxSpeed;
+		}
 	}
 }
 

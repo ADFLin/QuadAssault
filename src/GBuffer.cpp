@@ -5,15 +5,15 @@ GBuffer::GBuffer()
 {
 	mFBO = 0;
 	std::fill_n( mTexBuffers , (int)NUM_BUFFER_TYPE , GLuint(0) );
-	mFBODepth = 0;
+	mRBODepth = 0;
 }
 
 GBuffer::~GBuffer()
 {
 	if ( mTexBuffers[0] )
 		glDeleteTextures( NUM_BUFFER_TYPE , mTexBuffers );
-	if ( mFBODepth )
-		glDeleteFramebuffers( 1 , &mFBODepth );
+	if ( mRBODepth )
+		glDeleteRenderbuffers( 1 , &mRBODepth );
 	if ( mFBO )
 		glDeleteFramebuffers( 1 , &mFBO );
 }
@@ -41,10 +41,11 @@ bool GBuffer::create(int w , int h)
 		return false;
 	}
 
-	//glGenRenderbuffers(1, &mFBODepth );  
-	//glBindRenderbuffer(GL_RENDERBUFFER, mFBODepth );  
+#if 0
+	glGenRenderbuffers(1, &mRBODepth );  
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBODepth );  
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h );
-
+#endif
 	// restore default FBO
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 

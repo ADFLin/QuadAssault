@@ -20,9 +20,9 @@ RenderEngine::RenderEngine()
 
 bool RenderEngine::init( int width , int height )
 {
-	//mAmbientLight=Vec3f(0.1f, 0.1f, 0.1f);
-	mAmbientLight.setValue( 0 , 0 , 0 );
-	//mAmbientLight=Vec3f(0.3f, 0.3f, 0.3f);
+	mAmbientLight = Vec3f(0.1f, 0.1f, 0.1f);
+	//mAmbientLight = Vec3f( 0 , 0 , 0 );
+	//mAmbientLight = Vec3f(0.3f, 0.3f, 0.3f);
 
 	mFrameWidth  = width;
 	mFrameHeight = height;
@@ -42,7 +42,8 @@ bool RenderEngine::init( int width , int height )
 
 void RenderEngine::cleanup()
 {
-	glDeleteFramebuffers(1,&mFBOColor);
+	glDeleteFramebuffers(1,&mFBO);
+	glDeleteFramebuffers(1,&mRBODepth );
 	glDeleteTextures(1,&mTexLightmap);
 	glDeleteTextures(1,&mTexNormalMap);
 	glDeleteTextures(1,&mTexGeometry);
@@ -54,8 +55,7 @@ bool RenderEngine::setupFBO( int width , int height )
 	if ( !mGBuffer.create( width , height ) )
 		return false;
 
-
-	glGenFramebuffers(1,&mFBOColor);
+	glGenFramebuffers(1,&mFBO);
 
 	glGenTextures(1,&mTexLightmap);
 	glBindTexture(GL_TEXTURE_2D,mTexLightmap);
@@ -93,8 +93,8 @@ bool RenderEngine::setupFBO( int width , int height )
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 
-	glGenRenderbuffers(1, &mFBODepth );  
-	glBindRenderbuffer(GL_RENDERBUFFER, mFBODepth );  
+	glGenRenderbuffers(1, &mRBODepth );  
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBODepth );  
 	//glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8 , width , height);  
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width , height );
 
@@ -293,7 +293,7 @@ void RenderEngine::setupLightShaderParam( Shader* shader , Light* light )
 
 void RenderEngine::renderGeometryFBO( RenderParam& param )
 {
-	glBindFramebuffer(GL_FRAMEBUFFER ,mFBOColor);		
+	glBindFramebuffer(GL_FRAMEBUFFER ,mFBO);		
 	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, mTexGeometry, 0); 	
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
@@ -314,7 +314,7 @@ void RenderEngine::renderGeometryFBO( RenderParam& param )
 
 void RenderEngine::renderNormalFBO( RenderParam& param )
 {
-	glBindFramebuffer( GL_FRAMEBUFFER ,mFBOColor);		
+	glBindFramebuffer( GL_FRAMEBUFFER ,mFBO);		
 	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, mTexNormalMap, 0 ); 	
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
@@ -340,9 +340,9 @@ void RenderEngine::renderLightingFBO( RenderParam& param )
 {
 	renderNormalFBO( param );
 
-	glBindFramebuffer(GL_FRAMEBUFFER ,mFBOColor);		
+	glBindFramebuffer(GL_FRAMEBUFFER ,mFBO);		
 	glFramebufferTexture2D(GL_FRAMEBUFFER , GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, mTexLightmap, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mFBODepth ); 
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBODepth ); 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -442,8 +442,9 @@ void RenderEngine::renderLightingFBO( RenderParam& param )
 #endif
 
 			glPopMatrix();
-			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
 			glStencilFunc(GL_EQUAL, 0, 1);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 			glColorMask(true, true, true, true);
 		}
 		else
@@ -610,7 +611,6 @@ void RenderEngine::updateRenderGroup( RenderParam& param )
 		RenderGroup* group;
 		if ( iterGroup != mRenderGroups.end() && (*iterGroup)->renderer == renderer )
 		{
-			
 			group = *iterGroup;
 			obj->renderLink = group->objectLists;
 			group->objectLists = obj;

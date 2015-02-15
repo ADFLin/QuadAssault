@@ -12,8 +12,8 @@ class ColBody
 public:
 	ColBody();
 
-	void setMask( unsigned mask ){ colMask = mask; }
-	void setMaskCheck( unsigned mask ){ colMaskCheck = mask; }
+	void setTypeMask( unsigned mask ){ typeMask = mask; }
+	void setColMask( unsigned mask ){ colMask = mask; }
 	void setSize( Vec2f const& size ){ halfSize = size / 2; bUpdateSize = true; }
 	void setOffset( Vec2f const& offset ){ mOffset = offset;  }
 
@@ -29,8 +29,8 @@ private:
 
 	bool         bUpdateSize;
 	Vec2f        halfSize;
-	unsigned     colMaskCheck;
 	unsigned     colMask;
+	unsigned     typeMask;
 	Vec2f        cachePos;
 	Rect         boundBox;
 	int          idxCell;

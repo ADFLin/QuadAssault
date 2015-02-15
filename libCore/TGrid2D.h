@@ -2,7 +2,7 @@
 #define TGrid2D_h__
 
 #include <cassert>
-
+#include "CppVersion.h"
 
 template< class T >
 class MappingPolicy
@@ -18,6 +18,7 @@ template< class T >
 struct SimpleMapping
 {
 public:
+
 	static T&       getData( T* storage , int sx , int sy , int i , int j )             
 	{ assert( storage ); return storage[ i + sx * j ];  }
 	static T const& getData( T const* storage , int sx , int sy , int i , int j )
@@ -33,6 +34,13 @@ template < class T >
 struct FastMapping
 {
 	FastMapping(){  mMap = 0;  }
+#if CPP_RVALUE_REFENCE_SUPPORT
+	FastMapping( FastMapping&& rhs )
+		:mMap( rhs.mMap )
+	{
+		rhs.mMap = 0;
+	}
+#endif
 	T&       getData( T* storage , int sx , int sy , int i , int j )             
 	{ assert( mMap ); return mMap[j][i]; }
 	T const& getData( T const* storage , int sx , int sy , int i , int j ) const 
@@ -84,6 +92,25 @@ public:
 
 	~TGrid2D(){  cleanup(); }
 
+#if CPP_RVALUE_REFENCE_SUPPORT
+	TGrid2D( TGrid2D&& rhs )
+		:MP( rhs )
+		,mStorage( rhs.mStorage )
+		,mSizeX( rhs.mSizeX )
+		,mSizeY( rhs.mSizeY )
+	{
+		rhs.mStorage = 0;
+		rhs.mSizeX = 0;
+		rhs.mSizeY = 0;
+	}
+
+	TGrid2D& operator = ( TGrid2D&& rhs )
+	{
+		this->swap( rhs );
+		return *this;
+	}
+#endif
+
 	typedef T*       iterator;
 	typedef T const* const_iterator;
 
@@ -132,10 +159,11 @@ public:
 	void     swap( TGrid2D& other )
 	{
 		using std::swap;
+		MP::swap( other );
 		swap( mStorage , other.mStorage );
 		swap( mSizeX , other.mSizeX );
 		swap( mSizeY , other.mSizeY );
-		MP::swap( *this );
+		
 	}
 
 

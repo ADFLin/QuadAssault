@@ -40,9 +40,9 @@ protected:
 	float punjenje;
 
 	//NASLIJED:
-	float   brzina;
-	float   maxbrzina;
-	short   mHP;
+	float   mSpeed;
+	float   mMaxSpeed;
+	float   mHP;
 	float   brzinaPunjenja;
 	float   domet;
 	Player* mTarget;

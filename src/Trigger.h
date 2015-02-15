@@ -70,7 +70,7 @@ public:
 private:
 	ColBody mBody;
 	typedef std::vector< LevelObject* >  ObjectList;
-	std::vector< LevelObject* > mTouchObjects;
+	ObjectList mTouchObjects;
 
 	BEGIN_CLASS_PROP()
 	MEMBER_PROP( "AreaSize" , mSize )

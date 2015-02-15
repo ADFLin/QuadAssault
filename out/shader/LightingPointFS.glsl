@@ -37,15 +37,12 @@ MaterialParam getMaterial( in float id )
 
 void main()
 {
-	vec3 normal = texture2D( texNormal , gl_TexCoord[0].st ).rgb;
+	vec3 N = texture2D( texNormal , gl_TexCoord[0].st ).rgb;
 	float matId = texture2D( texNormal , gl_TexCoord[0].st ).a;
 	vec3 baseColor = texture2D( texBaseColor , gl_TexCoord[0].st ).rgb;
 
-	if ( normal == vec3(0,0,0) )
+	if ( N == vec3(0,0,0) )
 		discard;
-
-	normal = 2.0 * normal - 1.0;
-	normal = normalize(normal);
 
 	vec2 offset = gLight.pos - position;
 	float d = length( offset );
@@ -53,14 +50,16 @@ void main()
 	if ( d > gLight.radius )
 		discard;
 
+	vec3 normal = normalize( 2.0 * N - 1.0 );
 	vec3 lightDir = normalize( vec3( offset.x  , offset.y  , 50 ) );
-	vec3 hDir = reflect( lightDir , normal );
-
-	float difFactor = clamp( dot( lightDir , normal ) , 0.0 , 1.0 );
-
-	if ( texture2D( texNormal , gl_TexCoord[0].st ).rgb == vec3(1,1,1) )
+	
+	float difFactor;
+	if ( N == vec3(1,1,1) )
 		difFactor = 1.0;
+	else
+		difFactor = clamp( dot( lightDir , normal ) , 0.0 , 1.0 );
 
+	vec3 hDir = reflect( lightDir , normal );
 
 	float speFactor = clamp( dot( hDir , vec3(0,0,-1) ) , 0.0 , 1.0 );
 	float decay = clamp(( 1.0 - d / gLight.radius ), 0.0, 1.0 ) / ( d + 1 );

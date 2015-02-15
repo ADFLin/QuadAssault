@@ -37,6 +37,14 @@ void IObjectRenderer::renderGroup( RenderPass pass , int numObj, LevelObject* ob
 	} 
 }
 
+void IObjectRenderer::renderGroupMRT( int numObj , LevelObject* object )
+{
+	for( ; object ; object = nextObject( object ) )
+	{
+		renderMRT( object );
+	} 
+}
+
 class PlayerRenderer : public IObjectRenderer
 {
 public:

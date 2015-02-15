@@ -533,11 +533,11 @@ void LevelStage::loadLevel()
 
 	if ( mapFS.good() )
 	{
-		String linija_;
+		std::string linija_;
 		while(getline(mapFS,linija_))
 		{
 			std::istringstream lstring(linija_,std::ios::in);
-			String token;
+			std::string token;
 			while( getline(lstring,token,' ') )
 			{
 				if(token=="block")

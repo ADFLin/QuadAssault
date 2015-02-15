@@ -78,12 +78,28 @@ public:
 		float radius;
 	};
 
-	class LightingShaderParam
+	class ShaderEffect
 	{
 	public:
-		void init( Shader* shader )
+		ShaderEffect()
 		{
-			mShader = shader;
+			mShader = NULL;
+		}
+		void begin(){ mShader->bind(); }
+		void end(){ mShader->unbind(); }
+		Shader* mShader;
+	};
+
+	class LightingShaderEffect : public ShaderEffect
+	{
+	public:
+
+		bool init()
+		{
+			mShader = getRenderSystem()->createShader( "LightingPointVS.glsl" , "LightingPointFS.glsl" );
+			if ( !mShader )
+				return false;
+
 			locTexMaterial  = mShader->getParamLoc( "texMaterial" );
 			locTexBaseColor = mShader->getParamLoc( "texBaseColor" );
 			locTexNormal = mShader->getParamLoc( "texNormal" );
@@ -93,6 +109,7 @@ public:
 			locAmbIntensity = mShader->getParamLoc( "gLight.ambIntensity" );
 			locDifIntensity = mShader->getParamLoc( "gLight.difIntensity" );
 			locSpeIntensity = mShader->getParamLoc( "gLight.speIntensity" );
+			return true;
 		}
 
 		void setTexture( GBuffer* buffer , GLuint texMat )
@@ -111,8 +128,6 @@ public:
 			mShader->setParam( locDifIntensity , light.difIntensity );
 			mShader->setParam( locSpeIntensity , light.speIntensity );
 		}
-
-		Shader* mShader;
 		int locTexMaterial;
 		int locTexBaseColor;
 		int locTexNormal;
@@ -122,7 +137,35 @@ public:
 		int locAmbIntensity;
 		int locDifIntensity;
 		int locSpeIntensity;
+	};
 
+	class GeomShaderEffect : public ShaderEffect
+	{
+	public:
+		bool init()
+		{
+			mShader = getRenderSystem()->createShader( "GeomDefaultVS.glsl" , "GeomDefaultFS.glsl" );
+			if ( !mShader )
+				return false;
+
+			locTexDiffuse = mShader->getParamLoc( "texDiffuse" );
+			locTexNormal  = mShader->getParamLoc( "texNormal" );
+			locTexGlow = mShader->getParamLoc( "texGlow" );
+			locMatId = mShader->getParamLoc( "matId" );
+			return true;
+		}
+		void setTexture( GLuint texDif , GLuint texN , GLuint texG )
+		{
+			mShader->setTexture2D( locTexDiffuse , texDif , 0 );
+			mShader->setTexture2D( locTexNormal , texN , 1 );
+			mShader->setTexture2D( locTexGlow , texG , 2 );
+		}
+		void setMaterial( int id ){ mShader->setParam( locMatId , MatId2TexCoord( id ) ); }
+
+		int locTexDiffuse;
+		int locTexNormal;
+		int locTexGlow;
+		int locMatId;
 	};
 
 	static int const MaxRegMaterialNum = 512;
@@ -186,10 +229,11 @@ public:
 	{
 		RenderSystem* renderSys = getRenderSystem();
 
-		mGeomShader = renderSys->createShader( "GeomDefaultVS.glsl" , "GeomDefaultFS.glsl" );
 		mLightingGlowShader = renderSys->createShader( "LightingGlowVS.glsl" , "LightingGlowFS.glsl" );
-		mLightingShader = renderSys->createShader( "LightingPointVS.glsl" , "LightingPointFS.glsl" );
-		mLightingParam.init( mLightingShader );
+		if ( !mGeomSE.init() )
+			return false;
+		if ( !mLightingSE.init() )
+			return false;
 
 		TextureManager* texMgr = getRenderSystem()->getTextureMgr();
 
@@ -263,22 +307,21 @@ public:
 
 	virtual void onRender()
 	{
-		mGeomShader->bind();
-
+		
 		mGBuffer->bind();
 
 		//glDepthMask(GL_TRUE);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-		mGeomShader->setTexture2D( "texDiffuse" , mTexBlock[0]->id , 0 );
-		mGeomShader->setTexture2D( "texNormal" , mTexBlock[1]->id , 1 );
-		mGeomShader->setTexture2D( "texGlow" , 0 , 2 );
+		mGeomSE.begin();
+		mGeomSE.setTexture( mTexBlock[RP_DIFFUSE]->id , mTexBlock[RP_NORMAL]->id , 0 );
 
 		for( int j = 0 ; j < 10 ; ++j )
+		{
 			for( int i = 0 ; i < 20 ; ++i )
 			{
-				mGeomShader->setParam( "matId" , MatId2TexCoord(( i ) % 4 ) );
+				mGeomSE.setMaterial( ( i ) % 4 );
 				Vec2f pos( 10 + BLOCK_SIZE * i , 10 + BLOCK_SIZE * j );
 				Vec2f size( BLOCK_SIZE , BLOCK_SIZE );
 				glBegin(GL_QUADS);
@@ -288,106 +331,104 @@ public:
 				glTexCoord2f(0.0, 1.0); glVertex2f(pos.x, pos.y+size.y);
 				glEnd();
 			}
+		}
+		mGeomSE.setTexture( mTexObject[RP_DIFFUSE]->id , mTexObject[RP_NORMAL]->id , mTexObject[ RP_GLOW ]->id );
+		mGeomSE.setMaterial( ( 0 ) % 4 );
 
-			mGeomShader->setTexture2D( "texDiffuse" , mTexObject[0]->id , 0 );
-			mGeomShader->setTexture2D( "texNormal" , mTexObject[1]->id , 1 );
-			mGeomShader->setTexture2D( "texGlow" , mTexObject[2]->id , 2 );
+		drawSprite( Vec2f( 200 + 64 * 1 , 100 ) , Vec2f( 64 , 64 ) , 0.0f );	
+		drawSprite( Vec2f( 300 + 64 * 2 , 210 ) , Vec2f( 64 , 64 ) , 0.0f );
+
+		mGeomSE.end();
 
 
-			mGeomShader->setParam( "matId" , MatId2TexCoord(( 0 ) % 4 ) );
-			drawSprite( Vec2f( 200 + 64 * 1 , 100 ) , Vec2f( 64 , 64 ) , 0.0f );	
-			drawSprite( Vec2f( 300 + 64 * 2 , 210 ) , Vec2f( 64 , 64 ) , 0.0f );	
+		mGBuffer->unbind();
 
 
-			mGBuffer->unbind();
-			mGeomShader->unbind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_ONE , GL_ONE );
 
-			glEnable( GL_BLEND );
-			glBlendFunc( GL_ONE , GL_ONE );
+		Vec2i size = getGame()->getScreenSize();
 
-			Vec2i size = getGame()->getScreenSize();
+		mLightingGlowShader->bind();
+		mLightingGlowShader->setTexture2D( "texBaseColor" , mGBuffer->getTexture( GBuffer::eBASE_COLOR ) , 0 );
+		mLightingGlowShader->setTexture2D( "texGlow" , mGBuffer->getTexture( GBuffer::eLIGHTING ) , 1 );
 
-			mLightingGlowShader->bind();
-			mLightingGlowShader->setTexture2D( "texBaseColor" , mGBuffer->getTexture( GBuffer::eBASE_COLOR ) , 0 );
-			mLightingGlowShader->setTexture2D( "texGlow" , mGBuffer->getTexture( GBuffer::eLIGHTING ) , 1 );
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0, 1.0); glVertex2f(0, 0);
+		glTexCoord2f(1.0, 1.0); glVertex2f(size.x, 0);
+		glTexCoord2f(1.0, 0.0); glVertex2f(size.x, size.y);
+		glTexCoord2f(0.0, 0.0); glVertex2f(0, size.y);
+		glEnd();
+		mLightingGlowShader->unbind();
+
+		mLightingSE.begin();
+		mLightingSE.setTexture( mGBuffer , mTexMaterial );
+
+		for( int i = 0 ; i < ARRAY_SIZE( mLights ) ; ++i )
+		{
+			Light& light = mLights[i];
+
+			mLightingSE.setLight( light );
+
+			Vec2f halfRange =  Vec2f( light.radius , light.radius ); 
+
+			Vec2f minRender = light.pos - halfRange;
+			Vec2f maxRender = light.pos + halfRange;
+
+			Vec2f minTex , maxTex;
+			minTex.x = minRender.x / size.x;
+			maxTex.x = maxRender.x / size.x;
+			minTex.y = 1 - minRender.y / size.y;
+			maxTex.y = 1 - maxRender.y / size.y;
+
+			glColor3f(1,1,1);
 
 			glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 1.0); glVertex2f(0, 0);
-			glTexCoord2f(1.0, 1.0); glVertex2f(size.x, 0);
-			glTexCoord2f(1.0, 0.0); glVertex2f(size.x, size.y);
-			glTexCoord2f(0.0, 0.0); glVertex2f(0, size.y);
-			glEnd();
-			mLightingGlowShader->unbind();
+			glTexCoord2f(minTex.x,minTex.y); glVertex2f( minRender.x , minRender.y );
+			glTexCoord2f(maxTex.x,minTex.y); glVertex2f( maxRender.x , minRender.y );
+			glTexCoord2f(maxTex.x,maxTex.y); glVertex2f( maxRender.x , maxRender.y );
+			glTexCoord2f(minTex.x,maxTex.y); glVertex2f( minRender.x , maxRender.y );
+			glEnd();	
 
-			mLightingShader->bind();
-			mLightingParam.setTexture( mGBuffer , mTexMaterial );
-
-			for( int i = 0 ; i < ARRAY_SIZE( mLights ) ; ++i )
-			{
-				Light& light = mLights[i];
-
-				mLightingParam.setLight( light );
-
-				Vec2f halfRange =  Vec2f( light.radius , light.radius ); 
-
-				Vec2f minRender = light.pos - halfRange;
-				Vec2f maxRender = light.pos + halfRange;
-
-				Vec2f minTex , maxTex;
-				minTex.x = minRender.x / size.x;
-				maxTex.x = maxRender.x / size.x;
-				minTex.y = 1 - minRender.y / size.y;
-				maxTex.y = 1 - maxRender.y / size.y;
-
-				glColor3f(1,1,1);
-
-				glBegin(GL_QUADS);
-				glTexCoord2f(minTex.x,minTex.y); glVertex2f( minRender.x , minRender.y );
-				glTexCoord2f(maxTex.x,minTex.y); glVertex2f( maxRender.x , minRender.y );
-				glTexCoord2f(maxTex.x,maxTex.y); glVertex2f( maxRender.x , maxRender.y );
-				glTexCoord2f(minTex.x,maxTex.y); glVertex2f( minRender.x , maxRender.y );
-				glEnd();	
-
-			}
+		}
+		mLightingSE.end();
 
 
-			mLightingShader->unbind();
-
-			glDisable( GL_BLEND );
+		glDisable( GL_BLEND );
 
 
 #if 0
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable( GL_TEXTURE_2D );
+
+		{
+			Vec2i pos( 50 , 50 );
+			Vec2i size( 200 , 100 );
+			glBindTexture( GL_TEXTURE_2D , mGBuffer->getBuffer( GBuffer::eDIFFUSE ) );
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0, 0.0); glVertex2f(pos.x, pos.y);
+			glTexCoord2f(1.0, 0.0); glVertex2f(pos.x+size.x, pos.y);
+			glTexCoord2f(1.0, 1.0); glVertex2f(pos.x+size.x, pos.y+size.y);
+			glTexCoord2f(0.0, 1.0); glVertex2f(pos.x, pos.y+size.y);
+			glEnd();
+		}
+
+
+		{
+			Vec2i pos( 50 + 200 , 50 );
+			Vec2i size( 200 , 100 );
 			glEnable( GL_TEXTURE_2D );
-
-			{
-				Vec2i pos( 50 , 50 );
-				Vec2i size( 200 , 100 );
-				glBindTexture( GL_TEXTURE_2D , mGBuffer->getBuffer( GBuffer::eDIFFUSE ) );
-				glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex2f(pos.x, pos.y);
-				glTexCoord2f(1.0, 0.0); glVertex2f(pos.x+size.x, pos.y);
-				glTexCoord2f(1.0, 1.0); glVertex2f(pos.x+size.x, pos.y+size.y);
-				glTexCoord2f(0.0, 1.0); glVertex2f(pos.x, pos.y+size.y);
-				glEnd();
-			}
-
-
-			{
-				Vec2i pos( 50 + 200 , 50 );
-				Vec2i size( 200 , 100 );
-				glEnable( GL_TEXTURE_2D );
-				glBindTexture( GL_TEXTURE_2D , mGBuffer->getBuffer( GBuffer::eNORMAL ) );
-				glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex2f(pos.x, pos.y);
-				glTexCoord2f(1.0, 0.0); glVertex2f(pos.x+size.x, pos.y);
-				glTexCoord2f(1.0, 1.0); glVertex2f(pos.x+size.x, pos.y+size.y);
-				glTexCoord2f(0.0, 1.0); glVertex2f(pos.x, pos.y+size.y);
-				glEnd();
-			}
+			glBindTexture( GL_TEXTURE_2D , mGBuffer->getBuffer( GBuffer::eNORMAL ) );
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0, 0.0); glVertex2f(pos.x, pos.y);
+			glTexCoord2f(1.0, 0.0); glVertex2f(pos.x+size.x, pos.y);
+			glTexCoord2f(1.0, 1.0); glVertex2f(pos.x+size.x, pos.y+size.y);
+			glTexCoord2f(0.0, 1.0); glVertex2f(pos.x, pos.y+size.y);
+			glEnd();
+		}
 #endif
 
 
@@ -404,10 +445,9 @@ public:
 	Light     mLights[ 3 ];
 
 	FPtr< GBuffer >  mGBuffer;
-	Shader*   mGeomShader;
 	Shader*   mLightingGlowShader;
-	Shader*   mLightingShader;
-	LightingShaderParam mLightingParam;
+	GeomShaderEffect     mGeomSE;
+	LightingShaderEffect mLightingSE;
 };
 
 DevStage::DevStage()

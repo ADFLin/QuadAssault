@@ -13,8 +13,8 @@ void PlasmaMob::init()
 	mSize.x=64;
 	mSize.y=64;
 	
-	brzina=75;
-	maxbrzina=75;
+	mSpeed=75;
+	mMaxSpeed=75;
 	brzinaPunjenja=50;	
 	domet=512;
 	mHP=60;
@@ -32,19 +32,21 @@ void PlasmaMob::tick()
 	
 	shoot( IBulletFactory::Make< PlasmaBullet >() );	
 	
-	Vec2f dir;
-	dir= getLevel()->getPlayer()->getPos() - getPos();
-	if( dir.length2()<300 * 300 )
+	if ( mTarget )
 	{
-		brzina-=100*TICK_TIME;
-		if(brzina<0)
-			brzina=0;
-	}
-	else
-	{
-		brzina+=100*TICK_TIME;
-		if(brzina>maxbrzina)
-			brzina=maxbrzina;
+		Vec2f dir = mPosLastView - getPos();
+		if( dir.length2() < 300 * 300 )
+		{
+			mSpeed -= 100*TICK_TIME;
+			if( mSpeed < 0 )
+				mSpeed = 0;
+		}
+		else
+		{
+			mSpeed += 100*TICK_TIME;
+			if( mSpeed > mMaxSpeed )
+				mSpeed = mMaxSpeed;
+		}
 	}
 }
 

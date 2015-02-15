@@ -30,12 +30,16 @@ public:
 	TVector2& operator += ( TVector2 const& v ){  x += v.x;  y += v.y;  return *this;  }
 	TVector2& operator -= ( TVector2 const& v ){  x -= v.x;  y -= v.y;  return *this;  }
 
-	TVector2 const operator - ( void ){ return  TVector2( -x , -y );  }
+	TVector2 const operator - ( void ) const { return  TVector2( -x , -y );  }
 
-	operator T*()             { return &x; }
+	operator T*(){ return &x; }
 	operator T const*() const { return &x; }
 
 	static TVector2 Zero(){ return TVector2(0,0); }
+	static TVector2 PositiveX(){ return TVector2(1,0); }
+	static TVector2 PositiveY(){ return TVector2(0,1); }
+	static TVector2 NegativeX(){ return TVector2(-1,0); }
+	static TVector2 NegativeY(){ return TVector2(0,-1); }
 
 	TVector2 const operator + (TVector2 const& v) const {	return TVector2(x + v.x,y + v.y);  }
 	TVector2 const operator - (TVector2 const& v) const {	return TVector2(x - v.x,y - v.y);  }
@@ -50,6 +54,13 @@ public:
 
 public:
 	T x,y;
+
+private:
+	void operator + ( int ) const;
+	void operator - ( int ) const;
+	void operator +=( int ) const;
+	void operator -=( int ) const;
+
 };
 
 

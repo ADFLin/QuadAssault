@@ -31,9 +31,9 @@ public:
 	bool  updateBodySize( ColBody& body );
 
 	void  update();
-	bool  testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned maskCheckReplace = 0 );
-	Tile* rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned colMask );
-	Tile* testTerrainCollision( Rect const& bBox , unsigned colMask );
+	bool  testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned colMaskReplace = 0 );
+	Tile* rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned typeMask );
+	Tile* testTerrainCollision( Rect const& bBox , unsigned typeMask );
 	
 	void  findBody( Rect const& bBox , unsigned colMask , ColBodyVec& out );
 	float getCellLength(){ return mCellLength; }
@@ -44,7 +44,7 @@ private:
 	void updateBody( ColBody& body );
 	void calcCellPos( Vec2f const& pos , int& cx , int& cy );
 
-	Tile* rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned colMask );
+	Tile* rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned typeMask );
 	
 	
 	typedef IntrList< ColBody , MemberHook< ColBody , &ColBody::cellHook > >    CellBodyList;

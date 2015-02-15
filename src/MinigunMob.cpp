@@ -14,7 +14,7 @@ void MinigunMob::init()
 	mSize.x=64;
 	mSize.y=64;
 	
-	maxbrzina=250;	
+	mMaxSpeed=250;	
 	brzinaPunjenja=750;	
 	domet=512;
 
@@ -40,20 +40,24 @@ void MinigunMob::onDestroy( unsigned flag )
 void MinigunMob::tick()
 {
 	BaseClass::tick();
-	shoot( IBulletFactory::Make< MinigunBullet >() );	
-	Vec2f dir;
-	dir= getLevel()->getPlayer()->getPos()- getPos();
-	if( dir.length2()< 300 * 300 )
+
+	shoot( IBulletFactory::Make< MinigunBullet >() );
+
+	if ( mTarget )
 	{
-		brzina-=100* TICK_TIME;
-		if(brzina<0)
-			brzina=0;
-	}
-	else
-	{
-		brzina+=100* TICK_TIME;
-		if(brzina>maxbrzina)
-			brzina=maxbrzina;
+		Vec2f dir = mPosLastView - getPos();
+		if( dir.length2() < 300 * 300 )
+		{
+			mSpeed -= 100*TICK_TIME;
+			if( mSpeed < 0 )
+				mSpeed = 0;
+		}
+		else
+		{
+			mSpeed += 100*TICK_TIME;
+			if( mSpeed > mMaxSpeed )
+				mSpeed = mMaxSpeed;
+		}
 	}
 }
 

@@ -50,8 +50,8 @@ void Player::init()
 	brzina=200;
 
 	mBody.setSize( getSize() - Vec2f(4,4) );
-	mBody.setMask( COL_SOILD | COL_PLAYER | COL_RENDER );
-	mBody.setMaskCheck( COL_TERRAIN | COL_OBJECT );
+	mBody.setTypeMask( COL_SOILD | COL_PLAYER | COL_RENDER );
+	mBody.setColMask( COL_TERRAIN | COL_OBJECT );
 }
 
 void Player::onSpawn( unsigned flag )

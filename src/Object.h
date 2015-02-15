@@ -85,11 +85,7 @@ public:
 	static  ObjectClass* StaticClass();
 	ObjectType   getType(){ return getClass()->getType(); }
 	virtual ObjectClass* getClass(){ return StaticClass(); }
-	virtual void enumProp( IPropEditor& editor )
-	{
-		ClassEditReigster reg( editor );
-		reigsterContext( reg );
-	}
+	virtual void enumProp( IPropEditor& editor );
 
 	virtual void init(){}
 	virtual void onSpawn( unsigned flag ){}

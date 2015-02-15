@@ -82,4 +82,16 @@ inline void* operator new ( size_t size , FrameAllocator& allocator  )
 	return out;
 }
 
+inline void* operator new[] ( size_t size , FrameAllocator& allocator  )
+{
+	void* out = allocator.alloc( size );
+	if ( !out )
+		throw std::bad_alloc();
+
+	return out;
+}
+
+
+
+
 #endif // FrameAllocator_h__

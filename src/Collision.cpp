@@ -8,8 +8,8 @@ ColBody::ColBody()
 	,halfSize( 0,0 )
 {
 	idxCell = -1;
+	typeMask = 0;
 	colMask = 0;
-	colMaskCheck = 0;
 	bUpdateSize = true;
 }
 
@@ -35,19 +35,17 @@ void CollisionManager::setup( float width , float height  , float cellLength  )
 	mCellLength = cellLength;
 }
 
-bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned maskCheckReplace )
+bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColBody& body , unsigned colMaskReplace )
 {
-	unsigned maskCheck = ( maskCheckReplace ) ? maskCheckReplace : body.colMaskCheck;
-
-	assert( body.halfSize.x < mCellLength / 2 && body.halfSize.y < mCellLength / 2 );
+	unsigned colMask = ( colMaskReplace ) ? colMaskReplace : body.colMask;
 
 	Rect bBox;
 	bBox.min = body.boundBox.min + offset;
 	bBox.max = body.boundBox.max + offset;
 
-	if ( maskCheck & COL_TERRAIN )
+	if ( colMask & COL_TERRAIN )
 	{
-		Tile* tile = testTerrainCollision( bBox , body.colMask );
+		Tile* tile = testTerrainCollision( bBox , body.typeMask );
 		if ( tile )
 		{
 			info.isTerrain = true;
@@ -56,7 +54,7 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 		}
 	}
 
-	if ( maskCheck & COL_OBJECT )
+	if ( colMask & COL_OBJECT )
 	{
 		//Test Global Object
 		for ( CellBodyList::iterator iter = mGlobalBodies.begin() , itEnd = mGlobalBodies.end();
@@ -67,7 +65,7 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 			if ( &bodyTest == &body )
 				continue;
 
-			if ( ( maskCheck & bodyTest.colMask ) == 0 )
+			if ( ( colMask & bodyTest.typeMask ) == 0 )
 				continue;
 
 			if ( !bBox.intersect( bodyTest.boundBox ) )
@@ -119,7 +117,7 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 					if ( &bodyTest == &body )
 						continue;
 
-					if ( ( maskCheck & bodyTest.colMask ) == 0 )
+					if ( ( colMask & bodyTest.typeMask ) == 0 )
 						continue;
 
 					if ( !bBox.intersect( bodyTest.boundBox ) )
@@ -140,13 +138,11 @@ bool CollisionManager::testCollision( ColInfo& info , Vec2f const& offset , ColB
 
 bool CollisionManager::checkCollision( ColBody& body )
 {
-
-
 	bool result = false;
 
-	if ( body.colMaskCheck & COL_TERRAIN )
+	if ( body.colMask & COL_TERRAIN )
 	{
-		Tile* tile = testTerrainCollision( body.boundBox , body.colMask );
+		Tile* tile = testTerrainCollision( body.boundBox , body.typeMask );
 
 		if ( tile )
 		{
@@ -155,7 +151,7 @@ bool CollisionManager::checkCollision( ColBody& body )
 		}
 	}
 
-	if ( body.colMaskCheck & COL_OBJECT )
+	if ( body.colMask & COL_OBJECT )
 	{
 		for ( CellBodyList::iterator iter = mGlobalBodies.begin() , itEnd = mGlobalBodies.end();
 			iter != itEnd ; ++iter )
@@ -165,7 +161,7 @@ bool CollisionManager::checkCollision( ColBody& body )
 			if ( &bodyTest == &body )
 				continue;
 
-			unsigned mask = body.colMaskCheck & bodyTest.colMask;
+			unsigned mask = body.colMask & bodyTest.typeMask;
 
 			if ( mask == 0 )
 				continue;
@@ -216,7 +212,7 @@ bool CollisionManager::checkCollision( ColBody& body )
 					if ( &bodyTest == &body )
 						continue;
 
-					unsigned mask = body.colMaskCheck & bodyTest.colMask;
+					unsigned mask = body.colMask & bodyTest.typeMask;
 
 					if ( mask == 0 )
 						continue;
@@ -353,14 +349,13 @@ void CollisionManager::calcCellPos( Vec2f const& pos , int& cx , int& cy )
 	cy = Math::clamp( int( pos.y / mCellLength ) , 0 , mCellMap.getSizeY() - 1 );
 }
 
-Tile* CollisionManager::rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned colMask  )
+Tile* CollisionManager::rayTerrainTest( Vec2f const& from , Vec2f const& to , unsigned typeMask  )
 {
 	Vec2i tpFrom = Vec2i( Math::floor( from.x / BLOCK_SIZE ) , Math::floor( from.y / BLOCK_SIZE ) );
 
-
 	Tile* out;
 
-	if ( out = rayBlockTest( tpFrom , from , to , colMask ) )
+	if ( out = rayBlockTest( tpFrom , from , to , typeMask ) )
 		return out;
 
 	Vec2i tpCur  = tpFrom;
@@ -373,7 +368,7 @@ Tile* CollisionManager::rayTerrainTest( Vec2f const& from , Vec2f const& to , un
 		while( tpCur.y != tpTo.y )
 		{
 			tpCur.y += delta;
-			if ( out = rayBlockTest( tpCur , from , to , colMask ) )
+			if ( out = rayBlockTest( tpCur , from , to , typeMask ) )
 				return out;	
 		}
 	}
@@ -383,13 +378,13 @@ Tile* CollisionManager::rayTerrainTest( Vec2f const& from , Vec2f const& to , un
 		while( tpCur.x != tpTo.x )
 		{
 			tpCur.x += delta;
-			if ( out = rayBlockTest( tpCur , from , to , colMask ) )
+			if ( out = rayBlockTest( tpCur , from , to , typeMask ) )
 				return out;	
 		}
 	}
 	else
 	{
-		Vec2f flac = from / float( BLOCK_SIZE ) - Vec2f( tpFrom );
+		Vec2f frac = from / float( BLOCK_SIZE ) - Vec2f( tpFrom );
 		Vec2f dif = to - from;
 		float slopeFactor = dif.y / dif.x;
 		if ( slopeFactor < 0 )
@@ -398,35 +393,35 @@ Tile* CollisionManager::rayTerrainTest( Vec2f const& from , Vec2f const& to , un
 		int deltaX = -1;
 		if ( tpDif.x > 0 )
 		{
-			flac.x = 1 - flac.x;
+			frac.x = 1 - frac.x;
 			deltaX = 1;
 		}
 
 		int deltaY = -1;
 		if ( tpDif.y > 0 )
 		{
-			flac.y = 1 - flac.y;
+			frac.y = 1 - frac.y;
 			deltaY = 1;
 		}
 
 		for(;;)
 		{
-			float yOff = flac.x * slopeFactor;
+			float yOff = frac.x * slopeFactor;
 
-			if ( flac.y > yOff )
+			if ( frac.y > yOff )
 			{
-				flac.y -= yOff;
-				flac.x = 1;
+				frac.y -= yOff;
+				frac.x = 1;
 				tpCur.x += deltaX;
 			}
 			else
 			{
-				flac.x -= flac.y / slopeFactor;
-				flac.y = 1;
+				frac.x -= frac.y / slopeFactor;
+				frac.y = 1;
 				tpCur.y += deltaY;
 			}
 
-			if ( out = rayBlockTest( tpCur , from , to , colMask ) )
+			if ( out = rayBlockTest( tpCur , from , to , typeMask ) )
 				return out;
 
 			if ( tpCur.x == tpTo.x && tpCur.y == tpTo.y )
@@ -436,7 +431,7 @@ Tile* CollisionManager::rayTerrainTest( Vec2f const& from , Vec2f const& to , un
 	return NULL;
 }
 
-Tile* CollisionManager::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned colMask )
+Tile* CollisionManager::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Vec2f const& to , unsigned typeMask )
 {
 	if ( !mTerrain->checkRange( tPos.x , tPos.y ) )
 		return NULL;
@@ -444,7 +439,7 @@ Tile* CollisionManager::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Ve
 	Tile& tile = mTerrain->getData( tPos.x , tPos.y );
 	Block* block = Block::FromType( tile.type );
 
-	if ( ( block->getColMask() & colMask ) == 0 )
+	if ( ( block->getColMask() & typeMask ) == 0 )
 		return NULL;
 
 	if ( block->checkFlag( BF_NONSIMPLE ) )
@@ -456,7 +451,7 @@ Tile* CollisionManager::rayBlockTest( Vec2i const& tPos , Vec2f const& from , Ve
 	return &tile;
 }
 
-Tile* CollisionManager::testTerrainCollision( Rect const& bBox , unsigned colMask )
+Tile* CollisionManager::testTerrainCollision( Rect const& bBox , unsigned typeMask )
 {
 	TileMap& terrain = *mTerrain;
 
@@ -472,7 +467,7 @@ Tile* CollisionManager::testTerrainCollision( Rect const& bBox , unsigned colMas
 			Tile& tile = terrain.getData( x , y );
 			Block* block = Block::FromType( tile.type );
 
-			if ( ( block->getColMask() & colMask ) == 0 )
+			if ( ( block->getColMask() & typeMask ) == 0 )
 				continue;
 
 			Rect bBoxOther;
@@ -501,7 +496,7 @@ void CollisionManager::findBody( Rect const& bBox , unsigned colMask , ColBodyVe
 	{
 		ColBody& bodyTest = *iter;
 
-		if ( ( colMask & bodyTest.colMask ) == 0 )
+		if ( ( colMask & bodyTest.typeMask ) == 0 )
 			continue;
 
 		if ( !bBox.hitTest( bodyTest.cachePos ) )
@@ -528,7 +523,7 @@ void CollisionManager::findBody( Rect const& bBox , unsigned colMask , ColBodyVe
 			{
 				ColBody& bodyTest = *iter;
 
-				if ( ( colMask & bodyTest.colMask ) == 0 )
+				if ( ( colMask & bodyTest.typeMask ) == 0 )
 					continue;
 
 				if ( !bBox.hitTest( bodyTest.cachePos ) )
