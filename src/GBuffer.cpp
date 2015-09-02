@@ -51,3 +51,18 @@ bool GBuffer::create(int w , int h)
 
 	return true;
 }
+
+void GBuffer::bind()
+{
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mFBO );
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mFBODepth ); 
+
+	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 , GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4};
+	glDrawBuffers( NUM_BUFFER_TYPE , DrawBuffers );
+}
+
+void GBuffer::unbind()
+{
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0 ); 
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+}
